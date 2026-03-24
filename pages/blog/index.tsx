@@ -1,0 +1,141 @@
+import { useState } from 'react'
+import Link from 'next/link'
+import Nav from '../../components/Nav'
+import Footer from '../../components/Footer'
+import PostCard from '../../components/PostCard'
+import SEO from '../../components/SEO'
+import { getAllPosts, getAllCategories, Post } from '../../lib/posts'
+
+interface Props {
+  posts: Post[]
+  categories: { name: string; count: number }[]
+}
+
+const PER_PAGE = 12
+
+export default function Blog({ posts, categories }: Props) {
+  const [activeCategory, setActiveCategory] = useState('Všetky')
+  const [page, setPage] = useState(1)
+
+  const filtered = activeCategory === 'Všetky'
+    ? posts
+    : posts.filter(p => p.categories.includes(activeCategory))
+
+  const totalPages = Math.ceil(filtered.length / PER_PAGE)
+  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
+
+  const handleCategory = (cat: string) => {
+    setActiveCategory(cat)
+    setPage(1)
+  }
+
+  return (
+    <>
+      <SEO
+        title="Blog — Tipy z digitálneho marketingu"
+        description="Praktické tipy o cold emailoch, SEO, sociálnych médiách a tvorbe webov pre slovenské firmy. Overené stratégie z praxe."
+        canonical="https://www.monetico.sk/blog/"
+      />
+      <Nav />
+
+      {/* HERO */}
+      <div className="archive-hero">
+        <div>
+          <div className="section-label">Všetky články</div>
+          <h1 className="archive-title">
+            BLOG<br /><span className="outline">&amp; TIPY</span>
+          </h1>
+        </div>
+        <p className="archive-desc">
+          Pravidelné tipy z praxe o cold emailoch, SEO, sociálnych médiách a tvorbe webov. Žiadna teória — len to, čo skutočne funguje.
+          <br /><br />
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '2px', color: 'var(--acid)' }}>
+            {posts.length} ČLÁNKOV
+          </span>
+        </p>
+      </div>
+
+      {/* FILTER */}
+      <div className="filter-bar">
+        <button
+          className={`filter-btn ${activeCategory === 'Všetky' ? 'active' : ''}`}
+          onClick={() => handleCategory('Všetky')}
+        >
+          Všetky ({posts.length})
+        </button>
+        {categories.slice(0, 14).map(cat => (
+          <button
+            key={cat.name}
+            className={`filter-btn ${activeCategory === cat.name ? 'active' : ''}`}
+            onClick={() => handleCategory(cat.name)}
+          >
+            {cat.name} ({cat.count})
+          </button>
+        ))}
+      </div>
+
+      {/* POSTS GRID */}
+      <div className="posts-grid" style={{ margin: '2px 0' }}>
+        {paginated.length === 0 && (
+          <div style={{ padding: '80px 40px', color: 'var(--muted)', gridColumn: '1/-1' }}>
+            Žiadne články v tejto kategórii.
+          </div>
+        )}
+        {paginated.slice(0, 1).map(p => (
+          <PostCard key={p.id} post={p} featured />
+        ))}
+        {paginated.slice(1).map(p => (
+          <PostCard key={p.id} post={p} />
+        ))}
+      </div>
+
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          {page > 1 && (
+            <button className="page-btn" onClick={() => setPage(p => p - 1)}>←</button>
+          )}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+            <button
+              key={n}
+              className={`page-btn ${n === page ? 'active' : ''}`}
+              onClick={() => { setPage(n); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+            >
+              {n}
+            </button>
+          ))}
+          {page < totalPages && (
+            <button className="page-btn" onClick={() => setPage(p => p + 1)}>→</button>
+          )}
+        </div>
+      )}
+
+      {/* NEWSLETTER */}
+      <div className="newsletter">
+        <div>
+          <div className="section-label">Newsletter</div>
+          <h2 className="newsletter-title">Tipy priamo<br />do <span>inboxu.</span></h2>
+        </div>
+        <div>
+          <p style={{ color: 'var(--muted)', marginBottom: '22px', lineHeight: '1.7' }}>
+            Každý týždeň jeden tip z praxe. Bez spamu, len obsah, ktorý používate hneď.
+          </p>
+          <form className="newsletter-form" onSubmit={e => e.preventDefault()}>
+            <input className="newsletter-input" type="email" placeholder="váš@email.sk" required />
+            <button type="submit" className="newsletter-submit">Prihlásiť →</button>
+          </form>
+        </div>
+      </div>
+
+      <Footer />
+    </>
+  )
+}
+
+export async function getStaticProps() {
+  const posts = getAllPosts()
+  const categories = getAllCategories()
+  return {
+    props: { posts, categories },
+  }
+}
