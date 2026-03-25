@@ -1,58 +1,216 @@
-import Link from 'next/link'
-import Nav from '../../components/Nav'
-import Footer from '../../components/Footer'
-import SEO from '../../components/SEO'
+import Head from 'next/head';
+import Link from 'next/link';
+import Nav from '../../components/Nav';
+import Footer from '../../components/Footer';
 
 const services = [
-  { slug: 'cold-email', icon: '✉', title: 'Cold Email Kampane', short: 'Oslovíme tisíce B2B firiem priamo do inboxu rozhodovateľov.', from: '100 € / mes.', tag: 'B2B Outreach' },
-  { slug: 'seo', icon: '◎', title: 'SEO & Linkbuilding', short: 'Organická návštevnosť bez platených reklám. Dlhodobo a spoľahlivo.', from: '200 € / mes.', tag: 'Organický rast' },
-  { slug: 'socialne-media', icon: '◈', title: 'Sociálne Médiá', short: 'Správa FB, Instagram, LinkedIn. Obsah, komunita a rast značky.', from: '200 € / mes.', tag: 'Brand Building' },
-  { slug: 'email-marketing', icon: '⊛', title: 'Email Marketing', short: 'Automatizované kampane a newslettery pre e-shopy a weby.', from: '70 € / mes.', tag: 'Retencia' },
-  { slug: 'tvorba-webov', icon: '⬡', title: 'Tvorba Webov & E-shopov', short: 'WordPress a Shoptet riešenia šité na mieru. Od dizajnu po spustenie.', from: 'Individuálne', tag: 'Web & E-commerce' },
-  { slug: 'reklama', icon: '◬', title: 'Google & Facebook Ads', short: 'Platené kampane s jasným ROI. Search, Display, Shopping, Meta.', from: '150 € / mes.', tag: 'PPC Reklama' },
-]
+  {
+    slug: 'cold-email',
+    title: 'Cold Email kampane',
+    subtitle: 'B2B outreach na autopilote',
+    description: 'Oslovíme správnych ľudí v správnom čase. Nastavíme kompletnú cold email infraštruktúru, napíšeme sekvencie a spravujeme kampane.',
+    price: 'od 600 €',
+    priceNote: 'mesačne',
+    color: '#6366f1',
+    icon: '✉️',
+  },
+  {
+    slug: 'seo',
+    title: 'SEO obsah & Link building',
+    subtitle: 'Organická viditeľnosť, ktorá rastie',
+    description: 'Komplexná SEO stratégia: analýza kľúčových slov, optimalizácia stránok, budovanie odkazov a pravidelný reporting.',
+    price: 'od 400 €',
+    priceNote: 'mesačne',
+    color: '#06b6d4',
+    icon: '📈',
+  },
+  {
+    slug: 'texty-a-clanky',
+    title: 'SEO texty & copywriting',
+    subtitle: 'Obsah, ktorý predáva aj rankuje',
+    description: 'Píšeme SEO články, texty na web, popisy produktov, kategórie pre e-shopy a pravidelný blog. Obsah optimalizovaný pre vyhľadávače aj zákazníkov.',
+    price: 'od 30 €',
+    priceNote: 'za text',
+    color: '#10b981',
+    icon: '✍️',
+  },
+  {
+    slug: 'socialne-media',
+    title: 'Sociálne médiá',
+    subtitle: 'Komunita, ktorá kupuje',
+    description: 'Správa Instagramu, Facebooku a LinkedInu. Tvorba obsahu, stories, reels, mesačný report a sledovanie trendov.',
+    price: 'od 250 €',
+    priceNote: 'mesačne',
+    color: '#f59e0b',
+    icon: '📱',
+  },
+  {
+    slug: 'email-marketing',
+    title: 'Email marketing',
+    subtitle: 'Retenčný kanál s najvyšším ROI',
+    description: 'Nastavíme a spravujeme email marketing: automatizácie, newslettery, segmentácia databázy a A/B testovanie.',
+    price: 'od 300 €',
+    priceNote: 'mesačne',
+    color: '#a855f7',
+    icon: '📧',
+  },
+  {
+    slug: 'tvorba-webov',
+    title: 'Tvorba webov & e-shopov',
+    subtitle: 'Weby, ktoré konvertujú',
+    description: 'Prezentačné weby, e-shopy na Shoptete aj WordPresse. Dizajn na mieru, rýchlosť, SEO a správa doménového ekosystému.',
+    price: 'od 800 €',
+    priceNote: 'jednorazovo',
+    color: '#d4f53c',
+    icon: '🌐',
+  },
+];
 
-export default function Sluzby() {
+export default function SluzbyPage() {
   return (
     <>
-      <SEO
-        title="Služby"
-        description="Cold email, SEO, sociálne médiá, email marketing, tvorba webov a PPC reklamy. Digitálne služby pre rastúce slovenské firmy."
-        canonical="https://www.monetico.sk/sluzby/"
-      />
+      <Head>
+        <title>Služby — Monetico digitálna agentúra</title>
+        <meta name="description" content="Cold emailing, SEO, sociálne médiá, email marketing, tvorba webov a copywriting. Komplexný digitálny marketing pre vaše podnikanie." />
+      </Head>
       <Nav />
+      <main style={{ background: '#0a0a0a', minHeight: '100vh', paddingTop: 100 }}>
+        {/* Hero */}
+        <section style={{ padding: '80px 40px 0', maxWidth: 1400, margin: '0 auto' }}>
+          <span style={{
+            fontFamily: 'Space Mono, monospace',
+            fontSize: 11,
+            letterSpacing: '0.2em',
+            color: '#d4f53c',
+            textTransform: 'uppercase',
+          }}>
+            — Čo robíme
+          </span>
+          <h1 style={{
+            fontFamily: 'Syne, sans-serif',
+            fontWeight: 800,
+            fontSize: 'clamp(48px, 8vw, 120px)',
+            color: '#fff',
+            margin: '16px 0 24px',
+            lineHeight: 0.9,
+          }}>
+            Naše<br />
+            <span style={{ WebkitTextStroke: '2px #fff', color: 'transparent' }}>služby</span>
+          </h1>
+          <p style={{
+            fontFamily: 'DM Sans, sans-serif',
+            fontSize: 18,
+            color: '#666',
+            maxWidth: 600,
+            lineHeight: 1.6,
+          }}>
+            Od cold emailu až po kompletné weby. Jeden partner pre celý váš digitálny rast.
+          </p>
+        </section>
 
-      <section style={{ padding: '140px 48px 80px' }}>
-        <div className="section-label">Čo robíme</div>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(60px,9vw,130px)', letterSpacing: '-5px', lineHeight: '0.88', marginBottom: '80px' }}>
-          NAŠE<br /><span style={{ color: 'transparent', WebkitTextStroke: '1px rgba(244,240,232,0.2)' }}>SLUŽBY</span>
-        </h1>
+        {/* Services grid */}
+        <section style={{ padding: '80px 40px 120px', maxWidth: 1400, margin: '0 auto' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+            gap: 2,
+          }}>
+            {services.map((s) => (
+              <Link key={s.slug} href={`/sluzby/${s.slug}/`} style={{ textDecoration: 'none' }}>
+                <div
+                  style={{
+                    background: '#111',
+                    padding: '48px 40px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'background 0.2s',
+                    height: '100%',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 16,
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#161616'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#111'; }}
+                >
+                  {/* Color accent */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 2,
+                    background: s.color,
+                  }} />
 
-        <div className="services-grid">
-          {services.map((s, i) => (
-            <Link href={`/sluzby/${s.slug}/`} key={s.slug} style={{ textDecoration: 'none' }}>
-              <div className="service-card" style={{ cursor: 'pointer', height: '100%' }}>
-                <div className="service-num">0{i + 1}</div>
-                <span className="service-icon">{s.icon}</span>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--acid)', marginBottom: '10px' }}>{s.tag}</div>
-                <div className="service-title">{s.title}</div>
-                <p className="service-desc">{s.short}</p>
-                <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '16px', color: 'var(--acid)' }}>{s.from}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--muted)', letterSpacing: '2px' }}>DETAIL →</span>
+                  {/* Icon + arrow */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: 32 }}>{s.icon}</span>
+                    <span style={{ color: '#333', fontSize: 20 }}>↗</span>
+                  </div>
+
+                  <div>
+                    <span style={{
+                      fontFamily: 'Space Mono, monospace',
+                      fontSize: 10,
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      color: s.color,
+                    }}>
+                      {s.subtitle}
+                    </span>
+                    <h3 style={{
+                      fontFamily: 'Syne, sans-serif',
+                      fontWeight: 800,
+                      fontSize: 28,
+                      color: '#fff',
+                      margin: '8px 0 0',
+                      lineHeight: 1.1,
+                    }}>
+                      {s.title}
+                    </h3>
+                  </div>
+
+                  <p style={{
+                    fontFamily: 'DM Sans, sans-serif',
+                    fontSize: 15,
+                    color: '#666',
+                    lineHeight: 1.7,
+                    flex: 1,
+                  }}>
+                    {s.description}
+                  </p>
+
+                  <div style={{
+                    borderTop: '1px solid #1a1a1a',
+                    paddingTop: 20,
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 8,
+                  }}>
+                    <span style={{
+                      fontFamily: 'Syne, sans-serif',
+                      fontWeight: 800,
+                      fontSize: 28,
+                      color: '#fff',
+                    }}>
+                      {s.price}
+                    </span>
+                    <span style={{
+                      fontFamily: 'Space Mono, monospace',
+                      fontSize: 11,
+                      color: '#444',
+                    }}>
+                      {s.priceNote}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <div className="cta-strip">
-        <h2 className="cta-headline">Nie ste si istí?<br />Poradíme.</h2>
-        <Link href="/kontakt/" className="cta-btn">Nezáväzná konzultácia →</Link>
-      </div>
-
+              </Link>
+            ))}
+          </div>
+        </section>
+      </main>
       <Footer />
     </>
-  )
+  );
 }

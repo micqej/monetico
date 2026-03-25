@@ -1,204 +1,516 @@
-import Link from 'next/link'
-import Nav from '../../components/Nav'
-import Footer from '../../components/Footer'
-import SEO from '../../components/SEO'
+import { GetStaticPaths, GetStaticProps } from 'next';
+import Head from 'next/head';
+import Link from 'next/link';
+import Nav from '../../components/Nav';
+import Footer from '../../components/Footer';
 
-type Plan = { name: string; price: string; setup?: string; highlight?: boolean; features: string[] }
-type Service = {
-  slug: string; icon: string; title: string; desc: string
-  metaDesc: string; plans: Plan[]
-  includes: string[]; process: string[]
-}
+type ServiceData = {
+  slug: string;
+  title: string;
+  subtitle: string;
+  color: string;
+  icon: string;
+  heroText: string;
+  forWhom: string[];
+  whatYouGet: string[];
+  pricing: { name: string; price: string; items: string[] }[];
+  faq?: { q: string; a: string }[];
+};
 
-const SERVICES: Service[] = [
-  {
+const servicesData: Record<string, ServiceData> = {
+  'cold-email': {
     slug: 'cold-email',
-    icon: '✉',
-    title: 'Cold Email Kampane',
-    desc: 'Cold emailing je cielené oslovovanie potenciálnych zákazníkov prostredníctvom e-mailu — firiem alebo jednotlivcov, s ktorými ste doposiaľ neboli v kontakte. Oslovujete priamo ľudí s rozhodovacou právomocou, bez závislosti od algoritmov.',
-    metaDesc: 'Cold email kampane pre B2B firmy na Slovensku. Oslovia tisíce potenciálnych zákazníkov mesačne. Balíky od 100 €/mes.',
-    plans: [
-      { name: 'MINI', price: '100 € / mes.', setup: 'Nastavenie: 300 €', features: ['1 doména, 3 email účty', '~1 500 oslovených / mes.', '1 emailová sekvencia', 'Overenie do 2 000 emailov', 'Základný report', 'Vlastné servery'] },
-      { name: 'OPTIMAL', price: '200 € / mes.', setup: 'Nastavenie: 600 €', highlight: true, features: ['5 domén, 15 email účtov', '~7 500 oslovených / mes.', '2 emailové sekvencie', '1 segment databázy', 'Overenie do 10 000 emailov', 'Priebežná optimalizácia', 'Rozšírený report'] },
-      { name: 'POWER', price: '300 € / mes.', setup: 'Nastavenie: 800 €', features: ['10 domén, 30 email účtov', '~15 000 oslovených / mes.', '4 emailové sekvencie', '2 segmenty databázy', 'A/B testovanie', 'Overenie do 20 000 emailov', 'Rozšírený report'] },
+    title: 'Cold Email kampane',
+    subtitle: 'B2B outreach na autopilote',
+    color: '#6366f1',
+    icon: '✉️',
+    heroText: 'Oslovíme správnych decision makerov skôr, ako to urobia vaši konkurenti. Komplexné nastavenie, kvalifikované leady, merateľné výsledky.',
+    forWhom: [
+      'B2B firmy hľadajúce nových klientov',
+      'SaaS produkty a IT spoločnosti',
+      'Agentúry a konzultanti',
+      'Recruiting firmy',
+      'Výrobné firmy so B2B predajom',
     ],
-    includes: ['Nákup domén a emailových schránok', 'Postupné zohriatie emailov (warm-up)', 'Vytvorenie emailových sekvencií', 'Databáza kontaktov na mieru', 'Overenie emailových adries', 'Odosielanie cez vlastné servery', 'Mesačný report'],
-    process: ['Audit a príprava stratégie', 'Nákup domén a zohriatie (2–3 týždne)', 'Tvorba databázy a sekvencií', 'Spustenie kampane', 'Optimalizácia a reporting'],
+    whatYouGet: [
+      'Nákup a nastavenie domén a emailových schránok',
+      '"Zahrievanie" emailov (warm-up)',
+      'Výskum a budovanie zoznamu kontaktov',
+      'Copywriting emailových sekvencií (A/B testovanie)',
+      'Nastavenie v nástroji (ReachInbox, Instantly, Lemlist...)',
+      'Mesačný report s metrikami: open rate, reply rate, booked calls',
+      'Optimalizácia kampane každý mesiac',
+    ],
+    pricing: [
+      {
+        name: 'MINI',
+        price: '300 €',
+        items: [
+          'Nastavenie infraštruktúry',
+          '1 kampaň, 1 sekvencia',
+          'až 500 emailov/mesiac',
+          'Mesačný report',
+        ],
+      },
+      {
+        name: 'BASIC',
+        price: '500 €',
+        items: [
+          'Kompletná infraštruktúra',
+          '2 kampane, A/B sekvencie',
+          'až 1 500 emailov/mesiac',
+          'Bi-týždenný report',
+          'Správa odpovedí',
+        ],
+      },
+      {
+        name: 'OPTIMAL',
+        price: '800 €',
+        items: [
+          'Multi-domain infraštruktúra',
+          '3–5 kampaní súbežne',
+          'až 4 000 emailov/mesiac',
+          'Týždenný report',
+          'Správa odpovedí + kvalifikácia',
+          'LinkedIn doplnok',
+        ],
+      },
+      {
+        name: 'PREMIUM',
+        price: '1 200 €',
+        items: [
+          'Neobmedzená infraštruktúra',
+          'Neobmedzené kampane',
+          '10 000+ emailov/mesiac',
+          'Dedikovaný account manager',
+          'Full outreach funnel',
+          'LinkedIn + telefón',
+          'CRM integrácia',
+        ],
+      },
+    ],
   },
-  {
+  'seo': {
     slug: 'seo',
-    icon: '◎',
-    title: 'SEO & Linkbuilding',
-    desc: 'SEO optimalizácia vám pomôže získať organickú návštevnosť bez platených reklám. Analyzujeme váš web, odhalíme chyby a systematicky zlepšujeme viditeľnosť vo vyhľadávaní.',
-    metaDesc: 'SEO optimalizácia a linkbuilding pre slovenské weby. Technické SEO, analýza kľúčových slov, spätné odkazy. Od 200 €/mes.',
-    plans: [
-      { name: 'SEO Optimalizácia', price: '200 € / mes.', features: ['Základná SEO analýza', 'Odhalenie SEO chýb', 'Návrhy na vylepšenie', 'Zlepšovanie viditeľnosti', 'Mesačný report'] },
-      { name: 'SEO + Linkbuilding', price: '250 € / mes.', highlight: true, features: ['Všetko zo SEO Optimalizácie', 'Linkbuilding (5 odkazov/mes.)', 'Analýza súčasného stavu', 'Návrh stratégie odkazov', 'Zľava 50 € oproti samostatným'] },
-      { name: 'Ročný balík', price: '2 750 € / rok', features: ['12 mesiacov SEO + Linkbuilding', 'Mesiac zdarma (úspora 250 €)', 'Analýza kľúčových slov', 'Analýza konkurencie', 'GA4 + Search Console setup'] },
+    title: 'SEO obsah & Link building',
+    subtitle: 'Organická viditeľnosť, ktorá rastie',
+    color: '#06b6d4',
+    icon: '📈',
+    heroText: 'Dlhodobo udržateľná viditeľnosť vo vyhľadávačoch. Kombinujeme technické SEO, hodnotný obsah a kvalitné spätné odkazy.',
+    forWhom: [
+      'E-shopy chcúce rásť organicky',
+      'Firmy, ktoré nevyhovuje platiť za každý klik',
+      'Weby s existujúcou návštevnosťou, ktorú chcú zdvojnásobiť',
+      'Firmy vstupujúce na nové trhy',
     ],
-    includes: ['Technická SEO analýza', 'Analýza kľúčových slov (450 € jednorazovo)', 'Analýza konkurencie (150 € jednorazovo)', 'Linkbuilding — 5 kvalitných spätných odkazov', 'GA4, Search Console, Tag Manager', 'Mesačný report'],
-    process: ['Audit webu a analýza', 'Stratégia kľúčových slov', 'Technické opravy', 'Tvorba obsahu a linky', 'Monitoring a optimalizácia'],
+    whatYouGet: [
+      'Kompletná SEO analýza webu (technická aj obsahová)',
+      'Analýza kľúčových slov a konkurencie',
+      'On-page optimalizácia (meta tagy, headings, štruktúra)',
+      'Pravidelná tvorba SEO článkov a landing pages',
+      'Link building — kvalitné slovenské a české weby',
+      'Sledovanie pozícií a mesačný report',
+      'Google Search Console a Analytics monitoring',
+    ],
+    pricing: [
+      { name: 'SEO Audit', price: '350 €', items: ['Technická analýza', 'Kľúčové slová', 'Konkurencia', 'Akčný plán', 'Jednorazovo'] },
+      { name: 'Štart', price: '400 €/mes', items: ['4 SEO články/mesiac', 'On-page optimalizácia', '2 spätné odkazy', 'Mesačný report'] },
+      { name: 'Rast', price: '700 €/mes', items: ['8 SEO článkov/mesiac', 'Technické SEO', '5 spätných odkazov', 'Bi-týždenný report'] },
+      { name: 'Dominancia', price: '1 200 €/mes', items: ['16 SEO článkov/mesiac', 'Kompletné technické SEO', '10+ spätných odkazov', 'Týždenný report', 'Konzultácia 2x/mes'] },
+    ],
   },
-  {
+  'texty-a-clanky': {
+    slug: 'texty-a-clanky',
+    title: 'SEO texty & copywriting',
+    subtitle: 'Obsah, ktorý predáva aj rankuje',
+    color: '#10b981',
+    icon: '✍️',
+    heroText: 'Píšeme texty, ktoré vyhľadávače milujú a zákazníci čítajú. Od produktových popisov cez SEO články až po kompletný obsah webu.',
+    forWhom: [
+      'E-shopy bez času na písanie popisov produktov',
+      'Firmy budujúce blog a SEO obsah',
+      'Weby, ktoré potrebujú nové texty',
+      'Agentúry, ktoré outsourgujú copywriting',
+    ],
+    whatYouGet: [
+      'SEO optimalizované texty (kľúčové slová, štruktúra, meta)',
+      'Popisy produktov pre e-shopy',
+      'Texty kategórií a landing pages',
+      'Pravidelné SEO blogy a články',
+      'Texty na web (O nás, Služby, Kontakt...)',
+      'Preklady do AJ, DE, PL, HU',
+      'Nahodenie textov priamo na web',
+    ],
+    pricing: [
+      { name: 'Popis produktu', price: 'od 10 €', items: ['Jeden produkt', 'SEO optimalizovaný', 'CTA', 'Odovzdanie do 3 dní'] },
+      { name: 'SEO článok', price: 'od 60 €', items: ['1 000–2 000 slov', 'Kľúčové slová', 'Interné prepojenia', 'Meta title + description'] },
+      { name: 'Balík 20 produktov', price: '160 €', items: ['20 popisov produktov', 'Jednotný tone of voice', 'Odovzdanie do 7 dní'] },
+      { name: 'Mesačný blog', price: 'od 250 €/mes', items: ['4 články/mesiac', 'Plán téiem', 'SEO optimalizácia', 'Nahodenie na web'] },
+    ],
+    faq: [
+      { q: 'Ako rýchlo dostanem texty?', a: 'Štandardná dodacia lehota je 3–7 pracovných dní. Pri väčších zákazkách sa dohodne harmonogram.' },
+      { q: 'Píšete texty aj v cudzom jazyku?', a: 'Áno, pracujeme aj v angličtine, nemčine, poľštine a maďarčine. Cena sa individuálne dohodne.' },
+      { q: 'Môžete nahodiť texty priamo na web?', a: 'Áno, vieme nahodiť texty aj produkty priamo na WordPress, Shoptet alebo iný CMS.' },
+    ],
+  },
+  'socialne-media': {
     slug: 'socialne-media',
-    icon: '◈',
-    title: 'Správa Sociálnych Médií',
-    desc: 'Profesionálna správa Facebook, Instagram a LinkedIn profilov. Pravidelný obsah, reelsy, správa komunity a mesačné reporty. Vy sa venujete biznisu, my vašim sociálnym sieťam.',
-    metaDesc: 'Správa sociálnych sietí — Facebook, Instagram, LinkedIn. Posty, reelsy, stories, komunita. Balíky od 200 €/mes.',
-    plans: [
-      { name: 'ZÁKLAD', price: '200 € / mes.', features: ['12 postov + 4 stories', '30-dňový plán vopred', 'Sledovanie trendov', 'Mesačný report'] },
-      { name: 'ROZBEH', price: '300 € / mes.', highlight: true, features: ['16 postov + 8 stories + 4 reelsy', '30-dňový plán vopred', 'Sledovanie komentárov + trendov', 'Mesačný report'] },
-      { name: 'EXPANZIA', price: '500 € / mes.', features: ['30 postov + 16 stories + 4 reelsy', 'Odpovedanie na správy', 'Komentáre + trendy', 'Súťaže + rast followerov', 'Mesačný report'] },
+    title: 'Sociálne médiá',
+    subtitle: 'Komunita, ktorá kupuje',
+    color: '#f59e0b',
+    icon: '📱',
+    heroText: 'Pravidelný, hodnotný obsah, ktorý buduje dôveru a premieňa sledovateľov na zákazníkov.',
+    forWhom: [
+      'Firmy, ktoré chcú byť viditeľné na Instagrame a Facebooku',
+      'E-shopy budujúce komunitu',
+      'Lokálne podniky a reštaurácie',
+      'Odborníci a osobné značky',
     ],
-    includes: ['Tvorba grafiky a textov', '30-dňový obsahový plán', 'Plánovanie a publikovanie', 'Sledovanie trendov a hashtagov', 'Správa komentárov (vyššie balíky)', 'Mesačný report s výsledkami'],
-    process: ['Úvodná konzultácia', 'Tvorba obsahovej stratégie', 'Príprava 30-dňového plánu', 'Publikovanie a interakcia', 'Mesačný report a optimalizácia'],
+    whatYouGet: [
+      'Tvorba vizuálneho obsahu (grafiky, reels, stories)',
+      'Copywriting popisov a hashtagov',
+      'Plánovanie a publikovanie príspevkov',
+      'Sledovanie trendov a algoritmu',
+      'Mesačný report s dosahom a angažovanosťou',
+      'Komunikácia s komunitou (odpovede na komentáre)',
+    ],
+    pricing: [
+      { name: 'Štart', price: '250 €/mes', items: ['12 príspevkov/mes', '4 stories/mes', 'Mesačný report', '1 sociálna sieť'] },
+      { name: 'Rast', price: '450 €/mes', items: ['20 príspevkov/mes', '8 stories + reels', 'Bi-týždenný report', '2 sociálne siete'] },
+      { name: 'Dominancia', price: '750 €/mes', items: ['30+ príspevkov/mes', 'Reels, stories, carousel', 'Týždenný report', '3 siete', 'Community management'] },
+    ],
   },
-  {
+  'email-marketing': {
     slug: 'email-marketing',
-    icon: '⊛',
-    title: 'Email Marketing',
-    desc: 'Emailing patrí medzi najefektívnejšie nástroje digitálneho marketingu. Budujte vlastné publikum, automatizujte komunikáciu a získavajte zákazníkov späť — bez závislosti od algoritmov.',
-    metaDesc: 'Email marketing pre e-shopy a weby. Newslettery, automatizácie, segmentácia. Balíky od 70 €/mes.',
-    plans: [
-      { name: 'MINI', price: '70 € / mes.', setup: 'Nastavenie: 200 €', features: ['1 newsletter / mes.', '1 základná automatizácia', 'Import do 1 000 kontaktov', 'Segmentácia databázy', 'Základný report'] },
-      { name: 'STANDARD', price: '150 € / mes.', setup: 'Nastavenie: 400 €', highlight: true, features: ['Do 3 newsletterov / mes.', 'Do 3 automatizácií', 'Import do 10 000 kontaktov', 'Pokročilé tagovanie', 'Rozšírený report'] },
-      { name: 'PRO', price: '250 € / mes.', setup: 'Nastavenie: 500 €', features: ['Do 6 newsletterov / mes.', '5+ automatizácií', 'Neobmedzený import', 'Full servis + A/B testy', 'Rozšírený report + analýza'] },
+    title: 'Email marketing',
+    subtitle: 'Retenčný kanál s najvyšším ROI',
+    color: '#a855f7',
+    icon: '📧',
+    heroText: 'Email marketing má stále najvyšší ROI zo všetkých kanálov — až 42 € na každé 1 € investované. My ho nastavíme, zautomatizujeme a spravujeme.',
+    forWhom: [
+      'E-shopy s existujúcou databázou zákazníkov',
+      'B2B firmy s dlhým predajným cyklom',
+      'Kurzy a digitálne produkty',
+      'Firmy, ktoré chcú viac z existujúcich kontaktov',
     ],
-    includes: ['Konfigurácia emailového systému', 'Prepojenie s webom a formulármi', 'Tvorba emailových šablón', 'Automatizácie (uvítací, opustený košík...)', 'Segmentácia a tagovanie kontaktov', 'GDPR funkčnosť', 'Mesačný report'],
-    process: ['Nastavenie systému', 'Import a segmentácia databázy', 'Tvorba šablón a automatizácií', 'Spustenie kampaní', 'Optimalizácia podľa výsledkov'],
+    whatYouGet: [
+      'Nastavenie emailovej platformy (Mailchimp, Klaviyo, MailerLite...)',
+      'Tvorba automatizácií (welcome séria, abandoned cart, win-back)',
+      'Segmentácia databázy',
+      'Copywriting a dizajn newsletterov',
+      'A/B testovanie predmetov emailov',
+      'Mesačný report: open rate, CTR, konverzie',
+    ],
+    pricing: [
+      { name: 'Štart', price: '300 €/mes', items: ['Nastavenie platformy', '2 kampane/mes', 'Základné automatizácie', 'Mesačný report'] },
+      { name: 'Rast', price: '500 €/mes', items: ['4 kampane/mes', 'Pokročilé automatizácie', 'Segmentácia', 'A/B testy'] },
+      { name: 'Pro', price: '900 €/mes', items: ['Neobmedzené kampane', 'Kompletné automatizácie', 'Pokročilá segmentácia', 'CRM integrácia', 'Týždenný report'] },
+    ],
   },
-  {
+  'tvorba-webov': {
     slug: 'tvorba-webov',
-    icon: '⬡',
-    title: 'Tvorba Webov & E-shopov',
-    desc: 'Tvoríme moderné, rýchle a konverzné weby na WordPress a e-shopy na Shoptet. Od návrhu dizajnu po spustenie a SEO. Máme za sebou desiatky úspešných projektov na slovenskom trhu.',
-    metaDesc: 'Tvorba webov WordPress a Shoptet e-shopov na Slovensku. Moderný dizajn, SEO, rýchlosť. Pýtajte sa na cenu.',
-    plans: [
-      { name: 'Prezentačný web', price: 'od 800 €', features: ['WordPress na mieru', 'Responzívny dizajn', 'Základné SEO nastavenie', 'Kontaktný formulár', 'Napojenie na GA4'] },
-      { name: 'E-shop Shoptet', price: 'od 600 €', highlight: true, features: ['Shoptet na mieru', 'Dizajn a konfigurácia', 'Nastavenie platobných brán', 'SEO a analytika', 'Školenie administrácie'] },
-      { name: 'WordPress E-shop', price: 'od 1 200 €', features: ['WooCommerce riešenie', 'Vlastný dizajn', 'Pokročilé funkcie', 'Napojenie na sklady / ERP', 'Kompletná SEO optimalizácia'] },
+    title: 'Tvorba webov & e-shopov',
+    subtitle: 'Weby, ktoré konvertujú',
+    color: '#d4f53c',
+    icon: '🌐',
+    heroText: 'Vytvárame weby a e-shopy, ktoré vyzerajú dobre, načítavajú sa rýchlo a premieňajú návštevníkov na zákazníkov.',
+    forWhom: [
+      'Firmy bez webu alebo so zastaraným webom',
+      'E-shopy hľadajúce lepšiu platformu',
+      'Startupy potrebujúce rýchly launch',
+      'Firmy, ktoré chcú web s dobrým SEO základom',
     ],
-    includes: ['Návrh a dizajn na mieru', 'Responzívna verzia (mobil, tablet)', 'Základné SEO nastavenie', 'Napojenie na GA4 a Search Console', 'Zabezpečenie SSL certifikátu', 'Školenie pre správu webu', 'Podpora po spustení'],
-    process: ['Brief a analýza požiadaviek', 'Návrh dizajnu a schválenie', 'Vývoj a programovanie', 'Testovanie a korekcie', 'Spustenie a odovzdanie'],
-  },
-  {
-    slug: 'reklama',
-    icon: '◬',
-    title: 'Google & Facebook Ads',
-    desc: 'Reklama na Google a sociálnych sieťach, ktorá prináša reálne výsledky. Správne nastavené kampane, cielenie a priebežná optimalizácia. Pracujeme transparentne — vždy viete, za čo platíte.',
-    metaDesc: 'Google Ads a Facebook/Instagram reklama na Slovensku. Balíky od 150 €/mes. + jednorazové nastavenie.',
-    plans: [
-      { name: 'Google ŠTART', price: '150 € / mes.', setup: 'Nastavenie: 150 €', features: ['1 kampaň mesačne', 'Search / Shopping / Display', 'Základné kľúčové slová', 'GA4 prepojenie', 'Mesačný report'] },
-      { name: 'Facebook ŠTART', price: '200 € / mes.', setup: 'Nastavenie: 200 €', features: ['1 reklama mesačne', 'Základné cielenie', 'Vizuál + text', 'Mesačný report', 'Konzultácia 15 min.'] },
-      { name: 'Kombinovaný RAST', price: 'od 400 € / mes.', highlight: true, features: ['Google + Facebook kampane', 'Pokročilé cielenie', 'Remarketing', 'Podrobný report', 'Mesačný hovor'] },
+    whatYouGet: [
+      'Dizajn na mieru podľa vašej identity',
+      'Responzívny web (mobil, tablet, desktop)',
+      'SEO optimalizácia od základov',
+      'Rýchlosť — Core Web Vitals',
+      'Základné GDPR a cookie riešenie',
+      'Integrácia analytiky (GA4, Hotjar)',
+      '3 mesiace bezplatná podpora po spustení',
     ],
-    includes: ['Nastavenie reklamných účtov', 'Výber kľúčových slov / cieľových skupín', 'Tvorba textov a vizuálov', 'Napojenie na GA4 a konverzie', 'Priebežná optimalizácia', 'Mesačný report s odporúčaniami', 'Konzultácia'],
-    process: ['Audit a stratégia', 'Nastavenie kampaní', 'Schválenie a spustenie', 'Priebežná optimalizácia', 'Mesačný report a plán'],
+    pricing: [
+      { name: 'Prezentačný web', price: 'od 800 €', items: ['Šablóna / WordPress', '5–10 podstránok', 'SEO základ', 'Kontaktný formulár', 'Mobilná verzia'] },
+      { name: 'Web na mieru', price: 'od 2 000 €', items: ['Dizajn na mieru', 'Neobmedzené podstránky', 'Pokročilé SEO', 'Rýchlostná optimalizácia', 'Analytika'] },
+      { name: 'Shoptet e-shop', price: 'od 800 €', items: ['Nastavenie Shoptetu', 'Dizajn témy', 'Import produktov', 'Platobné metódy', 'SEO nastavenie'] },
+      { name: 'WordPress e-shop', price: 'od 2 500 €', items: ['WooCommerce', 'Dizajn na mieru', 'Produktový katalóg', 'Platobná brána', 'SEO & analytika'] },
+    ],
   },
-]
+};
 
-export default function ServicePage({ service }: { service: Service }) {
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: Object.keys(servicesData).map(slug => ({ params: { slug } })),
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const slug = params?.slug as string;
+  return { props: { service: servicesData[slug] || null } };
+};
+
+export default function ServicePage({ service }: { service: ServiceData }) {
+  if (!service) return null;
+
   return (
     <>
-      <SEO
-        title={service.title}
-        description={service.metaDesc}
-        canonical={`https://www.monetico.sk/sluzby/${service.slug}/`}
-      />
+      <Head>
+        <title>{service.title} — Monetico</title>
+        <meta name="description" content={service.heroText} />
+      </Head>
       <Nav />
+      <main style={{ background: '#0a0a0a', minHeight: '100vh', paddingTop: 100 }}>
+        {/* Hero */}
+        <section style={{
+          padding: '80px 40px 80px',
+          maxWidth: 1400,
+          margin: '0 auto',
+          borderBottom: '1px solid #1a1a1a',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, marginBottom: 32 }}>
+            <span style={{ fontSize: 48 }}>{service.icon}</span>
+            <div>
+              <span style={{
+                fontFamily: 'Space Mono, monospace',
+                fontSize: 11,
+                letterSpacing: '0.2em',
+                color: service.color,
+                textTransform: 'uppercase',
+              }}>
+                — {service.subtitle}
+              </span>
+              <h1 style={{
+                fontFamily: 'Syne, sans-serif',
+                fontWeight: 800,
+                fontSize: 'clamp(40px, 6vw, 80px)',
+                color: '#fff',
+                margin: '8px 0 0',
+                lineHeight: 1,
+              }}>
+                {service.title}
+              </h1>
+            </div>
+          </div>
+          <p style={{
+            fontFamily: 'DM Sans, sans-serif',
+            fontSize: 20,
+            color: '#888',
+            maxWidth: 700,
+            lineHeight: 1.6,
+          }}>
+            {service.heroText}
+          </p>
+          <div style={{ marginTop: 40, display: 'flex', gap: 16 }}>
+            <Link href="/kontakt/" style={{
+              fontFamily: 'Space Mono, monospace',
+              fontSize: 12,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              padding: '16px 32px',
+              background: service.color,
+              color: service.color === '#d4f53c' ? '#000' : '#fff',
+              textDecoration: 'none',
+              fontWeight: 700,
+            }}>
+              Chcem konzultáciu →
+            </Link>
+          </div>
+        </section>
 
-      {/* HERO */}
-      <section style={{ padding: '140px 48px 80px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 50% 60% at 70% 20%, rgba(212,245,60,0.06) 0%, transparent 60%)', pointerEvents: 'none' }} />
-        <div className="breadcrumb" style={{ padding: '0 0 40px' }}>
-          <Link href="/">Domov</Link>
-          <span className="sep">·</span>
-          <Link href="/sluzby/">Služby</Link>
-          <span className="sep">·</span>
-          <span className="current">{service.title}</span>
-        </div>
-        <span style={{ fontSize: '48px', display: 'block', marginBottom: '16px' }}>{service.icon}</span>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(48px,7vw,100px)', letterSpacing: '-4px', lineHeight: '0.92', marginBottom: '32px' }}>
-          {service.title.toUpperCase()}
-        </h1>
-        <p style={{ fontSize: '18px', color: 'var(--muted)', maxWidth: '640px', lineHeight: '1.75' }}>{service.desc}</p>
-      </section>
+        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 40px' }}>
+          {/* For whom + What you get */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 2,
+            marginTop: 2,
+          }}>
+            <div style={{ background: '#111', padding: '48px 40px' }}>
+              <h2 style={{
+                fontFamily: 'Syne, sans-serif',
+                fontWeight: 800,
+                fontSize: 28,
+                color: '#fff',
+                margin: '0 0 32px',
+              }}>
+                Pre koho je táto služba
+              </h2>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {service.forWhom.map((item, i) => (
+                  <li key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                    <span style={{ color: service.color, marginTop: 2, flexShrink: 0 }}>→</span>
+                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, color: '#aaa', lineHeight: 1.5 }}>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div style={{ background: '#111', padding: '48px 40px' }}>
+              <h2 style={{
+                fontFamily: 'Syne, sans-serif',
+                fontWeight: 800,
+                fontSize: 28,
+                color: '#fff',
+                margin: '0 0 32px',
+              }}>
+                Čo dostanete
+              </h2>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {service.whatYouGet.map((item, i) => (
+                  <li key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                    <span style={{ color: service.color, marginTop: 2, flexShrink: 0 }}>✓</span>
+                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, color: '#aaa', lineHeight: 1.5 }}>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
 
-      {/* PRICING */}
-      <section style={{ padding: '0 48px 80px' }}>
-        <div className="section-label">Cenník</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '2px', background: 'rgba(255,255,255,0.04)' }}>
-          {service.plans.map(plan => (
-            <div key={plan.name} style={{ background: plan.highlight ? 'var(--grey)' : 'var(--black)', padding: '40px', position: 'relative', borderTop: plan.highlight ? '3px solid var(--acid)' : '3px solid transparent' }}>
-              {plan.highlight && (
-                <div style={{ position: 'absolute', top: '-1px', left: '40px', background: 'var(--acid)', color: 'var(--black)', fontFamily: 'var(--font-mono)', fontSize: '9px', letterSpacing: '2px', padding: '4px 12px', textTransform: 'uppercase', fontWeight: 700 }}>
-                  Najobľúbenejší
+          {/* Pricing */}
+          <section style={{ padding: '80px 0' }}>
+            <h2 style={{
+              fontFamily: 'Syne, sans-serif',
+              fontWeight: 800,
+              fontSize: 48,
+              color: '#fff',
+              margin: '0 0 48px',
+            }}>
+              Cenník
+            </h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${Math.min(service.pricing.length, 4)}, 1fr)`,
+              gap: 2,
+            }}>
+              {service.pricing.map((plan, i) => (
+                <div key={i} style={{
+                  background: '#111',
+                  padding: '40px 32px',
+                  position: 'relative',
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 2,
+                    background: i === Math.floor(service.pricing.length / 2) ? service.color : '#1a1a1a',
+                  }} />
+                  <span style={{
+                    fontFamily: 'Space Mono, monospace',
+                    fontSize: 10,
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: '#555',
+                  }}>
+                    {plan.name}
+                  </span>
+                  <div style={{
+                    fontFamily: 'Syne, sans-serif',
+                    fontWeight: 800,
+                    fontSize: 36,
+                    color: '#fff',
+                    margin: '12px 0 24px',
+                  }}>
+                    {plan.price}
+                  </div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {plan.items.map((item, j) => (
+                      <li key={j} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                        <span style={{ color: service.color, flexShrink: 0, fontSize: 13 }}>✓</span>
+                        <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: '#777', lineHeight: 1.4 }}>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/kontakt/" style={{
+                    fontFamily: 'Space Mono, monospace',
+                    fontSize: 11,
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    padding: '12px 24px',
+                    border: `1px solid ${service.color}`,
+                    color: service.color,
+                    textDecoration: 'none',
+                    display: 'inline-block',
+                    transition: 'all 0.2s',
+                  }}>
+                    Mám záujem
+                  </Link>
                 </div>
-              )}
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '20px', letterSpacing: '-0.5px', marginBottom: '8px' }}>{plan.name}</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '32px', color: 'var(--acid)', letterSpacing: '-1px', marginBottom: '4px' }}>{plan.price}</div>
-              {plan.setup && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--muted)', letterSpacing: '1px', marginBottom: '24px' }}>{plan.setup}</div>}
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {plan.features.map(f => (
-                  <div key={f} style={{ display: 'flex', gap: '10px', fontSize: '13px', color: 'rgba(244,240,232,0.8)', alignItems: 'flex-start' }}>
-                    <span style={{ color: 'var(--acid)', flexShrink: 0, marginTop: '2px' }}>✓</span>
-                    {f}
+              ))}
+            </div>
+          </section>
+
+          {/* FAQ */}
+          {service.faq && (
+            <section style={{ padding: '0 0 80px' }}>
+              <h2 style={{
+                fontFamily: 'Syne, sans-serif',
+                fontWeight: 800,
+                fontSize: 48,
+                color: '#fff',
+                margin: '0 0 48px',
+              }}>
+                Časté otázky
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {service.faq.map((item, i) => (
+                  <div key={i} style={{ background: '#111', padding: '32px 40px' }}>
+                    <h3 style={{
+                      fontFamily: 'Syne, sans-serif',
+                      fontWeight: 700,
+                      fontSize: 20,
+                      color: '#fff',
+                      margin: '0 0 12px',
+                    }}>
+                      {item.q}
+                    </h3>
+                    <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, color: '#777', margin: 0, lineHeight: 1.6 }}>
+                      {item.a}
+                    </p>
                   </div>
                 ))}
               </div>
-              <Link href="/kontakt/" style={{ display: 'block', marginTop: '28px', background: plan.highlight ? 'var(--acid)' : 'transparent', border: `1px solid ${plan.highlight ? 'var(--acid)' : 'rgba(255,255,255,0.15)'}`, color: plan.highlight ? 'var(--black)' : 'var(--white)', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '13px', padding: '14px', textAlign: 'center', textDecoration: 'none', transition: 'all 0.2s' }}>
-                Mám záujem →
-              </Link>
+            </section>
+          )}
+
+          {/* CTA */}
+          <section style={{
+            background: '#d4f53c',
+            padding: '64px 60px',
+            marginBottom: 80,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 40,
+            flexWrap: 'wrap',
+          }}>
+            <div>
+              <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 36, color: '#000', margin: '0 0 8px' }}>
+                Zaujalo vás to?
+              </h2>
+              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 16, color: '#333', margin: 0 }}>
+                Nezáväzná konzultácia zdarma. Odpovieme do 24 hodín.
+              </p>
             </div>
-          ))}
+            <Link href="/kontakt/" style={{
+              fontFamily: 'Space Mono, monospace',
+              fontSize: 12,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              padding: '18px 40px',
+              background: '#000',
+              color: '#d4f53c',
+              textDecoration: 'none',
+              fontWeight: 700,
+              flexShrink: 0,
+            }}>
+              Dohodnúť konzultáciu →
+            </Link>
+          </section>
         </div>
-      </section>
-
-      {/* INCLUDES + PROCESS */}
-      <section style={{ padding: '0 48px 100px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px' }}>
-        <div>
-          <div className="section-label">Čo zahŕňa</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {service.includes.map(item => (
-              <div key={item} style={{ display: 'flex', gap: '16px', padding: '16px 0', borderBottom: '1px solid var(--border)', fontSize: '15px', color: 'rgba(244,240,232,0.8)', alignItems: 'center' }}>
-                <span style={{ color: 'var(--acid)', fontSize: '18px', flexShrink: 0 }}>✦</span>
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-        <div>
-          <div className="section-label">Ako prebieha spolupráca</div>
-          <div>
-            {service.process.map((step, i) => (
-              <div key={step} className="process-item">
-                <div className="process-step">0{i + 1}</div>
-                <div className="process-title" style={{ fontSize: '18px' }}>{step}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <div className="cta-strip">
-        <h2 className="cta-headline">Začneme<br />hneď?</h2>
-        <Link href="/kontakt/" className="cta-btn">Dohodnúť konzultáciu →</Link>
-      </div>
-
+      </main>
       <Footer />
     </>
-  )
-}
-
-export async function getStaticPaths() {
-  return {
-    paths: SERVICES.map(s => ({ params: { slug: s.slug } })),
-    fallback: false,
-  }
-}
-
-export async function getStaticProps({ params }: { params: { slug: string } }) {
-  const service = SERVICES.find(s => s.slug === params.slug)
-  if (!service) return { notFound: true }
-  return { props: { service } }
+  );
 }
