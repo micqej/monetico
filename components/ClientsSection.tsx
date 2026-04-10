@@ -18,7 +18,7 @@ export default function ClientsSection() {
   };
 
   return (
-    <section style={{ background: '#0a0a0a', padding: '120px 0' }}>
+    <section style={{ background: 'transparent', padding: '120px 0' }}>
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 40px' }}>
         {/* Header */}
         <div style={{ marginBottom: 64 }}>
@@ -97,18 +97,18 @@ export default function ClientsSection() {
                 justifyContent: 'center',
                 gap: 12,
                 padding: '32px 24px',
-                background: '#111',
+                background: 'var(--panel)',
                 textDecoration: 'none',
                 transition: 'background 0.2s, transform 0.2s',
                 position: 'relative',
                 overflow: 'hidden',
               }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = '#1a1a1a';
+                (e.currentTarget as HTMLElement).style.background = 'var(--panel-soft)';
                 (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.background = '#111';
+                (e.currentTarget as HTMLElement).style.background = 'var(--panel)';
                 (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
               }}
             >

@@ -1,14 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
 
 :root {
-  --black: #0a0a0a;
+  --black: #101316;
   --white: #f4f0e8;
   --acid: #7dd3c8;
   --orange: #d67c5c;
-  --grey: #111417;
-  --mid: #2a3136;
-  --border: rgba(255,255,255,0.08);
-  --muted: #8b9198;
+  --grey: #171c20;
+  --mid: #313940;
+  --border: rgba(255,255,255,0.1);
+  --muted: #98a0a8;
+  --panel: #1a2025;
+  --panel-soft: #20272d;
   --font-display: 'Syne', sans-serif;
   --font-mono: 'Space Mono', monospace;
   --font-body: 'DM Sans', sans-serif;
@@ -22,7 +24,9 @@ html {
 }
 
 body {
-  background: var(--black);
+  background:
+    radial-gradient(circle at top center, rgba(125,211,200,0.08), transparent 38%),
+    linear-gradient(180deg, #15191d 0%, var(--black) 24%, #12161a 100%);
   color: var(--white);
   font-family: var(--font-body);
   line-height: 1.6;
@@ -52,7 +56,7 @@ img { max-width: 100%; height: auto; }
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  background: rgba(10,10,10,0.75);
+  background: rgba(19,24,28,0.76);
 }
 
 .nav-logo {
@@ -190,8 +194,8 @@ img { max-width: 100%; height: auto; }
 .hero-bg {
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 75% 15%, rgba(125,211,200,0.1) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 50% at 15% 85%, rgba(214,124,92,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 60% at 75% 15%, rgba(125,211,200,0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 50% at 15% 85%, rgba(214,124,92,0.1) 0%, transparent 50%),
     var(--black);
   pointer-events: none;
 }
@@ -280,7 +284,7 @@ img { max-width: 100%; height: auto; }
   background: rgba(255,255,255,0.04);
 }
 .service-card {
-  background: var(--black);
+  background: var(--panel);
   padding: 48px 40px;
   position: relative;
   overflow: hidden;
@@ -294,7 +298,7 @@ img { max-width: 100%; height: auto; }
   background: var(--acid);
   transition: height 0.4s;
 }
-.service-card:hover { background: var(--grey); }
+.service-card:hover { background: var(--panel-soft); }
 .service-card:hover::before { height: 100%; }
 .service-num {
   font-family: var(--font-mono);
@@ -334,7 +338,7 @@ img { max-width: 100%; height: auto; }
   background: rgba(255,255,255,0.04);
 }
 .services-overview-card {
-  background: #111417;
+  background: var(--panel);
   padding: 48px 40px;
   position: relative;
   overflow: hidden;
@@ -346,7 +350,7 @@ img { max-width: 100%; height: auto; }
   gap: 16px;
 }
 .services-overview-card:hover {
-  background: #161b1f;
+  background: var(--panel-soft);
 }
 .service-overview-icon {
   display: inline-flex;
@@ -370,7 +374,7 @@ img { max-width: 100%; height: auto; }
   background: rgba(255,255,255,0.04);
 }
 .stat-box {
-  background: var(--black);
+  background: var(--panel);
   padding: 48px 40px;
   border-right: 1px solid var(--border);
 }
@@ -401,7 +405,7 @@ img { max-width: 100%; height: auto; }
   background: rgba(255,255,255,0.04);
 }
 .post-card {
-  background: var(--black);
+  background: var(--panel);
   padding: 40px;
   position: relative;
   overflow: hidden;
@@ -409,7 +413,7 @@ img { max-width: 100%; height: auto; }
   display: flex;
   flex-direction: column;
 }
-.post-card:hover { background: var(--grey); }
+.post-card:hover { background: var(--panel-soft); }
 
 .post-card.featured {
   grid-column: span 2;

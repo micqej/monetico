@@ -263,7 +263,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
         canonical={`${SITE_URL}/sluzby/${service.slug}/`}
       />
       <Nav />
-      <main style={{ background: '#0a0a0a', minHeight: '100vh', paddingTop: 100 }}>
+      <main style={{ background: 'transparent', minHeight: '100vh', paddingTop: 100 }}>
         {/* Hero */}
         <section style={{
           padding: '80px 40px 80px',
@@ -331,7 +331,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
             gap: 2,
             marginTop: 2,
           }}>
-            <div style={{ background: '#111', padding: '48px 40px' }}>
+            <div style={{ background: 'var(--panel)', padding: '48px 40px' }}>
               <h2 style={{
                 fontFamily: 'Syne, sans-serif',
                 fontWeight: 800,
@@ -350,7 +350,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                 ))}
               </ul>
             </div>
-            <div style={{ background: '#111', padding: '48px 40px' }}>
+            <div style={{ background: 'var(--panel)', padding: '48px 40px' }}>
               <h2 style={{
                 fontFamily: 'Syne, sans-serif',
                 fontWeight: 800,
@@ -389,7 +389,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
             }}>
               {service.pricing.map((plan, i) => (
                 <div key={i} style={{
-                  background: '#111',
+                  background: 'var(--panel)',
                   padding: '40px 32px',
                   position: 'relative',
                 }}>
@@ -460,7 +460,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {service.faq.map((item, i) => (
-                  <div key={i} style={{ background: '#111', padding: '32px 40px' }}>
+                  <div key={i} style={{ background: 'var(--panel)', padding: '32px 40px' }}>
                     <h3 style={{
                       fontFamily: 'Syne, sans-serif',
                       fontWeight: 700,

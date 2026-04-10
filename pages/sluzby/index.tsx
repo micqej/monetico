@@ -77,7 +77,7 @@ export default function SluzbyPage() {
         canonical={`${SITE_URL}/sluzby/`}
       />
       <Nav />
-      <main style={{ background: '#0a0a0a', minHeight: '100vh', paddingTop: 100 }}>
+      <main style={{ background: 'transparent', minHeight: '100vh', paddingTop: 100 }}>
         {/* Hero */}
         <section style={{ padding: '80px 40px 0', maxWidth: 1440, margin: '0 auto' }}>
           <span style={{

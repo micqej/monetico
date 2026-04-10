@@ -12,7 +12,7 @@ export default function GDPRPage() {
         canonical={`${SITE_URL}/gdpr/`}
       />
       <Nav />
-      <main style={{ background: '#0a0a0a', minHeight: '100vh', paddingTop: 120 }}>
+      <main style={{ background: 'transparent', minHeight: '100vh', paddingTop: 120 }}>
         <div style={{ maxWidth: 860, margin: '0 auto', padding: '80px 40px 120px' }}>
           <span style={{
             fontFamily: 'Space Mono, monospace',
