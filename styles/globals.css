@@ -283,6 +283,10 @@ img { max-width: 100%; height: auto; }
   gap: 2px;
   background: rgba(255,255,255,0.04);
 }
+.service-card-link {
+  display: block;
+  color: inherit;
+}
 .service-card {
   background: var(--panel);
   padding: 48px 40px;

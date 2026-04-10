@@ -64,20 +64,22 @@ export default function Home({ recentPosts, categories }: Props) {
 
         <div className="services-grid">
           {[
-            { num: '01', icon: 'mail' as ServiceIconName, title: 'Cold Email Kampane', desc: 'Oslovíme tisíce potenciálnych zákazníkov s personalizovanými emailmi. Reálne dohodnuté stretnutia, nie otvárateľnosť.' },
-            { num: '02', icon: 'seo' as ServiceIconName, title: 'SEO & Obsah', desc: 'Organická návštevnosť, ktorá predáva. Technické SEO, linkbuilding a obsah optimalizovaný pre slovenský trh.' },
-            { num: '03', icon: 'social' as ServiceIconName, title: 'Sociálne Médiá', desc: 'Správa FB, Instagram, LinkedIn. Obsah, ktorý baví, buduje značku a konvertuje sledovateľov na zákazníkov.' },
-            { num: '04', icon: 'email' as ServiceIconName, title: 'Email Marketing', desc: 'Automatizované sekvencie, newslettery a retenčné kampane. Priemer 42€ ROI na každé 1€ investície.' },
-            { num: '05', icon: 'web' as ServiceIconName, title: 'Tvorba Webov', desc: 'WordPress weby a Shoptet e-shopy na mieru. Rýchle, moderné, konverzné. Od dizajnu po spustenie.' },
-            { num: '06', icon: 'copy' as ServiceIconName, title: 'Komplexný Growth', desc: 'Pre firmy, ktoré chcú systematický rast. Kombinujeme všetky kanály do jednej stratégie šitej na mieru.' },
+            { num: '01', slug: 'cold-email', icon: 'mail' as ServiceIconName, title: 'Cold Email Kampane', desc: 'Oslovíme tisíce potenciálnych zákazníkov s personalizovanými emailmi. Reálne dohodnuté stretnutia, nie otvárateľnosť.' },
+            { num: '02', slug: 'seo', icon: 'seo' as ServiceIconName, title: 'SEO & Obsah', desc: 'Organická návštevnosť, ktorá predáva. Technické SEO, linkbuilding a obsah optimalizovaný pre slovenský trh.' },
+            { num: '03', slug: 'socialne-media', icon: 'social' as ServiceIconName, title: 'Sociálne Médiá', desc: 'Správa FB, Instagram, LinkedIn. Obsah, ktorý baví, buduje značku a konvertuje sledovateľov na zákazníkov.' },
+            { num: '04', slug: 'email-marketing', icon: 'email' as ServiceIconName, title: 'Email Marketing', desc: 'Automatizované sekvencie, newslettery a retenčné kampane. Priemer 42€ ROI na každé 1€ investície.' },
+            { num: '05', slug: 'tvorba-webov', icon: 'web' as ServiceIconName, title: 'Tvorba Webov', desc: 'WordPress weby a Shoptet e-shopy na mieru. Rýchle, moderné, konverzné. Od dizajnu po spustenie.' },
+            { num: '06', slug: 'komplexny-growth', icon: 'copy' as ServiceIconName, title: 'Komplexný Growth', desc: 'Pre firmy, ktoré chcú systematický rast. Kombinujeme všetky kanály do jednej stratégie šitej na mieru.' },
           ].map(s => (
-            <div key={s.num} className="service-card">
-              <div className="service-num">{s.num}</div>
-              <span className="service-icon"><ServiceIcon name={s.icon} size={28} /></span>
-              <div className="service-title">{s.title}</div>
-              <p className="service-desc">{s.desc}</p>
-              <span className="service-arrow"><ArrowUpRightIcon size={16} /></span>
-            </div>
+            <Link key={s.num} href={`/sluzby/${s.slug}/`} className="service-card-link">
+              <div className="service-card">
+                <div className="service-num">{s.num}</div>
+                <span className="service-icon"><ServiceIcon name={s.icon} size={28} /></span>
+                <div className="service-title">{s.title}</div>
+                <p className="service-desc">{s.desc}</p>
+                <span className="service-arrow"><ArrowUpRightIcon size={16} /></span>
+              </div>
+            </Link>
           ))}
         </div>
       </section>

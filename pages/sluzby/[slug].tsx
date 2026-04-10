@@ -238,6 +238,38 @@ const servicesData: Record<string, ServiceData> = {
       { name: 'WordPress e-shop', price: 'od 2 500 €', items: ['WooCommerce', 'Dizajn na mieru', 'Produktový katalóg', 'Platobná brána', 'SEO & analytika'] },
     ],
   },
+  'komplexny-growth': {
+    slug: 'komplexny-growth',
+    title: 'Komplexný Growth',
+    subtitle: 'Jedna stratégia, viac kanálov',
+    color: '#7dd3c8',
+    icon: 'copy',
+    heroText: 'Pre firmy, ktoré nechcú riešiť marketing po častiach. Poskladáme cold email, SEO, obsah, sociálne siete, email marketing aj web do jedného funkčného rastového systému.',
+    forWhom: [
+      'Firmy, ktoré chcú jedného partnera namiesto piatich dodávateľov',
+      'Značky vo fáze rastu, ktoré potrebujú koordináciu naprieč kanálmi',
+      'E-shopy a služby, ktoré chcú zvýšiť dopyt aj retenciu súčasne',
+      'Majitelia, ktorí chcú mať jasný plán, priority a reporting',
+    ],
+    whatYouGet: [
+      'Rastový audit a prioritizáciu kanálov podľa potenciálu',
+      'Mesačný plán kampaní, obsahu a výkonových aktivít',
+      'Prepojenie cold emailu, SEO, sociálnych sietí a email marketingu',
+      'Landing pages, lead magnety a konverzné úpravy webu',
+      'Jednotný reporting a pravidelné strategické konzultácie',
+      'Priebežnú optimalizáciu podľa dát a obchodných cieľov',
+    ],
+    pricing: [
+      { name: 'Sprint', price: 'od 900 €/mes', items: ['Audit + roadmapa', '2 hlavné kanály', 'Mesačný reporting', '1 strategický call'] },
+      { name: 'Scale', price: 'od 1 500 €/mes', items: ['3–4 prepojené kanály', 'Obsah + distribúcia', 'Lead gen funnel', 'Bi-týždenné konzultácie'] },
+      { name: 'Partner', price: 'od 2 500 €/mes', items: ['Kompletný growth stack', 'Priebežné experimenty', 'Týždenné vyhodnocovanie', 'Dedikovaná spolupráca'] },
+    ],
+    faq: [
+      { q: 'Je to vhodné aj pre menšie firmy?', a: 'Áno, ak už máte funkčný produkt alebo službu a chcete systematicky rásť. Growth spolupráca dáva najväčší zmysel tam, kde je priestor prepájať viac kanálov naraz.' },
+      { q: 'Musím využívať všetky kanály?', a: 'Nie. Stratégiu skladáme podľa cieľov a kapacít. Niekedy majú zmysel dva silné kanály, inokedy širší mix.' },
+      { q: 'Ako rýchlo uvidím výsledky?', a: 'Niektoré kanály prinesú reakcie v priebehu týždňov, iné sa rozbiehajú dlhšie. Dôležité je, že všetko riadime v jednom pláne a vieme presne, čo funguje.' },
+    ],
+  },
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
