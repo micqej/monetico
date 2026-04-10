@@ -582,11 +582,13 @@ const servicesData: Record<string, ServiceData> = {
       },
     ],
     pricing: [
+      { name: 'Web cez našu technológiu', price: 'od 300 €', items: ['rýchle nasadenie', 'nie je určený na samostatnú editáciu', 'ročná podpora 30 min mesačne', 'vhodné pre menšie prezentačné weby'] },
       { name: 'Prezentačný web', price: 'od 800 €', items: ['šablóna alebo WordPress', '5 až 10 podstránok', 'SEO základ', 'kontaktný formulár', 'mobilná verzia'] },
       { name: 'Web na mieru', price: 'od 2 000 €', items: ['dizajn na mieru', 'pokročilé SEO', 'rýchlostná optimalizácia', 'analytika', 'vyššia flexibilita'] },
       { name: 'Shoptet e-shop', price: 'od 800 €', items: ['nastavenie Shoptetu', 'úprava témy', 'import produktov', 'platobné metódy', 'základné SEO'] },
       { name: 'WordPress e-shop', price: 'od 2 500 €', items: ['WooCommerce', 'dizajn na mieru', 'produktový katalóg', 'platobná brána', 'SEO a analytika'] },
     ],
+    pricingNote: 'Weby cez našu technológiu sú vhodné, ak chcete rýchle a cenovo dostupné riešenie. Po spustení ich neviete samostatne editovať, ale v cene je ročná podpora v rozsahu 30 minút mesačne.',
   },
   'komplexny-growth': {
     slug: 'komplexny-growth',
@@ -913,10 +915,12 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                     style={{
                       fontFamily: 'Syne, sans-serif',
                       fontWeight: 800,
-                      fontSize: 32,
+                      fontSize: 28,
                       color: '#fff',
                       margin: '12px 0 24px',
                       lineHeight: 1.15,
+                      letterSpacing: '-0.02em',
+                      overflowWrap: 'anywhere',
                     }}
                   >
                     {plan.price}
@@ -927,7 +931,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                         <span style={{ color: service.color, flexShrink: 0, display: 'inline-flex' }}>
                           <CheckIcon size={13} />
                         </span>
-                        <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: '#777', lineHeight: 1.45 }}>{item}</span>
+                        <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: '#777', lineHeight: 1.45 }}>{item}</span>
                       </li>
                     ))}
                   </ul>
