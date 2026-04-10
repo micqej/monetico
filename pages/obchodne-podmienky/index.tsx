@@ -1,11 +1,12 @@
 import Nav from '../../components/Nav'
 import Footer from '../../components/Footer'
 import SEO from '../../components/SEO'
+import { SITE_URL } from '../../lib/site'
 
 export default function ObchodnePodmienky() {
   return (
     <>
-      <SEO title="Obchodné podmienky" description="Obchodné podmienky spoločnosti Brandrise s.r.o. — Monetico agentúra." canonical="https://www.monetico.sk/obchodne-podmienky/" />
+      <SEO title="Obchodné podmienky" description="Obchodné podmienky spoločnosti Brandrise s.r.o. — Monetico agentúra." canonical={`${SITE_URL}/obchodne-podmienky/`} />
       <Nav />
       <div style={{ padding: '140px 48px 100px', maxWidth: '860px' }}>
         <div className="section-label">Právne informácie</div>

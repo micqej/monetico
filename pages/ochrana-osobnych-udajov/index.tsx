@@ -1,11 +1,12 @@
 import Nav from '../../components/Nav'
 import Footer from '../../components/Footer'
 import SEO from '../../components/SEO'
+import { SITE_URL } from '../../lib/site'
 
 export default function GDPR() {
   return (
     <>
-      <SEO title="Ochrana osobných údajov" description="Zásady ochrany osobných údajov spoločnosti Brandrise s.r.o. — Monetico." canonical="https://www.monetico.sk/ochrana-osobnych-udajov/" />
+      <SEO title="Ochrana osobných údajov" description="Zásady ochrany osobných údajov spoločnosti Brandrise s.r.o. — Monetico." canonical={`${SITE_URL}/ochrana-osobnych-udajov/`} />
       <Nav />
       <div style={{ padding: '140px 48px 100px', maxWidth: '860px' }}>
         <div className="section-label">Právne informácie</div>

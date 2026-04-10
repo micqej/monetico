@@ -5,6 +5,7 @@ import PostCard from '../../components/PostCard'
 import SEO from '../../components/SEO'
 import { getAllPosts, getPostBySlug, getAllSlugs, formatDate, Post } from '../../lib/posts'
 import { renderWordPressContent, extractHeadings } from '../../lib/renderContent'
+import { SITE_URL } from '../../lib/site'
 
 interface Props {
   post: Post
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export default function PostPage({ post, related, headings, cleanContent }: Props) {
-  const canonical = `https://www.monetico.sk/${post.slug}/`
+  const canonical = `${SITE_URL}/${post.slug}/`
   const cat = post.categories[0] || 'Blog'
 
   return (
@@ -26,6 +27,7 @@ export default function PostPage({ post, related, headings, cleanContent }: Prop
         ogTitle={post.og_title || post.meta_title || post.title}
         ogDesc={post.og_desc || post.meta_desc}
         keywords={post.meta_keywords}
+        type="article"
       />
       <Nav />
 

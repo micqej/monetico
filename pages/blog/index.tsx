@@ -5,6 +5,7 @@ import Footer from '../../components/Footer'
 import PostCard from '../../components/PostCard'
 import SEO from '../../components/SEO'
 import { getAllPosts, getAllCategories, Post } from '../../lib/posts'
+import { SITE_URL } from '../../lib/site'
 
 interface Props {
   posts: Post[]
@@ -34,7 +35,7 @@ export default function Blog({ posts, categories }: Props) {
       <SEO
         title="Blog — Tipy z digitálneho marketingu"
         description="Praktické tipy o cold emailoch, SEO, sociálnych médiách a tvorbe webov pre slovenské firmy. Overené stratégie z praxe."
-        canonical="https://www.monetico.sk/blog/"
+        canonical={`${SITE_URL}/blog/`}
       />
       <Nav />
 

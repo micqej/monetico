@@ -1,14 +1,16 @@
-import Head from 'next/head';
 import Nav from '../../components/Nav';
 import Footer from '../../components/Footer';
+import SEO from '../../components/SEO';
+import { SITE_URL } from '../../lib/site';
 
 export default function GDPRPage() {
   return (
     <>
-      <Head>
-        <title>GDPR — Monetico</title>
-        <meta name="description" content="Informácie o spracovaní osobných údajov podľa nariadenia GDPR — Monetico digitálna agentúra." />
-      </Head>
+      <SEO
+        title="GDPR"
+        description="Informácie o spracovaní osobných údajov podľa nariadenia GDPR — Monetico digitálna agentúra."
+        canonical={`${SITE_URL}/gdpr/`}
+      />
       <Nav />
       <main style={{ background: '#0a0a0a', minHeight: '100vh', paddingTop: 120 }}>
         <div style={{ maxWidth: 860, margin: '0 auto', padding: '80px 40px 120px' }}>
@@ -16,7 +18,7 @@ export default function GDPRPage() {
             fontFamily: 'Space Mono, monospace',
             fontSize: 11,
             letterSpacing: '0.2em',
-            color: '#d4f53c',
+            color: 'var(--acid)',
             textTransform: 'uppercase',
           }}>
             — Právne informácie
@@ -42,7 +44,7 @@ export default function GDPRPage() {
               so sídlom Sokolovská 178/10, 040 11 Košice, IČO: 53196449, DIČ: 2121313865, IČ DPH: SK2121313865,
               prevádzkujúca značku <strong style={{ color: '#fff' }}>Monetico</strong>.
             </p>
-            <p>Kontaktný e-mail: <a href="mailto:info@monetico.sk" style={{ color: '#d4f53c' }}>info@monetico.sk</a></p>
+            <p>Kontaktný e-mail: <a href="mailto:info@monetico.sk" style={{ color: 'var(--acid)' }}>info@monetico.sk</a></p>
 
             <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
               2. Účel a právny základ spracúvania
@@ -92,8 +94,8 @@ export default function GDPRPage() {
               <li><strong style={{ color: '#fff' }}>Právo odvolať súhlas</strong> — kedykoľvek bez uvedenia dôvodu</li>
             </ul>
             <p>
-              Svoju požiadavku nám môžete zaslať na <a href="mailto:info@monetico.sk" style={{ color: '#d4f53c' }}>info@monetico.sk</a>.
-              Máte tiež právo podať sťažnosť na Úrad na ochranu osobných údajov SR (<a href="https://www.uoou.sk" target="_blank" rel="noopener noreferrer" style={{ color: '#d4f53c' }}>uoou.sk</a>).
+              Svoju požiadavku nám môžete zaslať na <a href="mailto:info@monetico.sk" style={{ color: 'var(--acid)' }}>info@monetico.sk</a>.
+              Máte tiež právo podať sťažnosť na Úrad na ochranu osobných údajov SR (<a href="https://www.uoou.sk" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--acid)' }}>uoou.sk</a>).
             </p>
 
             <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
@@ -113,7 +115,7 @@ export default function GDPRPage() {
             </h2>
             <p>
               Naša webová stránka používa súbory cookies. Podrobné informácie nájdete v sekcii
-              {' '}<a href="/ochrana-osobnych-udajov/" style={{ color: '#d4f53c' }}>Ochrana osobných údajov</a>.
+              {' '}<a href="/ochrana-osobnych-udajov/" style={{ color: 'var(--acid)' }}>Ochrana osobných údajov</a>.
               Cookies, ktoré nie sú nevyhnutné, používame len s vaším súhlasom.
             </p>
 

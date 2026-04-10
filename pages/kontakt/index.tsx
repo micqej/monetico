@@ -2,6 +2,8 @@ import { useState } from 'react'
 import Nav from '../../components/Nav'
 import Footer from '../../components/Footer'
 import SEO from '../../components/SEO'
+import { SparkIcon } from '../../components/Icons'
+import { SITE_URL } from '../../lib/site'
 
 const SERVICES = [
   'Cold Email Kampane',
@@ -29,7 +31,7 @@ export default function Kontakt() {
       <SEO
         title="Kontakt"
         description="Kontaktujte Monetico agentúru. Nezáväzná konzultácia zdarma. Cold email, SEO, sociálne médiá, tvorba webov na Slovensku."
-        canonical="https://www.monetico.sk/kontakt/"
+        canonical={`${SITE_URL}/kontakt/`}
       />
       <Nav />
       <div className="contact-page">
@@ -99,7 +101,7 @@ export default function Kontakt() {
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--acid)', marginBottom: '16px' }}>Naše služby</div>
               {['Cold Email','SEO','Sociálne Médiá','Email Marketing','WordPress','Shoptet','Google & FB Ads'].map(s => (
                 <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: '1px solid var(--border)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                  <span style={{ color: 'var(--acid)' }}>✦</span> {s}
+                  <span style={{ color: 'var(--acid)', display: 'inline-flex' }}><SparkIcon size={14} /></span> {s}
                 </div>
               ))}
             </div>

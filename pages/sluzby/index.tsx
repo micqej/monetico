@@ -1,7 +1,9 @@
-import Head from 'next/head';
 import Link from 'next/link';
 import Nav from '../../components/Nav';
 import Footer from '../../components/Footer';
+import SEO from '../../components/SEO';
+import { ArrowUpRightIcon, ServiceIcon, type ServiceIconName } from '../../components/Icons';
+import { SITE_URL } from '../../lib/site';
 
 const services = [
   {
@@ -11,8 +13,8 @@ const services = [
     description: 'Oslovíme správnych ľudí v správnom čase. Nastavíme kompletnú cold email infraštruktúru, napíšeme sekvencie a spravujeme kampane.',
     price: 'od 600 €',
     priceNote: 'mesačne',
-    color: '#6366f1',
-    icon: '✉️',
+    color: '#7c9cff',
+    icon: 'mail' as ServiceIconName,
   },
   {
     slug: 'seo',
@@ -21,8 +23,8 @@ const services = [
     description: 'Komplexná SEO stratégia: analýza kľúčových slov, optimalizácia stránok, budovanie odkazov a pravidelný reporting.',
     price: 'od 400 €',
     priceNote: 'mesačne',
-    color: '#06b6d4',
-    icon: '📈',
+    color: '#53b8d9',
+    icon: 'seo' as ServiceIconName,
   },
   {
     slug: 'texty-a-clanky',
@@ -31,8 +33,8 @@ const services = [
     description: 'Píšeme SEO články, texty na web, popisy produktov, kategórie pre e-shopy a pravidelný blog. Obsah optimalizovaný pre vyhľadávače aj zákazníkov.',
     price: 'od 30 €',
     priceNote: 'za text',
-    color: '#10b981',
-    icon: '✍️',
+    color: '#63b98f',
+    icon: 'copy' as ServiceIconName,
   },
   {
     slug: 'socialne-media',
@@ -41,8 +43,8 @@ const services = [
     description: 'Správa Instagramu, Facebooku a LinkedInu. Tvorba obsahu, stories, reels, mesačný report a sledovanie trendov.',
     price: 'od 250 €',
     priceNote: 'mesačne',
-    color: '#f59e0b',
-    icon: '📱',
+    color: '#c78a62',
+    icon: 'social' as ServiceIconName,
   },
   {
     slug: 'email-marketing',
@@ -51,8 +53,8 @@ const services = [
     description: 'Nastavíme a spravujeme email marketing: automatizácie, newslettery, segmentácia databázy a A/B testovanie.',
     price: 'od 300 €',
     priceNote: 'mesačne',
-    color: '#a855f7',
-    icon: '📧',
+    color: '#b18ae0',
+    icon: 'email' as ServiceIconName,
   },
   {
     slug: 'tvorba-webov',
@@ -61,27 +63,28 @@ const services = [
     description: 'Prezentačné weby, e-shopy na Shoptete aj WordPresse. Dizajn na mieru, rýchlosť, SEO a správa doménového ekosystému.',
     price: 'od 800 €',
     priceNote: 'jednorazovo',
-    color: '#d4f53c',
-    icon: '🌐',
+    color: '#7dd3c8',
+    icon: 'web' as ServiceIconName,
   },
 ];
 
 export default function SluzbyPage() {
   return (
     <>
-      <Head>
-        <title>Služby — Monetico digitálna agentúra</title>
-        <meta name="description" content="Cold emailing, SEO, sociálne médiá, email marketing, tvorba webov a copywriting. Komplexný digitálny marketing pre vaše podnikanie." />
-      </Head>
+      <SEO
+        title="Služby"
+        description="Cold emailing, SEO, sociálne médiá, email marketing, tvorba webov a copywriting. Komplexný digitálny marketing pre vaše podnikanie."
+        canonical={`${SITE_URL}/sluzby/`}
+      />
       <Nav />
       <main style={{ background: '#0a0a0a', minHeight: '100vh', paddingTop: 100 }}>
         {/* Hero */}
-        <section style={{ padding: '80px 40px 0', maxWidth: 1400, margin: '0 auto' }}>
+        <section style={{ padding: '80px 40px 0', maxWidth: 1440, margin: '0 auto' }}>
           <span style={{
             fontFamily: 'Space Mono, monospace',
             fontSize: 11,
             letterSpacing: '0.2em',
-            color: '#d4f53c',
+            color: 'var(--acid)',
             textTransform: 'uppercase',
           }}>
             — Čo robíme
@@ -109,30 +112,11 @@ export default function SluzbyPage() {
         </section>
 
         {/* Services grid */}
-        <section style={{ padding: '80px 40px 120px', maxWidth: 1400, margin: '0 auto' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
-            gap: 2,
-          }}>
+        <section className="services-overview-shell">
+          <div className="services-overview-grid">
             {services.map((s) => (
               <Link key={s.slug} href={`/sluzby/${s.slug}/`} style={{ textDecoration: 'none' }}>
-                <div
-                  style={{
-                    background: '#111',
-                    padding: '48px 40px',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    transition: 'background 0.2s',
-                    height: '100%',
-                    boxSizing: 'border-box',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 16,
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#161616'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#111'; }}
-                >
+                <div className="services-overview-card">
                   {/* Color accent */}
                   <div style={{
                     position: 'absolute',
@@ -145,8 +129,12 @@ export default function SluzbyPage() {
 
                   {/* Icon + arrow */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: 32 }}>{s.icon}</span>
-                    <span style={{ color: '#333', fontSize: 20 }}>↗</span>
+                    <span className="service-overview-icon" style={{ color: s.color }}>
+                      <ServiceIcon name={s.icon} size={28} />
+                    </span>
+                    <span style={{ color: '#3d4348', display: 'inline-flex' }}>
+                      <ArrowUpRightIcon size={18} />
+                    </span>
                   </div>
 
                   <div>
@@ -162,7 +150,7 @@ export default function SluzbyPage() {
                     <h3 style={{
                       fontFamily: 'Syne, sans-serif',
                       fontWeight: 800,
-                      fontSize: 28,
+                      fontSize: 30,
                       color: '#fff',
                       margin: '8px 0 0',
                       lineHeight: 1.1,
@@ -191,7 +179,7 @@ export default function SluzbyPage() {
                     <span style={{
                       fontFamily: 'Syne, sans-serif',
                       fontWeight: 800,
-                      fontSize: 28,
+                      fontSize: 30,
                       color: '#fff',
                     }}>
                       {s.price}

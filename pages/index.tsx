@@ -3,7 +3,9 @@ import Nav from '../components/Nav'
 import Footer from '../components/Footer'
 import PostCard from '../components/PostCard'
 import SEO from '../components/SEO'
+import { ArrowUpRightIcon, ServiceIcon, SparkIcon, type ServiceIconName } from '../components/Icons'
 import { getAllPosts, getAllCategories, Post } from '../lib/posts'
+import { SITE_URL } from '../lib/site'
 
 interface Props {
   recentPosts: Post[]
@@ -14,7 +16,7 @@ export default function Home({ recentPosts, categories }: Props) {
   return (
     <>
       <SEO
-        canonical="https://www.monetico.sk/"
+        canonical={`${SITE_URL}/`}
         description="Digitálna agentúra pre rastúce slovenské firmy. Cold email kampane, SEO, sociálne médiá, email marketing a tvorba webov na WordPress a Shoptet."
       />
       <Nav />
@@ -49,7 +51,7 @@ export default function Home({ recentPosts, categories }: Props) {
         <div className="marquee-track">
           {['Cold Email', 'SEO Optimalizácia', 'Sociálne Médiá', 'Email Marketing', 'Tvorba Webov', 'Shoptet E-shopy', 'WordPress', 'Cold Email', 'SEO Optimalizácia', 'Sociálne Médiá', 'Email Marketing', 'Tvorba Webov', 'Shoptet E-shopy', 'WordPress'].map((item, i) => (
             <div key={i} className="marquee-item">
-              <em>✦</em> {item}
+              <em><SparkIcon size={14} /></em> {item}
             </div>
           ))}
         </div>
@@ -62,19 +64,19 @@ export default function Home({ recentPosts, categories }: Props) {
 
         <div className="services-grid">
           {[
-            { num: '01', icon: '✉', title: 'Cold Email Kampane', desc: 'Oslovíme tisíce potenciálnych zákazníkov s personalizovanými emailmi. Reálne dohodnuté stretnutia, nie otvárateľnosť.' },
-            { num: '02', icon: '◎', title: 'SEO & Obsah', desc: 'Organická návštevnosť, ktorá predáva. Technické SEO, linkbuilding a obsah optimalizovaný pre slovenský trh.' },
-            { num: '03', icon: '◈', title: 'Sociálne Médiá', desc: 'Správa FB, Instagram, LinkedIn. Obsah, ktorý baví, buduje značku a konvertuje sledovateľov na zákazníkov.' },
-            { num: '04', icon: '⊛', title: 'Email Marketing', desc: 'Automatizované sekvencie, newslettery a retenčné kampane. Priemer 42€ ROI na každé 1€ investície.' },
-            { num: '05', icon: '⬡', title: 'Tvorba Webov', desc: 'WordPress weby a Shoptet e-shopy na mieru. Rýchle, moderné, konverzné. Od dizajnu po spustenie.' },
-            { num: '06', icon: '◬', title: 'Komplexný Growth', desc: 'Pre firmy, ktoré chcú systematický rast. Kombinujeme všetky kanály do jednej stratégie šitej na mieru.' },
+            { num: '01', icon: 'mail' as ServiceIconName, title: 'Cold Email Kampane', desc: 'Oslovíme tisíce potenciálnych zákazníkov s personalizovanými emailmi. Reálne dohodnuté stretnutia, nie otvárateľnosť.' },
+            { num: '02', icon: 'seo' as ServiceIconName, title: 'SEO & Obsah', desc: 'Organická návštevnosť, ktorá predáva. Technické SEO, linkbuilding a obsah optimalizovaný pre slovenský trh.' },
+            { num: '03', icon: 'social' as ServiceIconName, title: 'Sociálne Médiá', desc: 'Správa FB, Instagram, LinkedIn. Obsah, ktorý baví, buduje značku a konvertuje sledovateľov na zákazníkov.' },
+            { num: '04', icon: 'email' as ServiceIconName, title: 'Email Marketing', desc: 'Automatizované sekvencie, newslettery a retenčné kampane. Priemer 42€ ROI na každé 1€ investície.' },
+            { num: '05', icon: 'web' as ServiceIconName, title: 'Tvorba Webov', desc: 'WordPress weby a Shoptet e-shopy na mieru. Rýchle, moderné, konverzné. Od dizajnu po spustenie.' },
+            { num: '06', icon: 'copy' as ServiceIconName, title: 'Komplexný Growth', desc: 'Pre firmy, ktoré chcú systematický rast. Kombinujeme všetky kanály do jednej stratégie šitej na mieru.' },
           ].map(s => (
             <div key={s.num} className="service-card">
               <div className="service-num">{s.num}</div>
-              <span className="service-icon">{s.icon}</span>
+              <span className="service-icon"><ServiceIcon name={s.icon} size={28} /></span>
               <div className="service-title">{s.title}</div>
               <p className="service-desc">{s.desc}</p>
-              <span className="service-arrow">→</span>
+              <span className="service-arrow"><ArrowUpRightIcon size={16} /></span>
             </div>
           ))}
         </div>

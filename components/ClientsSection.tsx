@@ -26,7 +26,7 @@ export default function ClientsSection() {
             fontFamily: 'Space Mono, monospace',
             fontSize: 11,
             letterSpacing: '0.2em',
-            color: '#d4f53c',
+            color: 'var(--acid)',
             textTransform: 'uppercase',
           }}>
             — Naši klienti
@@ -61,10 +61,10 @@ export default function ClientsSection() {
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
                 padding: '8px 18px',
-                border: `1px solid ${activeFilter === cat ? '#d4f53c' : '#333'}`,
-                background: activeFilter === cat ? '#d4f53c' : 'transparent',
+                border: `1px solid ${activeFilter === cat ? 'var(--acid)' : '#333'}`,
+                background: activeFilter === cat ? 'var(--acid)' : 'transparent',
                 color: activeFilter === cat ? '#000' : '#666',
-                cursor: 'none',
+                cursor: 'pointer',
                 transition: 'all 0.2s',
               }}
             >
@@ -125,13 +125,13 @@ export default function ClientsSection() {
                     width: 6,
                     height: 6,
                     borderRadius: '50%',
-                    background: cat === 'web' ? '#d4f53c'
-                      : cat === 'eshop' ? '#ff6b35'
-                      : cat === 'cold-email' ? '#6366f1'
-                      : cat === 'seo' ? '#06b6d4'
-                      : cat === 'social' ? '#f59e0b'
-                      : cat === 'texty' ? '#10b981'
-                      : '#a855f7',
+                    background: cat === 'web' ? '#7dd3c8'
+                      : cat === 'eshop' ? '#d67c5c'
+                      : cat === 'cold-email' ? '#7c9cff'
+                      : cat === 'seo' ? '#53b8d9'
+                      : cat === 'social' ? '#c78a62'
+                      : cat === 'texty' ? '#63b98f'
+                      : '#b18ae0',
                   }} />
                 ))}
               </div>
@@ -179,13 +179,13 @@ export default function ClientsSection() {
                 width: 8,
                 height: 8,
                 borderRadius: '50%',
-                background: key === 'web' ? '#d4f53c'
-                  : key === 'eshop' ? '#ff6b35'
-                  : key === 'cold-email' ? '#6366f1'
-                  : key === 'seo' ? '#06b6d4'
-                  : key === 'social' ? '#f59e0b'
-                  : key === 'texty' ? '#10b981'
-                  : '#a855f7',
+                background: key === 'web' ? '#7dd3c8'
+                  : key === 'eshop' ? '#d67c5c'
+                  : key === 'cold-email' ? '#7c9cff'
+                  : key === 'seo' ? '#53b8d9'
+                  : key === 'social' ? '#c78a62'
+                  : key === 'texty' ? '#63b98f'
+                  : '#b18ae0',
                 flexShrink: 0,
               }} />
               <span style={{

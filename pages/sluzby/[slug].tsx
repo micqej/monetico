@@ -1,15 +1,17 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import Head from 'next/head';
 import Link from 'next/link';
 import Nav from '../../components/Nav';
 import Footer from '../../components/Footer';
+import SEO from '../../components/SEO';
+import { ArrowRightIcon, CheckIcon, ServiceIcon, type ServiceIconName } from '../../components/Icons';
+import { SITE_URL } from '../../lib/site';
 
 type ServiceData = {
   slug: string;
   title: string;
   subtitle: string;
   color: string;
-  icon: string;
+  icon: ServiceIconName;
   heroText: string;
   forWhom: string[];
   whatYouGet: string[];
@@ -22,8 +24,8 @@ const servicesData: Record<string, ServiceData> = {
     slug: 'cold-email',
     title: 'Cold Email kampane',
     subtitle: 'B2B outreach na autopilote',
-    color: '#6366f1',
-    icon: '✉️',
+    color: '#7c9cff',
+    icon: 'mail',
     heroText: 'Oslovíme správnych decision makerov skôr, ako to urobia vaši konkurenti. Komplexné nastavenie, kvalifikované leady, merateľné výsledky.',
     forWhom: [
       'B2B firmy hľadajúce nových klientov',
@@ -94,8 +96,8 @@ const servicesData: Record<string, ServiceData> = {
     slug: 'seo',
     title: 'SEO obsah & Link building',
     subtitle: 'Organická viditeľnosť, ktorá rastie',
-    color: '#06b6d4',
-    icon: '📈',
+    color: '#53b8d9',
+    icon: 'seo',
     heroText: 'Dlhodobo udržateľná viditeľnosť vo vyhľadávačoch. Kombinujeme technické SEO, hodnotný obsah a kvalitné spätné odkazy.',
     forWhom: [
       'E-shopy chcúce rásť organicky',
@@ -123,8 +125,8 @@ const servicesData: Record<string, ServiceData> = {
     slug: 'texty-a-clanky',
     title: 'SEO texty & copywriting',
     subtitle: 'Obsah, ktorý predáva aj rankuje',
-    color: '#10b981',
-    icon: '✍️',
+    color: '#63b98f',
+    icon: 'copy',
     heroText: 'Píšeme texty, ktoré vyhľadávače milujú a zákazníci čítajú. Od produktových popisov cez SEO články až po kompletný obsah webu.',
     forWhom: [
       'E-shopy bez času na písanie popisov produktov',
@@ -157,8 +159,8 @@ const servicesData: Record<string, ServiceData> = {
     slug: 'socialne-media',
     title: 'Sociálne médiá',
     subtitle: 'Komunita, ktorá kupuje',
-    color: '#f59e0b',
-    icon: '📱',
+    color: '#c78a62',
+    icon: 'social',
     heroText: 'Pravidelný, hodnotný obsah, ktorý buduje dôveru a premieňa sledovateľov na zákazníkov.',
     forWhom: [
       'Firmy, ktoré chcú byť viditeľné na Instagrame a Facebooku',
@@ -184,8 +186,8 @@ const servicesData: Record<string, ServiceData> = {
     slug: 'email-marketing',
     title: 'Email marketing',
     subtitle: 'Retenčný kanál s najvyšším ROI',
-    color: '#a855f7',
-    icon: '📧',
+    color: '#b18ae0',
+    icon: 'email',
     heroText: 'Email marketing má stále najvyšší ROI zo všetkých kanálov — až 42 € na každé 1 € investované. My ho nastavíme, zautomatizujeme a spravujeme.',
     forWhom: [
       'E-shopy s existujúcou databázou zákazníkov',
@@ -211,8 +213,8 @@ const servicesData: Record<string, ServiceData> = {
     slug: 'tvorba-webov',
     title: 'Tvorba webov & e-shopov',
     subtitle: 'Weby, ktoré konvertujú',
-    color: '#d4f53c',
-    icon: '🌐',
+    color: '#7dd3c8',
+    icon: 'web',
     heroText: 'Vytvárame weby a e-shopy, ktoré vyzerajú dobre, načítavajú sa rýchlo a premieňajú návštevníkov na zákazníkov.',
     forWhom: [
       'Firmy bez webu alebo so zastaraným webom',
@@ -255,10 +257,11 @@ export default function ServicePage({ service }: { service: ServiceData }) {
 
   return (
     <>
-      <Head>
-        <title>{service.title} — Monetico</title>
-        <meta name="description" content={service.heroText} />
-      </Head>
+      <SEO
+        title={service.title}
+        description={service.heroText}
+        canonical={`${SITE_URL}/sluzby/${service.slug}/`}
+      />
       <Nav />
       <main style={{ background: '#0a0a0a', minHeight: '100vh', paddingTop: 100 }}>
         {/* Hero */}
@@ -269,7 +272,9 @@ export default function ServicePage({ service }: { service: ServiceData }) {
           borderBottom: '1px solid #1a1a1a',
         }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, marginBottom: 32 }}>
-            <span style={{ fontSize: 48 }}>{service.icon}</span>
+            <span style={{ color: service.color, display: 'inline-flex' }}>
+              <ServiceIcon name={service.icon} size={44} />
+            </span>
             <div>
               <span style={{
                 fontFamily: 'Space Mono, monospace',
@@ -309,11 +314,11 @@ export default function ServicePage({ service }: { service: ServiceData }) {
               textTransform: 'uppercase',
               padding: '16px 32px',
               background: service.color,
-              color: service.color === '#d4f53c' ? '#000' : '#fff',
+              color: '#0a0a0a',
               textDecoration: 'none',
               fontWeight: 700,
             }}>
-              Chcem konzultáciu →
+              Chcem konzultáciu
             </Link>
           </div>
         </section>
@@ -339,7 +344,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {service.forWhom.map((item, i) => (
                   <li key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <span style={{ color: service.color, marginTop: 2, flexShrink: 0 }}>→</span>
+                    <span style={{ color: service.color, marginTop: 2, flexShrink: 0, display: 'inline-flex' }}><ArrowRightIcon size={14} /></span>
                     <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, color: '#aaa', lineHeight: 1.5 }}>{item}</span>
                   </li>
                 ))}
@@ -358,7 +363,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {service.whatYouGet.map((item, i) => (
                   <li key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <span style={{ color: service.color, marginTop: 2, flexShrink: 0 }}>✓</span>
+                    <span style={{ color: service.color, marginTop: 2, flexShrink: 0, display: 'inline-flex' }}><CheckIcon size={14} /></span>
                     <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, color: '#aaa', lineHeight: 1.5 }}>{item}</span>
                   </li>
                 ))}
@@ -417,7 +422,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {plan.items.map((item, j) => (
                       <li key={j} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                        <span style={{ color: service.color, flexShrink: 0, fontSize: 13 }}>✓</span>
+                        <span style={{ color: service.color, flexShrink: 0, display: 'inline-flex' }}><CheckIcon size={13} /></span>
                         <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14, color: '#777', lineHeight: 1.4 }}>{item}</span>
                       </li>
                     ))}
@@ -476,7 +481,8 @@ export default function ServicePage({ service }: { service: ServiceData }) {
 
           {/* CTA */}
           <section style={{
-            background: '#d4f53c',
+            background: '#111417',
+            border: '1px solid rgba(255,255,255,0.08)',
             padding: '64px 60px',
             marginBottom: 80,
             display: 'flex',
@@ -486,10 +492,10 @@ export default function ServicePage({ service }: { service: ServiceData }) {
             flexWrap: 'wrap',
           }}>
             <div>
-              <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 36, color: '#000', margin: '0 0 8px' }}>
+              <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 36, color: '#fff', margin: '0 0 8px' }}>
                 Zaujalo vás to?
               </h2>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 16, color: '#333', margin: 0 }}>
+              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 16, color: '#8b9198', margin: 0 }}>
                 Nezáväzná konzultácia zdarma. Odpovieme do 24 hodín.
               </p>
             </div>
@@ -499,13 +505,13 @@ export default function ServicePage({ service }: { service: ServiceData }) {
               letterSpacing: '0.15em',
               textTransform: 'uppercase',
               padding: '18px 40px',
-              background: '#000',
-              color: '#d4f53c',
+              background: service.color,
+              color: '#0a0a0a',
               textDecoration: 'none',
               fontWeight: 700,
               flexShrink: 0,
             }}>
-              Dohodnúť konzultáciu →
+              Dohodnúť konzultáciu
             </Link>
           </section>
         </div>

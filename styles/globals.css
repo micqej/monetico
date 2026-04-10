@@ -3,12 +3,12 @@
 :root {
   --black: #0a0a0a;
   --white: #f4f0e8;
-  --acid: #d4f53c;
-  --orange: #ff4d1c;
-  --grey: #151515;
-  --mid: #2e2e2e;
-  --border: rgba(255,255,255,0.07);
-  --muted: #666;
+  --acid: #7dd3c8;
+  --orange: #d67c5c;
+  --grey: #111417;
+  --mid: #2a3136;
+  --border: rgba(255,255,255,0.08);
+  --muted: #8b9198;
   --font-display: 'Syne', sans-serif;
   --font-mono: 'Space Mono', monospace;
   --font-body: 'DM Sans', sans-serif;
@@ -167,7 +167,10 @@ img { max-width: 100%; height: auto; }
 .marquee-item em {
   font-style: normal;
   color: var(--acid);
-  font-size: 16px;
+  font-size: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 @keyframes marquee {
   from { transform: translateX(0); }
@@ -187,8 +190,8 @@ img { max-width: 100%; height: auto; }
 .hero-bg {
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 75% 15%, rgba(212,245,60,0.07) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 50% at 15% 85%, rgba(255,77,28,0.05) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 60% at 75% 15%, rgba(125,211,200,0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 50% at 15% 85%, rgba(214,124,92,0.07) 0%, transparent 50%),
     var(--black);
   pointer-events: none;
 }
@@ -301,6 +304,7 @@ img { max-width: 100%; height: auto; }
   margin-bottom: 28px;
 }
 .service-icon { font-size: 32px; margin-bottom: 18px; display: block; }
+.service-icon svg { display: block; }
 .service-title {
   font-family: var(--font-display);
   font-weight: 700;
@@ -313,12 +317,50 @@ img { max-width: 100%; height: auto; }
 .service-arrow {
   position: absolute;
   bottom: 28px; right: 28px;
-  font-size: 18px;
   color: var(--acid);
+  display: inline-flex;
   opacity: 0;
   transition: opacity 0.3s, transform 0.3s;
 }
 .service-card:hover .service-arrow { opacity: 1; transform: translateX(4px); }
+
+.services-overview-shell {
+  padding: 80px 0 120px;
+}
+.services-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  background: rgba(255,255,255,0.04);
+}
+.services-overview-card {
+  background: #111417;
+  padding: 48px 40px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.25s ease, transform 0.25s ease;
+  min-height: 430px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.services-overview-card:hover {
+  background: #161b1f;
+}
+.service-overview-icon {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  border-radius: 16px;
+}
+.service-overview-icon svg {
+  display: block;
+}
 
 /* ─── STATS ─── */
 .stats-grid {
@@ -914,7 +956,7 @@ img { max-width: 100%; height: auto; }
   letter-spacing: -2px;
   transition: color 0.3s;
 }
-.process-item:hover .process-step { color: rgba(212,245,60,0.12); }
+.process-item:hover .process-step { color: rgba(125,211,200,0.14); }
 .process-title {
   font-family: var(--font-display);
   font-weight: 700;
@@ -1045,6 +1087,7 @@ footer {
 /* ─── RESPONSIVE ─── */
 @media (max-width: 1024px) {
   .services-grid { grid-template-columns: repeat(2, 1fr); }
+  .services-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .posts-grid { grid-template-columns: repeat(2, 1fr); }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .post-card.featured { grid-column: span 2; grid-template-columns: 1fr; }
@@ -1061,7 +1104,8 @@ footer {
   .hero { padding: 110px 24px 64px; }
   .hero-bottom { flex-direction: column; align-items: flex-start; }
   .section { padding: 72px 24px; }
-  .services-grid, .posts-grid, .stats-grid, .related-grid { grid-template-columns: 1fr; }
+  .services-grid, .posts-grid, .stats-grid, .related-grid, .services-overview-grid { grid-template-columns: 1fr; }
+  .services-overview-card { min-height: auto; padding: 36px 24px; }
   .post-card.featured { grid-column: span 1; grid-template-columns: 1fr; padding: 36px 24px; }
   .archive-hero { padding: 110px 24px 56px; }
   .filter-bar { padding: 20px 24px; }
