@@ -205,7 +205,6 @@ img { max-width: 100%; height: auto; }
   background: var(--ink); border: 2px solid var(--ink); border-radius: var(--r);
   margin: 16px var(--side); overflow: hidden; box-shadow: var(--sh); position: relative;
 }
-.stats-grid::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--y), var(--purple), transparent); z-index: 1; }
 .stat-box { padding: 40px 32px; border-right: 2px solid rgba(255,255,255,.12); }
 .stat-box:last-child { border-right: none; }
 .stat-num { font-family: var(--font-display); font-weight: 900; font-size: clamp(40px, 5vw, 60px); letter-spacing: -2px; color: var(--y); line-height: 1; }
@@ -273,7 +272,6 @@ img { max-width: 100%; height: auto; }
   display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap;
   position: relative; overflow: hidden;
 }
-.cta-strip::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--y), var(--purple), transparent); }
 .cta-headline { font-family: var(--font-display); font-weight: 900; font-size: clamp(32px, 4.6vw, 60px); letter-spacing: -2px; line-height: .95; color: var(--white); }
 .cta-btn {
   display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;
