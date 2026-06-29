@@ -4,7 +4,8 @@ import Footer from '../components/Footer'
 import PostCard from '../components/PostCard'
 import SEO from '../components/SEO'
 import { ArrowUpRightIcon, ServiceIcon, SparkIcon, type ServiceIconName } from '../components/Icons'
-import { getAllPosts, getAllCategories, Post } from '../lib/posts'
+import { getAllPosts, mergePosts, categoriesFrom, Post } from '../lib/posts'
+import { getPublishedPosts } from '../lib/articles'
 import { SITE_URL } from '../lib/site'
 
 interface Props {
@@ -140,7 +141,13 @@ export default function Home({ recentPosts, categories }: Props) {
         </div>
         <div>
           <p style={{ color: 'var(--muted)', marginBottom: '22px', lineHeight: '1.7' }}>Žiadny spam. Len overené stratégie z praxe, ktoré fungujú pre slovenské firmy.</p>
-          <form className="newsletter-form" onSubmit={e => e.preventDefault()}>
+          <form className="newsletter-form" onSubmit={async e => {
+            e.preventDefault()
+            const input = e.currentTarget.querySelector('input') as HTMLInputElement | null
+            const email = input?.value
+            if (!email) return
+            try { await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, source: 'homepage' }) }); if (input) input.value = ''; alert('Ďakujeme! Prihlásili sme vás.') } catch {}
+          }}>
             <input className="newsletter-input" type="email" placeholder="váš@email.sk" required />
             <button type="submit" className="newsletter-submit">Prihlásiť sa →</button>
           </form>
@@ -159,12 +166,13 @@ export default function Home({ recentPosts, categories }: Props) {
 }
 
 export async function getStaticProps() {
-  const allPosts = getAllPosts()
-  const categories = getAllCategories()
+  const allPosts = mergePosts(getAllPosts(), await getPublishedPosts())
+  const categories = categoriesFrom(allPosts)
   return {
     props: {
       recentPosts: allPosts.slice(0, 7),
       categories,
     },
+    revalidate: 60,
   }
 }

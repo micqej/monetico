@@ -59,3 +59,16 @@ export function formatDate(dateStr: string): string {
 export function getRecentPosts(n = 6): Post[] {
   return allPosts.slice(0, n)
 }
+
+/** Merge static JSON posts with DB articles (DB wins on slug clash), newest first. */
+export function mergePosts(base: Post[], extra: Post[]): Post[] {
+  const extraSlugs = new Set(extra.map(p => p.slug))
+  const merged = [...extra, ...base.filter(p => !extraSlugs.has(p.slug))]
+  return merged.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+}
+
+export function categoriesFrom(posts: Post[]): { name: string; count: number }[] {
+  const counts: Record<string, number> = {}
+  for (const post of posts) for (const cat of post.categories) counts[cat] = (counts[cat] || 0) + 1
+  return Object.entries(counts).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count)
+}

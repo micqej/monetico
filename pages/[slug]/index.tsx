@@ -3,7 +3,8 @@ import Nav from '../../components/Nav'
 import Footer from '../../components/Footer'
 import PostCard from '../../components/PostCard'
 import SEO from '../../components/SEO'
-import { getAllPosts, getPostBySlug, getAllSlugs, formatDate, Post } from '../../lib/posts'
+import { getAllPosts, getPostBySlug, getAllSlugs, mergePosts, formatDate, Post } from '../../lib/posts'
+import { getPublishedPosts } from '../../lib/articles'
 import { renderWordPressContent, extractHeadings } from '../../lib/renderContent'
 import { SITE_URL } from '../../lib/site'
 
@@ -133,17 +134,20 @@ export default function PostPage({ post, related, headings, cleanContent }: Prop
 
 export async function getStaticPaths() {
   const slugs = getAllSlugs()
+  const dbSlugs = (await getPublishedPosts()).map(p => p.slug)
+  const all = Array.from(new Set([...slugs, ...dbSlugs]))
   return {
-    paths: slugs.map(slug => ({ params: { slug } })),
-    fallback: false,
+    paths: all.map(slug => ({ params: { slug } })),
+    fallback: 'blocking',
   }
 }
 
 export async function getStaticProps({ params }: { params: { slug: string } }) {
-  const post = getPostBySlug(params.slug)
+  const dbPosts = await getPublishedPosts()
+  const post = getPostBySlug(params.slug) || dbPosts.find(p => p.slug === params.slug)
   if (!post) return { notFound: true }
 
-  const allPosts = getAllPosts()
+  const allPosts = mergePosts(getAllPosts(), dbPosts)
 
   // Related: same category, different post, max 3
   const related = allPosts
@@ -160,5 +164,6 @@ export async function getStaticProps({ params }: { params: { slug: string } }) {
       headings,
       cleanContent,
     },
+    revalidate: 60,
   }
 }
