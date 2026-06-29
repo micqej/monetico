@@ -1,20 +1,24 @@
-import { neon, type NeonQueryFunction } from '@neondatabase/serverless'
+import postgres from 'postgres'
 
 /**
- * Lazy Neon (Vercel Postgres) connection.
- * Returns null when no DATABASE_URL is configured, so the whole admin/autopilot
- * stack degrades gracefully and the public site keeps running on static JSON.
+ * Lazy Postgres connection (works with any provider — Supabase, Neon, Hetzner…).
+ * Returns null when no connection string is configured, so the whole
+ * admin/autopilot stack degrades gracefully and the public site keeps running
+ * on the static JSON posts.
  */
-let _sql: NeonQueryFunction<false, false> | null | undefined
+type Sql = ReturnType<typeof postgres>
+let _sql: Sql | null | undefined
 
-export function getSql(): NeonQueryFunction<false, false> | null {
+export function getSql(): Sql | null {
   if (_sql !== undefined) return _sql
   const url =
     process.env.DATABASE_URL ||
     process.env.POSTGRES_URL ||
     process.env.POSTGRES_PRISMA_URL ||
     process.env.DATABASE_URL_UNPOOLED
-  _sql = url ? neon(url) : null
+  _sql = url
+    ? postgres(url, { prepare: false, ssl: 'require', idle_timeout: 20, max: 3 })
+    : null
   return _sql
 }
 

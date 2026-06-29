@@ -2,12 +2,39 @@ import { useEffect, useState, useCallback } from 'react'
 import Head from 'next/head'
 
 type Session = { authed: boolean; configured: boolean; db: boolean; ai: boolean; pexels: boolean; pixabay: boolean }
-type Article = any
 type ImageR = { url: string; thumb: string; credit: string; source: string }
 
 const CATEGORIES = ['Marketing Tipy', 'Podnikanie', 'O eshopoch', 'Ako na to', 'Analýza', 'Email', 'SEO', 'WordPress', 'O weboch', 'Sociálne siete']
-const TABS = ['Prehľad', 'Generovať', 'Články', 'Plán', 'Newsletter', 'Nastavenia'] as const
-type Tab = typeof TABS[number]
+const TABS: { id: string; icon: string }[] = [
+  { id: 'Prehľad', icon: 'overview' }, { id: 'Generovať', icon: 'generate' },
+  { id: 'Články', icon: 'articles' }, { id: 'Plán', icon: 'plan' },
+  { id: 'Newsletter', icon: 'mail' }, { id: 'Nastavenia', icon: 'settings' },
+]
+
+/* ── SVG ikony (feather) ── */
+function Ic({ n, s = 18 }: { n: string; s?: number }) {
+  const c: Record<string, JSX.Element> = {
+    overview: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></>,
+    generate: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />,
+    articles: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></>,
+    plan: <><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></>,
+    mail: <><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" /><polyline points="22,6 12,13 2,6" /></>,
+    settings: <><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></>,
+    logout: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></>,
+    check: <polyline points="20 6 9 17 4 12" />,
+    x: <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>,
+    warn: <><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></>,
+    plus: <><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></>,
+    trash: <><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></>,
+    edit: <><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></>,
+    search: <><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></>,
+    image: <><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></>,
+    play: <polygon points="5 3 19 12 5 21 5 3" />,
+    lock: <><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></>,
+    arrow: <><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></>,
+  }
+  return <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">{c[n]}</svg>
+}
 
 async function api(url: string, opts?: RequestInit) {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts })
@@ -23,19 +50,16 @@ const emptyEditor = {
 
 export default function Admin() {
   const [sess, setSess] = useState<Session | null>(null)
-  const [pw, setPw] = useState('')
+  const [pin, setPin] = useState('')
   const [err, setErr] = useState('')
-  const [tab, setTab] = useState<Tab>('Prehľad')
+  const [tab, setTab] = useState('Prehľad')
 
-  const refresh = useCallback(async () => {
-    const s = await api('/api/admin/session')
-    setSess(s)
-  }, [])
+  const refresh = useCallback(async () => setSess(await api('/api/admin/session')), [])
   useEffect(() => { refresh() }, [refresh])
 
   async function login(e: any) {
     e.preventDefault(); setErr('')
-    try { await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ password: pw }) }); await refresh() }
+    try { await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ pin }) }); setPin(''); await refresh() }
     catch (e: any) { setErr(e.message) }
   }
   async function logout() { await api('/api/admin/logout', { method: 'POST' }); await refresh() }
@@ -44,40 +68,49 @@ export default function Admin() {
     <>
       <Head><title>Admin — Monetico</title><meta name="robots" content="noindex, nofollow" /></Head>
       <style>{css}</style>
-      <div className="aw">
-        <header className="ah">
-          <div className="alogo"><span className="adot" />MONETICO <em>admin</em></div>
-          {sess?.authed && <button className="abtn ghost" onClick={logout}>Odhlásiť</button>}
-        </header>
 
-        {!sess ? <div className="acard">Načítavam…</div> : !sess.authed ? (
-          <form className="acard login" onSubmit={login}>
-            <h2>Prihlásenie</h2>
-            {!sess.configured && <div className="awarn">⚠ Nastav <code>ADMIN_PASSWORD</code> vo Vercel env premenných.</div>}
-            <input className="ain" type="password" placeholder="Heslo" value={pw} onChange={e => setPw(e.target.value)} />
+      {!sess ? <div className="aload">Načítavam…</div> : !sess.authed ? (
+        <div className="alogin">
+          <form className="acard lcard" onSubmit={login}>
+            <div className="licon"><Ic n="lock" s={26} /></div>
+            <h1>Monetico admin</h1>
+            <p className="amut">Zadaj PIN</p>
+            {!sess.configured && <div className="awarn"><Ic n="warn" s={15} /> Nastav <code>ADMIN_PIN</code> vo Vercel premenných.</div>}
+            <input className="ain pin" inputMode="numeric" autoComplete="off" type="password" placeholder="••••" value={pin} onChange={e => setPin(e.target.value)} autoFocus />
             {err && <div className="aerr">{err}</div>}
-            <button className="abtn" type="submit">Vstúpiť →</button>
+            <button className="abtn full" type="submit">Vstúpiť</button>
           </form>
-        ) : (
-          <>
-            <nav className="atabs">{TABS.map(t => (
-              <button key={t} className={`atab${tab === t ? ' on' : ''}`} onClick={() => setTab(t)}>{t}</button>
-            ))}</nav>
+        </div>
+      ) : (
+        <div className="aw">
+          <aside className="aside">
+            <div className="alogo"><span className="adot" />Monetico</div>
+            <nav className="anav">
+              {TABS.map(t => (
+                <button key={t.id} className={`anav-i${tab === t.id ? ' on' : ''}`} onClick={() => setTab(t.id)}>
+                  <Ic n={t.icon} /> {t.id}
+                </button>
+              ))}
+            </nav>
+            <button className="anav-i out" onClick={logout}><Ic n="logout" /> Odhlásiť</button>
+          </aside>
+          <main className="amain">
+            <h2 className="ahd">{tab}</h2>
             {tab === 'Prehľad' && <Overview sess={sess} />}
             {tab === 'Generovať' && <Generate sess={sess} />}
             {tab === 'Články' && <Articles />}
-            {tab === 'Plán' && <Plan sess={sess} />}
+            {tab === 'Plán' && <Plan />}
             {tab === 'Newsletter' && <Newsletter />}
             {tab === 'Nastavenia' && <Settings />}
-          </>
-        )}
-      </div>
+          </main>
+        </div>
+      )}
     </>
   )
 }
 
-function Status({ ok, label }: { ok: boolean; label: string }) {
-  return <span className={`apill ${ok ? 'good' : 'bad'}`}>{ok ? '✓' : '✗'} {label}</span>
+function Stat({ ok, label }: { ok: boolean; label: string }) {
+  return <span className={`apill ${ok ? 'good' : 'bad'}`}><Ic n={ok ? 'check' : 'x'} s={13} /> {label}</span>
 }
 
 function Overview({ sess }: { sess: Session }) {
@@ -90,21 +123,22 @@ function Overview({ sess }: { sess: Session }) {
     setBusy(false)
   }
   return (
-    <div className="acard">
-      <h2>Stav integrácií</h2>
-      <div className="arow">
-        <Status ok={sess.db} label="Databáza (Neon)" />
-        <Status ok={sess.ai} label="OpenAI" />
-        <Status ok={sess.pexels} label="Pexels" />
-        <Status ok={sess.pixabay} label="Pixabay" />
+    <>
+      <div className="acard">
+        <h3>Stav integrácií</h3>
+        <div className="arow wrap">
+          <Stat ok={sess.db} label="Databáza" /><Stat ok={sess.ai} label="OpenAI" />
+          <Stat ok={sess.pexels} label="Pexels" /><Stat ok={sess.pixabay} label="Pixabay" />
+        </div>
+        <p className="amut sm">Doplň vo Vercel → Environment Variables: <code>DATABASE_URL</code>, <code>OPENAI_API_KEY</code>, <code>PEXELS_API_KEY</code>, <code>PIXABAY_API_KEY</code>, <code>ADMIN_PIN</code>, <code>CRON_SECRET</code>.</p>
       </div>
-      <p className="amuted">Čo chýba, doplň vo Vercel → Settings → Environment Variables: <code>DATABASE_URL</code> (Neon integrácia), <code>OPENAI_API_KEY</code>, <code>PEXELS_API_KEY</code>, <code>PIXABAY_API_KEY</code>, <code>ADMIN_PASSWORD</code>, <code>CRON_SECRET</code>.</p>
-      <hr className="ahr" />
-      <h2>Autopilot</h2>
-      <p className="amuted">Spustí jeden cyklus: vyberie tému z plánu (alebo navrhne novú), vygeneruje článok, pridá fotku a podľa nastavení publikuje.</p>
-      <button className="abtn" onClick={runNow} disabled={busy}>{busy ? 'Pracujem…' : 'Spustiť autopilota teraz'}</button>
-      {run && <pre className="apre">{JSON.stringify(run, null, 2)}</pre>}
-    </div>
+      <div className="acard">
+        <h3>Autopilot</h3>
+        <p className="amut sm">Spustí jeden cyklus: vyberie tému, vygeneruje článok, pridá fotku a podľa nastavení publikuje.</p>
+        <button className="abtn" onClick={runNow} disabled={busy}><Ic n="play" s={15} /> {busy ? 'Pracujem…' : 'Spustiť teraz'}</button>
+        {run && <pre className="apre">{JSON.stringify(run, null, 2)}</pre>}
+      </div>
+    </>
   )
 }
 
@@ -114,35 +148,26 @@ function Editor({ initial, images, onSaved }: { initial: any; images: ImageR[]; 
   const [q, setQ] = useState('')
   const [msg, setMsg] = useState('')
   const set = (k: string, v: any) => setA((p: any) => ({ ...p, [k]: v }))
-
-  async function searchImg() {
-    if (!q) return
-    try { const d = await api(`/api/admin/images?q=${encodeURIComponent(q)}&source=both`); setImgs(d.images) } catch {}
-  }
+  async function searchImg() { if (!q) return; try { const d = await api(`/api/admin/images?q=${encodeURIComponent(q)}&source=both`); setImgs(d.images) } catch {} }
   async function save(status: string) {
     setMsg('')
     const payload = { ...a, status, tags: String(a.tags).split(',').map((t: string) => t.trim()).filter(Boolean) }
     try {
       if (a.id) await api(`/api/admin/articles/${a.id}`, { method: 'PUT', body: JSON.stringify(payload) })
       else await api('/api/admin/articles', { method: 'POST', body: JSON.stringify(payload) })
-      setMsg('Uložené ✓'); onSaved()
+      setMsg('Uložené'); onSaved()
     } catch (e: any) { setMsg(e.message) }
   }
-
   return (
     <div className="acard">
-      <h2>{a.id ? 'Upraviť článok' : 'Nový článok'}</h2>
+      <h3>{a.id ? 'Upraviť článok' : 'Nový článok'}</h3>
       <label className="alab">Titulok</label>
       <input className="ain" value={a.title} onChange={e => set('title', e.target.value)} />
       <div className="agrid2">
-        <div><label className="alab">Kategória</label>
-          <select className="ain" value={a.category} onChange={e => set('category', e.target.value)}>
-            {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-          </select></div>
-        <div><label className="alab">Tagy (čiarka)</label>
-          <input className="ain" value={a.tags} onChange={e => set('tags', e.target.value)} /></div>
+        <div><label className="alab">Kategória</label><select className="ain" value={a.category} onChange={e => set('category', e.target.value)}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></div>
+        <div><label className="alab">Tagy (čiarka)</label><input className="ain" value={a.tags} onChange={e => set('tags', e.target.value)} /></div>
       </div>
-      <label className="alab">Perex / excerpt</label>
+      <label className="alab">Perex</label>
       <textarea className="ain" rows={2} value={a.excerpt} onChange={e => set('excerpt', e.target.value)} />
       <label className="alab">Obsah (HTML)</label>
       <textarea className="ain mono" rows={14} value={a.content} onChange={e => set('content', e.target.value)} />
@@ -152,27 +177,20 @@ function Editor({ initial, images, onSaved }: { initial: any; images: ImageR[]; 
       </div>
       <label className="alab">Meta description</label>
       <textarea className="ain" rows={2} value={a.meta_desc} onChange={e => set('meta_desc', e.target.value)} />
-
       <label className="alab">Obrázok</label>
       {a.image_url && <img className="aimgsel" src={a.image_url} alt="" />}
       <div className="arow">
-        <input className="ain" placeholder="Hľadať fotku (napr. email marketing)" value={q} onChange={e => setQ(e.target.value)} />
-        <button className="abtn ghost" type="button" onClick={searchImg}>Hľadať</button>
+        <input className="ain" style={{ marginBottom: 0 }} placeholder="Hľadať fotku…" value={q} onChange={e => setQ(e.target.value)} />
+        <button className="abtn ghost" type="button" onClick={searchImg}><Ic n="search" s={15} /> Hľadať</button>
       </div>
       <div className="aimgs">
         {imgs.map((im, i) => (
-          <button key={i} type="button" className={`athumb${a.image_url === im.url ? ' on' : ''}`} title={im.credit}
-            onClick={() => { set('image_url', im.url); set('image_credit', im.credit) }}>
+          <button key={i} type="button" className={`athumb${a.image_url === im.url ? ' on' : ''}`} title={im.credit} onClick={() => { set('image_url', im.url); set('image_credit', im.credit) }}>
             <img src={im.thumb} alt="" /><span>{im.source}</span>
           </button>
         ))}
       </div>
-
-      <div className="arow" style={{ marginTop: 16 }}>
-        <button className="abtn ghost" onClick={() => save('draft')}>Uložiť koncept</button>
-        <button className="abtn" onClick={() => save('published')}>Publikovať →</button>
-        {msg && <span className="amuted">{msg}</span>}
-      </div>
+      <div className="arow mt"><button className="abtn ghost" onClick={() => save('draft')}>Uložiť koncept</button><button className="abtn" onClick={() => save('published')}>Publikovať</button>{msg && <span className="amut sm">{msg}</span>}</div>
     </div>
   )
 }
@@ -184,33 +202,26 @@ function Generate({ sess }: { sess: Session }) {
   const [editor, setEditor] = useState<any>(null)
   const [images, setImages] = useState<ImageR[]>([])
   const [err, setErr] = useState('')
-
   async function gen() {
     setBusy(true); setErr(''); setEditor(null)
     try {
       const d = await api('/api/admin/generate', { method: 'POST', body: JSON.stringify({ topic, category: cat }) })
       setImages(d.images || [])
-      setEditor({
-        ...emptyEditor, title: d.article.title, category: d.article.category,
-        tags: (d.article.tags || []).join(', '), content: d.article.content, excerpt: d.article.excerpt,
-        meta_title: d.article.meta_title, meta_desc: d.article.meta_desc, meta_keywords: d.article.meta_keywords,
-        image_url: d.images?.[0]?.url || '', image_credit: d.images?.[0]?.credit || '',
-      })
+      setEditor({ ...emptyEditor, title: d.article.title, category: d.article.category, tags: (d.article.tags || []).join(', '), content: d.article.content, excerpt: d.article.excerpt, meta_title: d.article.meta_title, meta_desc: d.article.meta_desc, meta_keywords: d.article.meta_keywords, image_url: d.images?.[0]?.url || '', image_credit: d.images?.[0]?.credit || '' })
     } catch (e: any) { setErr(e.message) }
     setBusy(false)
   }
-
   return (
     <>
       <div className="acard">
-        <h2>Generovať článok cez AI</h2>
-        {!sess.ai && <div className="awarn">⚠ Najprv nastav <code>OPENAI_API_KEY</code>.</div>}
+        <h3>Generovať článok cez AI</h3>
+        {!sess.ai && <div className="awarn"><Ic n="warn" s={15} /> Najprv nastav <code>OPENAI_API_KEY</code>.</div>}
         <label className="alab">Téma / kľúčové slovo</label>
         <input className="ain" placeholder="napr. Ako začať s cold emailingom v roku 2026" value={topic} onChange={e => setTopic(e.target.value)} />
         <label className="alab">Kategória</label>
         <select className="ain" value={cat} onChange={e => setCat(e.target.value)}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select>
         {err && <div className="aerr">{err}</div>}
-        <button className="abtn" onClick={gen} disabled={busy || !topic}>{busy ? 'Generujem…' : 'Vygenerovať ✨'}</button>
+        <button className="abtn" onClick={gen} disabled={busy || !topic}><Ic n="generate" s={15} /> {busy ? 'Generujem…' : 'Vygenerovať'}</button>
       </div>
       {editor && <Editor initial={editor} images={images} onSaved={() => {}} />}
     </>
@@ -218,32 +229,25 @@ function Generate({ sess }: { sess: Session }) {
 }
 
 function Articles() {
-  const [list, setList] = useState<Article[]>([])
+  const [list, setList] = useState<any[]>([])
   const [edit, setEdit] = useState<any>(null)
-  const load = useCallback(async () => { const d = await api('/api/admin/articles'); setList(d.articles) }, [])
+  const load = useCallback(async () => setList((await api('/api/admin/articles')).articles), [])
   useEffect(() => { load() }, [load])
   async function del(id: number) { if (!confirm('Zmazať článok?')) return; await api(`/api/admin/articles/${id}`, { method: 'DELETE' }); load() }
-  function openEdit(a: Article) {
-    setEdit({ id: a.id, title: a.title, slug: a.slug, category: a.category, tags: (a.tags || []).join(', '),
-      content: a.content, excerpt: a.excerpt, meta_title: a.meta_title, meta_desc: a.meta_desc,
-      meta_keywords: a.meta_keywords, image_url: a.image_url, image_credit: a.image_credit, status: a.status })
-  }
+  function openEdit(a: any) { setEdit({ id: a.id, title: a.title, slug: a.slug, category: a.category, tags: (a.tags || []).join(', '), content: a.content, excerpt: a.excerpt, meta_title: a.meta_title, meta_desc: a.meta_desc, meta_keywords: a.meta_keywords, image_url: a.image_url, image_credit: a.image_credit, status: a.status }) }
   return (
     <>
       <div className="acard">
-        <h2>Články ({list.length})</h2>
+        <h3>Články z admina ({list.length})</h3>
         <table className="atab2"><tbody>
           {list.map(a => (
             <tr key={a.id}>
-              <td><b>{a.title}</b><br /><span className="amuted">{a.category} · {a.source}</span></td>
+              <td><b>{a.title}</b><br /><span className="amut sm">{a.category} · {a.source}</span></td>
               <td><span className={`apill ${a.status === 'published' ? 'good' : 'bad'}`}>{a.status}</span></td>
-              <td style={{ textAlign: 'right' }}>
-                <button className="abtn ghost sm" onClick={() => openEdit(a)}>Upraviť</button>
-                <button className="abtn ghost sm" onClick={() => del(a.id)}>Zmazať</button>
-              </td>
+              <td className="ar"><button className="icbtn" title="Upraviť" onClick={() => openEdit(a)}><Ic n="edit" s={16} /></button><button className="icbtn" title="Zmazať" onClick={() => del(a.id)}><Ic n="trash" s={16} /></button></td>
             </tr>
           ))}
-          {list.length === 0 && <tr><td className="amuted">Zatiaľ žiadne články z admina (162 pôvodných je v statických dátach).</td></tr>}
+          {list.length === 0 && <tr><td className="amut sm">Zatiaľ žiadne (162 pôvodných je v statických dátach).</td></tr>}
         </tbody></table>
       </div>
       {edit && <Editor initial={edit} images={[]} onSaved={() => { setEdit(null); load() }} />}
@@ -251,38 +255,34 @@ function Articles() {
   )
 }
 
-function Plan({ sess }: { sess: Session }) {
+function Plan() {
   const [list, setList] = useState<any[]>([])
   const [topic, setTopic] = useState('')
   const [cat, setCat] = useState('Marketing Tipy')
   const [when, setWhen] = useState('')
-  const load = useCallback(async () => { const d = await api('/api/admin/plan'); setList(d.plan) }, [])
+  const load = useCallback(async () => setList((await api('/api/admin/plan')).plan), [])
   useEffect(() => { load() }, [load])
-  async function add() {
-    if (!topic) return
-    await api('/api/admin/plan', { method: 'POST', body: JSON.stringify({ topic, category: cat, scheduled_for: when || null }) })
-    setTopic(''); setWhen(''); load()
-  }
+  async function add() { if (!topic) return; await api('/api/admin/plan', { method: 'POST', body: JSON.stringify({ topic, category: cat, scheduled_for: when || null }) }); setTopic(''); setWhen(''); load() }
   async function del(id: number) { await api(`/api/admin/plan/${id}`, { method: 'DELETE' }); load() }
   return (
     <div className="acard">
-      <h2>Plán obsahu</h2>
-      <p className="amuted">Témy, ktoré autopilot postupne spracuje. Môžeš naplánovať mesiace dopredu (dátum je voliteľný).</p>
+      <h3>Plán obsahu</h3>
+      <p className="amut sm">Témy, ktoré autopilot postupne spracuje. Dátum je voliteľný.</p>
       <div className="agrid3">
         <input className="ain" placeholder="Téma" value={topic} onChange={e => setTopic(e.target.value)} />
         <select className="ain" value={cat} onChange={e => setCat(e.target.value)}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select>
         <input className="ain" type="datetime-local" value={when} onChange={e => setWhen(e.target.value)} />
       </div>
-      <button className="abtn" onClick={add} disabled={!topic}>Pridať do plánu</button>
-      <table className="atab2" style={{ marginTop: 16 }}><tbody>
+      <button className="abtn" onClick={add} disabled={!topic}><Ic n="plus" s={15} /> Pridať</button>
+      <table className="atab2 mt"><tbody>
         {list.map(p => (
           <tr key={p.id}>
-            <td><b>{p.topic}</b><br /><span className="amuted">{p.category}{p.scheduled_for ? ' · ' + new Date(p.scheduled_for).toLocaleString('sk-SK') : ''}</span></td>
+            <td><b>{p.topic}</b><br /><span className="amut sm">{p.category}{p.scheduled_for ? ' · ' + new Date(p.scheduled_for).toLocaleString('sk-SK') : ''}</span></td>
             <td><span className={`apill ${p.status === 'done' ? 'good' : 'bad'}`}>{p.status}</span></td>
-            <td style={{ textAlign: 'right' }}><button className="abtn ghost sm" onClick={() => del(p.id)}>Zmazať</button></td>
+            <td className="ar"><button className="icbtn" onClick={() => del(p.id)}><Ic n="trash" s={16} /></button></td>
           </tr>
         ))}
-        {list.length === 0 && <tr><td className="amuted">Plán je prázdny — autopilot si tému navrhne sám.</td></tr>}
+        {list.length === 0 && <tr><td className="amut sm">Plán je prázdny — autopilot si tému navrhne sám.</td></tr>}
       </tbody></table>
     </div>
   )
@@ -293,11 +293,11 @@ function Newsletter() {
   useEffect(() => { api('/api/admin/subscribers').then(d => setList(d.subscribers)).catch(() => {}) }, [])
   return (
     <div className="acard">
-      <h2>Newsletter — odbery ({list.length})</h2>
-      <a className="abtn ghost" href="/api/admin/subscribers?format=csv">Export CSV</a>
-      <table className="atab2" style={{ marginTop: 16 }}><tbody>
-        {list.map(s => <tr key={s.id}><td>{s.email}</td><td className="amuted">{s.source}</td><td className="amuted" style={{ textAlign: 'right' }}>{new Date(s.created_at).toLocaleDateString('sk-SK')}</td></tr>)}
-        {list.length === 0 && <tr><td className="amuted">Zatiaľ žiadne emaily.</td></tr>}
+      <h3>Newsletter — odbery ({list.length})</h3>
+      <a className="abtn ghost" href="/api/admin/subscribers?format=csv"><Ic n="mail" s={15} /> Export CSV</a>
+      <table className="atab2 mt"><tbody>
+        {list.map(s => <tr key={s.id}><td>{s.email}</td><td className="amut sm">{s.source}</td><td className="amut sm ar">{new Date(s.created_at).toLocaleDateString('sk-SK')}</td></tr>)}
+        {list.length === 0 && <tr><td className="amut sm">Zatiaľ žiadne emaily.</td></tr>}
       </tbody></table>
     </div>
   )
@@ -310,12 +310,12 @@ function Settings() {
   if (!s) return <div className="acard">Načítavam…</div>
   const set = (k: string, v: any) => setS((p: any) => ({ ...p, [k]: v }))
   const days = [['Po', 1], ['Ut', 2], ['St', 3], ['Št', 4], ['Pi', 5], ['So', 6], ['Ne', 0]] as const
-  async function save() { setMsg(''); try { const d = await api('/api/admin/settings', { method: 'POST', body: JSON.stringify(s) }); setS(d.settings); setMsg('Uložené ✓') } catch (e: any) { setMsg(e.message) } }
+  async function save() { setMsg(''); try { const d = await api('/api/admin/settings', { method: 'POST', body: JSON.stringify(s) }); setS(d.settings); setMsg('Uložené') } catch (e: any) { setMsg(e.message) } }
   return (
     <div className="acard">
-      <h2>Nastavenia autopilota</h2>
+      <h3>Nastavenia autopilota</h3>
       <label className="achk"><input type="checkbox" checked={s.autopilotEnabled} onChange={e => set('autopilotEnabled', e.target.checked)} /> Autopilot zapnutý</label>
-      <label className="achk"><input type="checkbox" checked={s.autoPublish} onChange={e => set('autoPublish', e.target.checked)} /> Automaticky publikovať (vyp = ukladať ako koncept)</label>
+      <label className="achk"><input type="checkbox" checked={s.autoPublish} onChange={e => set('autoPublish', e.target.checked)} /> Automaticky publikovať (vyp = koncept)</label>
       <label className="achk"><input type="checkbox" checked={s.autoInterlink} onChange={e => set('autoInterlink', e.target.checked)} /> Automatické prelinkovanie</label>
       <div className="agrid3">
         <div><label className="alab">Článkov / týždeň</label><input className="ain" type="number" value={s.postsPerWeek} onChange={e => set('postsPerWeek', +e.target.value)} /></div>
@@ -323,10 +323,8 @@ function Settings() {
         <div><label className="alab">Predvolená kategória</label><select className="ain" value={s.defaultCategory} onChange={e => set('defaultCategory', e.target.value)}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></div>
       </div>
       <label className="alab">Dni publikovania</label>
-      <div className="arow">{days.map(([lab, d]) => (
-        <label key={d} className={`aday${s.publishDays.includes(d) ? ' on' : ''}`}>
-          <input type="checkbox" checked={s.publishDays.includes(d)} onChange={e => set('publishDays', e.target.checked ? [...s.publishDays, d] : s.publishDays.filter((x: number) => x !== d))} />{lab}
-        </label>
+      <div className="arow wrap">{days.map(([lab, d]) => (
+        <button key={d} type="button" className={`aday${s.publishDays.includes(d) ? ' on' : ''}`} onClick={() => set('publishDays', s.publishDays.includes(d) ? s.publishDays.filter((x: number) => x !== d) : [...s.publishDays, d])}>{lab}</button>
       ))}</div>
       <div className="agrid3">
         <div><label className="alab">AI model</label><select className="ain" value={s.model} onChange={e => set('model', e.target.value)}><option value="gpt-4o-mini">gpt-4o-mini (lacný)</option><option value="gpt-4o">gpt-4o (kvalitnejší)</option></select></div>
@@ -339,48 +337,63 @@ function Settings() {
       <textarea className="ain" rows={3} value={s.tone} onChange={e => set('tone', e.target.value)} />
       <label className="alab">Predmet newslettera</label>
       <input className="ain" value={s.newsletterSubject} onChange={e => set('newsletterSubject', e.target.value)} />
-      <div className="arow" style={{ marginTop: 16 }}><button className="abtn" onClick={save}>Uložiť nastavenia</button>{msg && <span className="amuted">{msg}</span>}</div>
+      <div className="arow mt"><button className="abtn" onClick={save}>Uložiť nastavenia</button>{msg && <span className="amut sm">{msg}</span>}</div>
     </div>
   )
 }
 
 const css = `
-.aw{max-width:1000px;margin:0 auto;padding:24px 18px 80px;font-family:'Inter',-apple-system,sans-serif;color:#0e0e0c}
-.ah{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.alogo{font-weight:900;font-size:20px;display:flex;align-items:center;gap:9px;letter-spacing:-.5px}.alogo em{color:#6b21d9;font-style:normal}
-.adot{width:12px;height:12px;border-radius:50%;background:#6b21d9}
-.acard{background:#fff;border:2px solid #0e0e0c;border-radius:16px;box-shadow:4px 4px 0 #0e0e0c;padding:24px;margin-bottom:18px}
-.acard h2{font-size:20px;font-weight:800;letter-spacing:-.4px;margin-bottom:14px}
-.login{max-width:380px;margin:60px auto}
-.atabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
-.atab{font-family:inherit;font-weight:700;font-size:13px;padding:9px 15px;border:2px solid #0e0e0c;border-radius:50px;background:#fff;cursor:pointer;box-shadow:2px 2px 0 #0e0e0c}
-.atab.on{background:#f5e642}
-.abtn{font-family:inherit;font-weight:800;font-size:13px;padding:11px 20px;border:2px solid #0e0e0c;border-radius:50px;background:#f5e642;color:#0e0e0c;cursor:pointer;box-shadow:3px 3px 0 #0e0e0c}
-.abtn:hover{transform:translate(-1px,-1px)}.abtn:disabled{opacity:.5;cursor:default}
-.abtn.ghost{background:#fff}.abtn.sm{padding:7px 13px;font-size:12px;box-shadow:2px 2px 0 #0e0e0c;margin-left:6px}
-.ain{width:100%;font-family:inherit;font-size:14px;padding:11px 14px;border:2px solid #0e0e0c;border-radius:12px;margin-bottom:12px;outline:none;background:#fff}
-.ain.mono{font-family:'Space Mono',monospace;font-size:12.5px}
-.alab{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#6b6b68;margin-bottom:6px}
-.amuted{color:#6b6b68;font-size:13px}
-.aerr{color:#c0392b;font-size:13px;margin-bottom:10px;font-weight:600}
-.awarn{background:#fff3cd;border:2px solid #0e0e0c;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:12px}
-.arow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+:root{--bg:#f6f7f9;--card:#fff;--bd:#e6e8ec;--ink:#111827;--mut:#6b7280;--acc:#4f46e5;--acc-sft:#eef2ff;--good:#059669;--good-sft:#ecfdf5;--bad:#9ca3af;--bad-sft:#f3f4f6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:'Inter',-apple-system,sans-serif;color:var(--ink)}
+.aload,.alogin{min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--mut)}
+.lcard{width:360px;text-align:center}
+.licon{width:52px;height:52px;border-radius:14px;background:var(--acc-sft);color:var(--acc);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.lcard h1{font-size:20px;font-weight:700;margin:0 0 2px}
+.pin{text-align:center;letter-spacing:8px;font-size:22px}
+.aw{display:flex;min-height:100vh}
+.aside{width:230px;flex-shrink:0;background:var(--card);border-right:1px solid var(--bd);padding:22px 16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.alogo{font-weight:800;font-size:18px;letter-spacing:-.3px;display:flex;align-items:center;gap:9px;padding:0 10px 18px}
+.adot{width:11px;height:11px;border-radius:50%;background:var(--acc)}
+.anav{display:flex;flex-direction:column;gap:3px;flex:1}
+.anav-i{display:flex;align-items:center;gap:11px;font-family:inherit;font-size:14px;font-weight:500;color:var(--mut);background:none;border:0;padding:10px 12px;border-radius:9px;cursor:pointer;text-align:left;width:100%}
+.anav-i:hover{background:var(--bg);color:var(--ink)}
+.anav-i.on{background:var(--acc-sft);color:var(--acc);font-weight:600}
+.anav-i.out{color:var(--mut);margin-top:8px}
+.amain{flex:1;padding:26px 30px;max-width:960px}
+.ahd{font-size:22px;font-weight:700;margin:0 0 18px;letter-spacing:-.4px}
+.acard{background:var(--card);border:1px solid var(--bd);border-radius:13px;padding:22px;margin-bottom:16px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.acard h3{font-size:15px;font-weight:700;margin:0 0 14px}
+.amut{color:var(--mut)}.amut.sm{font-size:13px}.sm{font-size:13px}
+.alab{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-bottom:6px}
+.ain{width:100%;font-family:inherit;font-size:14px;padding:10px 12px;border:1px solid var(--bd);border-radius:9px;margin-bottom:13px;outline:none;background:#fff;color:var(--ink)}
+.ain:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-sft)}
+.ain.mono{font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.5}
+.abtn{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-weight:600;font-size:13.5px;padding:9px 16px;border:1px solid var(--acc);border-radius:9px;background:var(--acc);color:#fff;cursor:pointer}
+.abtn:hover{background:#4338ca}.abtn:disabled{opacity:.5;cursor:default}
+.abtn.ghost{background:#fff;color:var(--ink);border-color:var(--bd)}.abtn.ghost:hover{background:var(--bg)}
+.abtn.full{width:100%;justify-content:center;padding:11px}
+.icbtn{background:none;border:1px solid var(--bd);border-radius:8px;padding:7px;color:var(--mut);cursor:pointer;margin-left:6px}
+.icbtn:hover{color:var(--acc);border-color:var(--acc)}
+.arow{display:flex;gap:10px;align-items:center}.arow.wrap{flex-wrap:wrap}.arow.mt,.mt{margin-top:14px}
 .agrid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .agrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-@media(max-width:640px){.agrid2,.agrid3{grid-template-columns:1fr}}
-.apill{font-size:11px;font-weight:700;padding:4px 11px;border-radius:50px;border:2px solid #0e0e0c;text-transform:uppercase}
-.apill.good{background:#d1fae5}.apill.bad{background:#ffe0e0}
-.ahr{border:none;border-top:1px solid #e4e3de;margin:20px 0}
-.apre{background:#0e0e0c;color:#c4f000;padding:14px;border-radius:10px;font-size:12px;overflow:auto;margin-top:12px}
-.atab2{width:100%;border-collapse:collapse}
-.atab2 td{border-bottom:1px solid #e4e3de;padding:11px 8px;vertical-align:top;font-size:14px}
-.aimgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px}
-.athumb{position:relative;border:2px solid #0e0e0c;border-radius:10px;overflow:hidden;cursor:pointer;padding:0;background:none;aspect-ratio:4/3}
-.athumb.on{outline:3px solid #6b21d9;outline-offset:1px}
+@media(max-width:760px){.aside{width:64px;padding:18px 8px}.anav-i span,.alogo{font-size:0}.anav-i{justify-content:center;gap:0}.agrid2,.agrid3{grid-template-columns:1fr}}
+.apill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:50px}
+.apill.good{background:var(--good-sft);color:var(--good)}.apill.bad{background:var(--bad-sft);color:var(--bad)}
+.awarn{display:flex;align-items:center;gap:8px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:9px;padding:10px 13px;font-size:13px;margin-bottom:13px}
+.aerr{color:#dc2626;font-size:13px;margin-bottom:11px;font-weight:500}
+.apre{background:#0f172a;color:#a3e635;padding:13px;border-radius:9px;font-size:12px;overflow:auto;margin-top:12px;font-family:'Space Mono',monospace}
+.atab2{width:100%;border-collapse:collapse}.atab2.mt{margin-top:6px}
+.atab2 td{border-bottom:1px solid var(--bd);padding:11px 6px;vertical-align:middle;font-size:14px}
+.atab2 tr:last-child td{border-bottom:0}.ar{text-align:right}
+.aimgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px;margin-top:10px}
+.athumb{position:relative;border:1px solid var(--bd);border-radius:9px;overflow:hidden;cursor:pointer;padding:0;background:none;aspect-ratio:4/3}
+.athumb.on{outline:2px solid var(--acc);outline-offset:1px}
 .athumb img{width:100%;height:100%;object-fit:cover;display:block}
-.athumb span{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);color:#fff;font-size:9px;text-align:center;padding:2px}
-.aimgsel{width:100%;max-height:220px;object-fit:cover;border:2px solid #0e0e0c;border-radius:12px;margin-bottom:10px}
-.achk{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;margin-bottom:10px;cursor:pointer}
-.aday{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:7px 12px;border:2px solid #0e0e0c;border-radius:50px;cursor:pointer}
-.aday.on{background:#f5e642}.aday input{display:none}
+.athumb span{position:absolute;bottom:0;left:0;right:0;background:rgba(15,23,42,.65);color:#fff;font-size:9px;text-align:center;padding:2px}
+.aimgsel{width:100%;max-height:220px;object-fit:cover;border:1px solid var(--bd);border-radius:10px;margin-bottom:11px}
+.achk{display:flex;align-items:center;gap:9px;font-size:14px;margin-bottom:11px;cursor:pointer}
+.aday{font-family:inherit;font-size:13px;font-weight:600;padding:7px 13px;border:1px solid var(--bd);border-radius:8px;background:#fff;color:var(--mut);cursor:pointer}
+.aday.on{background:var(--acc-sft);color:var(--acc);border-color:var(--acc)}
 `

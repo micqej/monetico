@@ -3,20 +3,24 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 const COOKIE = 'monetico_admin'
 
+function adminPin(): string {
+  return process.env.ADMIN_PIN || process.env.ADMIN_PASSWORD || ''
+}
+
 export function adminConfigured(): boolean {
-  return !!process.env.ADMIN_PASSWORD
+  return !!adminPin()
 }
 
 function expectedToken(): string {
-  const pw = process.env.ADMIN_PASSWORD || ''
-  return crypto.createHmac('sha256', pw + '::monetico-admin').update('session').digest('hex')
+  const pin = adminPin()
+  return crypto.createHmac('sha256', pin + '::monetico-admin').update('session').digest('hex')
 }
 
-export function checkPassword(pw: string): boolean {
-  const real = process.env.ADMIN_PASSWORD
+export function checkPin(pin: string): boolean {
+  const real = adminPin()
   if (!real) return false
   // constant-time compare
-  const a = Buffer.from(pw)
+  const a = Buffer.from(pin)
   const b = Buffer.from(real)
   return a.length === b.length && crypto.timingSafeEqual(a, b)
 }
