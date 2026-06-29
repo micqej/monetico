@@ -18,6 +18,14 @@ export function renderWordPressContent(content: string): string {
   // Trim excess whitespace lines
   html = html.replace(/\n{3,}/g, '\n\n')
 
+  // Inject stable IDs into h2–h4 headings (in document order) so the
+  // table-of-contents anchors match the headings in the body.
+  let hIndex = 0
+  html = html.replace(/<h([2-4])([^>]*)>/gi, (m, lvl, attrs) => {
+    if (/\bid=/.test(attrs)) return m
+    return `<h${lvl}${attrs} id="h-${hIndex++}">`
+  })
+
   return html.trim()
 }
 
