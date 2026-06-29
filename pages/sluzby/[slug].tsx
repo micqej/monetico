@@ -658,14 +658,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return { props: { service: servicesData[slug] || null } };
 };
 
-const sectionTitleStyle = {
-  fontFamily: 'var(--font-display)',
-  fontWeight: 800,
-  fontSize: 28,
-  color: 'var(--ink)',
-  margin: '0 0 28px',
-} as const;
-
 export default function ServicePage({ service }: { service: ServiceData }) {
   if (!service) return null;
 
@@ -677,397 +669,124 @@ export default function ServicePage({ service }: { service: ServiceData }) {
         canonical={`${SITE_URL}/sluzby/${service.slug}/`}
       />
       <Nav />
-      <main style={{ background: 'transparent', minHeight: '100vh', paddingTop: 100 }}>
-        <section
-          style={{
-            padding: '80px 40px 80px',
-            maxWidth: 1400,
-            margin: '0 auto',
-            borderBottom: '1px solid #1a1a1a',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, marginBottom: 32 }}>
-            <span style={{ color: service.color, display: 'inline-flex' }}>
-              <ServiceIcon name={service.icon} size={44} />
-            </span>
+      <main>
+        {/* HERO */}
+        <section className="svc-hero">
+          <Link href="/sluzby/" className="svc-back">← Späť na služby</Link>
+          <div className="svc-hero-row">
+            <span className="svc-hero-ico"><ServiceIcon name={service.icon} size={40} /></span>
             <div>
-              <span
-                style={{
-                  fontFamily: 'Space Mono, monospace',
-                  fontSize: 11,
-                  letterSpacing: '0.2em',
-                  color: service.color,
-                  textTransform: 'uppercase',
-                }}
-              >
-                — {service.subtitle}
-              </span>
-              <h1
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 800,
-                  fontSize: 'clamp(40px, 6vw, 80px)',
-                  color: 'var(--ink)',
-                  margin: '8px 0 0',
-                  lineHeight: 1,
-                }}
-              >
-                {service.title}
-              </h1>
+              <div className="svc-eyebrow">{service.subtitle}</div>
+              <h1 className="svc-title">{service.title}</h1>
             </div>
           </div>
-          <p
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 20,
-              color: 'var(--muted)',
-              maxWidth: 780,
-              lineHeight: 1.6,
-            }}
-          >
-            {service.heroText}
-          </p>
-          <div style={{ marginTop: 40, display: 'flex', gap: 16 }}>
-            <Link
-              href="/kontakt/"
-              style={{
-                fontFamily: 'Space Mono, monospace',
-                fontSize: 12,
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                padding: '16px 32px',
-                background: service.color,
-                color: '#0a0a0a',
-                textDecoration: 'none',
-                fontWeight: 700,
-              }}
-            >
-              Chcem konzultáciu
-            </Link>
-          </div>
+          <p className="svc-lead">{service.heroText}</p>
+          <Link href="/kontakt/" className="btn-primary">Chcem konzultáciu →</Link>
         </section>
 
-        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 40px' }}>
+        <div className="svc-wrap">
           {service.intro && (
-            <section style={{ paddingTop: 80 }}>
-              <div style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '48px 40px' }}>
-                <h2 style={sectionTitleStyle}>Viac o službe</h2>
-                <div style={{ display: 'grid', gap: 20 }}>
-                  {service.intro.map((paragraph, index) => (
-                    <p
-                      key={index}
-                      style={{
-                        fontFamily: 'var(--font-body)',
-                        fontSize: 17,
-                        color: 'var(--muted)',
-                        lineHeight: 1.75,
-                        margin: 0,
-                        maxWidth: 1040,
-                      }}
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
+            <section className="svc-block">
+              <h2 className="svc-block-h2">Viac o službe</h2>
+              <div className="svc-prose">
+                {service.intro.map((p, i) => <p key={i}>{p}</p>)}
               </div>
             </section>
           )}
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: 2,
-              marginTop: 2,
-            }}
-          >
-            <div style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '48px 40px' }}>
-              <h2 style={sectionTitleStyle}>Pre koho je táto služba</h2>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="svc-cols">
+            <section className="svc-block">
+              <h2 className="svc-block-h2">Pre koho je táto služba</h2>
+              <ul className="svc-list">
                 {service.forWhom.map((item, i) => (
-                  <li key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <span style={{ color: service.color, marginTop: 2, flexShrink: 0, display: 'inline-flex' }}>
-                      <ArrowRightIcon size={14} />
-                    </span>
-                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--muted)', lineHeight: 1.5 }}>{item}</span>
-                  </li>
+                  <li key={i}><span className="svc-ic"><ArrowRightIcon size={14} /></span>{item}</li>
                 ))}
               </ul>
-            </div>
-            <div style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '48px 40px' }}>
-              <h2 style={sectionTitleStyle}>Čo dostanete</h2>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            </section>
+            <section className="svc-block">
+              <h2 className="svc-block-h2">Čo dostanete</h2>
+              <ul className="svc-list">
                 {service.whatYouGet.map((item, i) => (
-                  <li key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <span style={{ color: service.color, marginTop: 2, flexShrink: 0, display: 'inline-flex' }}>
-                      <CheckIcon size={14} />
-                    </span>
-                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--muted)', lineHeight: 1.5 }}>{item}</span>
-                  </li>
+                  <li key={i}><span className="svc-ic"><CheckIcon size={14} /></span>{item}</li>
                 ))}
               </ul>
-            </div>
+            </section>
           </div>
 
           {service.process && (
-            <section style={{ padding: '80px 0 0' }}>
-              <h2
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 800,
-                  fontSize: 48,
-                  color: 'var(--ink)',
-                  margin: '0 0 40px',
-                }}
-              >
-                Ako prebieha spolupráca
-              </h2>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                  gap: 2,
-                }}
-              >
-                {service.process.map((step, index) => (
-                  <div key={step.title} style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '36px 32px' }}>
-                    <div
-                      style={{
-                        fontFamily: 'Space Mono, monospace',
-                        fontSize: 11,
-                        letterSpacing: '0.2em',
-                        color: service.color,
-                        marginBottom: 16,
-                      }}
-                    >
-                      0{index + 1}
-                    </div>
-                    <h3
-                      style={{
-                        fontFamily: 'var(--font-display)',
-                        fontWeight: 700,
-                        fontSize: 24,
-                        color: 'var(--ink)',
-                        margin: '0 0 12px',
-                      }}
-                    >
-                      {step.title}
-                    </h3>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>
-                      {step.text}
-                    </p>
+            <section>
+              <h2 className="svc-h2">Ako prebieha spolupráca</h2>
+              <div className="svc-steps">
+                {service.process.map((step, i) => (
+                  <div key={step.title} className="svc-step">
+                    <div className="svc-step-n">0{i + 1}</div>
+                    <h3 className="svc-step-t">{step.title}</h3>
+                    <p>{step.text}</p>
                   </div>
                 ))}
               </div>
             </section>
           )}
 
-          <section style={{ padding: '80px 0' }}>
-            <h2
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontWeight: 800,
-                fontSize: 48,
-                color: 'var(--ink)',
-                margin: '0 0 48px',
-              }}
-            >
-              Cenník
-            </h2>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                gap: 2,
-              }}
-            >
+          <section>
+            <h2 className="svc-h2">Cenník</h2>
+            <div className="svc-price-grid">
               {service.pricing.map((plan, i) => (
-                <div
-                  key={i}
-                  style={{
-                    background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)',
-                    padding: '40px 32px',
-                    position: 'relative',
-                  }}
-                >
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: 2,
-                      background: i === Math.floor(service.pricing.length / 2) ? service.color : '#1a1a1a',
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontFamily: 'Space Mono, monospace',
-                      fontSize: 10,
-                      letterSpacing: '0.2em',
-                      textTransform: 'uppercase',
-                      color: 'var(--faint)',
-                    }}
-                  >
-                    {plan.name}
-                  </span>
-                  <div
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontWeight: 800,
-                      fontSize: 28,
-                      color: 'var(--ink)',
-                      margin: '12px 0 24px',
-                      lineHeight: 1.15,
-                      letterSpacing: '-0.02em',
-                      overflowWrap: 'anywhere',
-                    }}
-                  >
-                    {plan.price}
-                  </div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div key={i} className={`svc-price-card${i === Math.floor(service.pricing.length / 2) ? ' is-hot' : ''}`}>
+                  <span className="svc-price-name">{plan.name}</span>
+                  <div className="svc-price-val">{plan.price}</div>
+                  <ul className="svc-list">
                     {plan.items.map((item, j) => (
-                      <li key={j} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                        <span style={{ color: service.color, flexShrink: 0, display: 'inline-flex' }}>
-                          <CheckIcon size={13} />
-                        </span>
-                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--muted)', lineHeight: 1.45 }}>{item}</span>
-                      </li>
+                      <li key={j}><span className="svc-ic"><CheckIcon size={13} /></span>{item}</li>
                     ))}
                   </ul>
-                  <Link
-                    href="/kontakt/"
-                    style={{
-                      fontFamily: 'Space Mono, monospace',
-                      fontSize: 11,
-                      letterSpacing: '0.15em',
-                      textTransform: 'uppercase',
-                      padding: '12px 24px',
-                      border: `1px solid ${service.color}`,
-                      color: service.color,
-                      textDecoration: 'none',
-                      display: 'inline-block',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    Mám záujem
-                  </Link>
+                  <Link href="/kontakt/" className="svc-price-btn">Mám záujem →</Link>
                 </div>
               ))}
             </div>
           </section>
 
           {(service.pricingNote || service.extras) && (
-            <section
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                gap: 2,
-                paddingBottom: service.faq ? 80 : 0,
-              }}
-            >
+            <div className="svc-cols">
               {service.pricingNote && (
-                <div style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '40px 36px' }}>
-                  <h2 style={sectionTitleStyle}>Dôležité k cenníku</h2>
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 16, color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
-                    {service.pricingNote}
-                  </p>
-                </div>
+                <section className="svc-block">
+                  <h2 className="svc-block-h2">Dôležité k cenníku</h2>
+                  <div className="svc-prose"><p>{service.pricingNote}</p></div>
+                </section>
               )}
               {service.extras && (
-                <div style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '40px 36px' }}>
-                  <h2 style={sectionTitleStyle}>Doplnky a rozšírenia</h2>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    {service.extras.map((item, index) => (
-                      <li key={index} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                        <span style={{ color: service.color, marginTop: 2, flexShrink: 0, display: 'inline-flex' }}>
-                          <ArrowRightIcon size={14} />
-                        </span>
-                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--muted)', lineHeight: 1.55 }}>{item}</span>
-                      </li>
+                <section className="svc-block">
+                  <h2 className="svc-block-h2">Doplnky a rozšírenia</h2>
+                  <ul className="svc-list">
+                    {service.extras.map((item, i) => (
+                      <li key={i}><span className="svc-ic"><ArrowRightIcon size={14} /></span>{item}</li>
                     ))}
                   </ul>
-                </div>
+                </section>
               )}
-            </section>
+            </div>
           )}
 
           {service.faq && (
-            <section style={{ padding: service.pricingNote || service.extras ? '0 0 80px' : '0 0 80px' }}>
-              <h2
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 800,
-                  fontSize: 48,
-                  color: 'var(--ink)',
-                  margin: '0 0 48px',
-                }}
-              >
-                Časté otázky
-              </h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <section>
+              <h2 className="svc-h2">Časté otázky</h2>
+              <div className="svc-faq">
                 {service.faq.map((item, i) => (
-                  <div key={i} style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '32px 40px' }}>
-                    <h3
-                      style={{
-                        fontFamily: 'var(--font-display)',
-                        fontWeight: 700,
-                        fontSize: 20,
-                        color: 'var(--ink)',
-                        margin: '0 0 12px',
-                      }}
-                    >
-                      {item.q}
-                    </h3>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--muted)', margin: 0, lineHeight: 1.6 }}>
-                      {item.a}
-                    </p>
+                  <div key={i} className="svc-faq-item">
+                    <h3 className="svc-faq-q">{item.q}</h3>
+                    <p className="svc-faq-a">{item.a}</p>
                   </div>
                 ))}
               </div>
             </section>
           )}
 
-          <section
-            style={{
-              background: 'var(--y)',
-              border: '2px solid var(--ink)',
-              borderRadius: 22,
-              boxShadow: 'var(--sh)',
-              padding: '56px 56px',
-              marginBottom: 80,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 40,
-              flexWrap: 'wrap',
-            }}
-          >
+          <section className="svc-final-cta">
             <div>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 36, color: 'var(--ink)', margin: '0 0 8px' }}>
-                Zaujalo vás to?
-              </h2>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 16, color: 'var(--ink)', margin: 0 }}>
-                Nezáväzná konzultácia zdarma. Odpovieme do 24 hodín.
-              </p>
+              <h2 className="svc-final-h2">Zaujalo vás to?</h2>
+              <p className="svc-final-p">Nezáväzná konzultácia zdarma. Odpovieme do 24 hodín.</p>
             </div>
-            <Link
-              href="/kontakt/"
-              style={{
-                fontFamily: 'Space Mono, monospace',
-                fontSize: 12,
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                padding: '18px 40px',
-                background: service.color,
-                color: '#0a0a0a',
-                textDecoration: 'none',
-                fontWeight: 700,
-                flexShrink: 0,
-              }}
-            >
-              Dohodnúť konzultáciu
-            </Link>
+            <Link href="/kontakt/" className="svc-final-btn">Dohodnúť konzultáciu →</Link>
           </section>
         </div>
       </main>
