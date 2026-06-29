@@ -76,7 +76,7 @@ export default function Blog({ posts, categories }: Props) {
       </div>
 
       {/* POSTS GRID */}
-      <div className="posts-grid" style={{ margin: '2px 0' }}>
+      <div className="posts-grid" style={{ marginTop: 2, marginBottom: 2 }}>
         {paginated.length === 0 && (
           <div style={{ padding: '80px 40px', color: 'var(--muted)', gridColumn: '1/-1' }}>
             Žiadne články v tejto kategórii.
