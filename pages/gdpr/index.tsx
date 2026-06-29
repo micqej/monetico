@@ -24,40 +24,40 @@ export default function GDPRPage() {
             — Právne informácie
           </span>
           <h1 style={{
-            fontFamily: 'Syne, sans-serif',
+            fontFamily: 'var(--font-display)',
             fontWeight: 800,
             fontSize: 'clamp(36px, 6vw, 72px)',
-            color: '#fff',
+            color: 'var(--ink)',
             margin: '16px 0 64px',
             lineHeight: 1,
           }}>
             GDPR
           </h1>
 
-          <div style={{ color: '#aaa', fontFamily: 'DM Sans, sans-serif', fontSize: 16, lineHeight: 1.8 }}>
+          <div style={{ color: 'var(--ink)', fontFamily: 'var(--font-body)', fontSize: 16, lineHeight: 1.8 }}>
 
-            <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
+            <h2 style={{ color: 'var(--ink)', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
               1. Prevádzkovateľ osobných údajov
             </h2>
             <p>
-              Prevádzkovateľom osobných údajov je spoločnosť <strong style={{ color: '#fff' }}>Brandrise s. r. o.</strong>,
+              Prevádzkovateľom osobných údajov je spoločnosť <strong style={{ color: 'var(--ink)' }}>Brandrise s. r. o.</strong>,
               so sídlom Sokolovská 178/10, 040 11 Košice, IČO: 53196449, DIČ: 2121313865, IČ DPH: SK2121313865,
-              prevádzkujúca značku <strong style={{ color: '#fff' }}>Monetico</strong>.
+              prevádzkujúca značku <strong style={{ color: 'var(--ink)' }}>Monetico</strong>.
             </p>
             <p>Kontaktný e-mail: <a href="mailto:info@monetico.sk" style={{ color: 'var(--acid)' }}>info@monetico.sk</a></p>
 
-            <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
+            <h2 style={{ color: 'var(--ink)', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
               2. Účel a právny základ spracúvania
             </h2>
             <p>Vaše osobné údaje spracúvame na nasledovné účely:</p>
             <ul style={{ paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <li><strong style={{ color: '#fff' }}>Plnenie zmluvy</strong> — spracovanie objednávok, fakturácia, komunikácia ohľadom poskytovaných služieb (čl. 6 ods. 1 písm. b) GDPR).</li>
-              <li><strong style={{ color: '#fff' }}>Oprávnený záujem</strong> — zasielanie relevantných obchodných ponúk existujúcim klientom (čl. 6 ods. 1 písm. f) GDPR).</li>
-              <li><strong style={{ color: '#fff' }}>Súhlas</strong> — zasielanie newsletteru a marketingových e-mailov (čl. 6 ods. 1 písm. a) GDPR).</li>
-              <li><strong style={{ color: '#fff' }}>Zákonná povinnosť</strong> — vedenie účtovníctva a daňová evidencia (čl. 6 ods. 1 písm. c) GDPR).</li>
+              <li><strong style={{ color: 'var(--ink)' }}>Plnenie zmluvy</strong> — spracovanie objednávok, fakturácia, komunikácia ohľadom poskytovaných služieb (čl. 6 ods. 1 písm. b) GDPR).</li>
+              <li><strong style={{ color: 'var(--ink)' }}>Oprávnený záujem</strong> — zasielanie relevantných obchodných ponúk existujúcim klientom (čl. 6 ods. 1 písm. f) GDPR).</li>
+              <li><strong style={{ color: 'var(--ink)' }}>Súhlas</strong> — zasielanie newsletteru a marketingových e-mailov (čl. 6 ods. 1 písm. a) GDPR).</li>
+              <li><strong style={{ color: 'var(--ink)' }}>Zákonná povinnosť</strong> — vedenie účtovníctva a daňová evidencia (čl. 6 ods. 1 písm. c) GDPR).</li>
             </ul>
 
-            <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
+            <h2 style={{ color: 'var(--ink)', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
               3. Aké osobné údaje spracúvame
             </h2>
             <ul style={{ paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -68,7 +68,7 @@ export default function GDPRPage() {
               <li>Technické údaje pri návšteve webu (IP adresa, cookies — pozri sekciu Cookies)</li>
             </ul>
 
-            <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
+            <h2 style={{ color: 'var(--ink)', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
               4. Doba uchovávania
             </h2>
             <p>
@@ -80,25 +80,25 @@ export default function GDPRPage() {
               <li>Marketingový súhlas — do jeho odvolania</li>
             </ul>
 
-            <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
+            <h2 style={{ color: 'var(--ink)', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
               5. Vaše práva
             </h2>
             <p>Podľa GDPR máte nasledovné práva:</p>
             <ul style={{ paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <li><strong style={{ color: '#fff' }}>Právo na prístup</strong> — zistiť, aké údaje o vás spracúvame</li>
-              <li><strong style={{ color: '#fff' }}>Právo na opravu</strong> — opraviť nesprávne alebo neúplné údaje</li>
-              <li><strong style={{ color: '#fff' }}>Právo na vymazanie</strong> — „právo byť zabudnutý"</li>
-              <li><strong style={{ color: '#fff' }}>Právo na obmedzenie spracúvania</strong></li>
-              <li><strong style={{ color: '#fff' }}>Právo na prenosnosť údajov</strong></li>
-              <li><strong style={{ color: '#fff' }}>Právo namietať</strong> — najmä voči spracúvaniu na marketingové účely</li>
-              <li><strong style={{ color: '#fff' }}>Právo odvolať súhlas</strong> — kedykoľvek bez uvedenia dôvodu</li>
+              <li><strong style={{ color: 'var(--ink)' }}>Právo na prístup</strong> — zistiť, aké údaje o vás spracúvame</li>
+              <li><strong style={{ color: 'var(--ink)' }}>Právo na opravu</strong> — opraviť nesprávne alebo neúplné údaje</li>
+              <li><strong style={{ color: 'var(--ink)' }}>Právo na vymazanie</strong> — „právo byť zabudnutý"</li>
+              <li><strong style={{ color: 'var(--ink)' }}>Právo na obmedzenie spracúvania</strong></li>
+              <li><strong style={{ color: 'var(--ink)' }}>Právo na prenosnosť údajov</strong></li>
+              <li><strong style={{ color: 'var(--ink)' }}>Právo namietať</strong> — najmä voči spracúvaniu na marketingové účely</li>
+              <li><strong style={{ color: 'var(--ink)' }}>Právo odvolať súhlas</strong> — kedykoľvek bez uvedenia dôvodu</li>
             </ul>
             <p>
               Svoju požiadavku nám môžete zaslať na <a href="mailto:info@monetico.sk" style={{ color: 'var(--acid)' }}>info@monetico.sk</a>.
               Máte tiež právo podať sťažnosť na Úrad na ochranu osobných údajov SR (<a href="https://www.uoou.sk" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--acid)' }}>uoou.sk</a>).
             </p>
 
-            <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
+            <h2 style={{ color: 'var(--ink)', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
               6. Príjemcovia osobných údajov
             </h2>
             <p>
@@ -110,7 +110,7 @@ export default function GDPRPage() {
               <li>Orgánom verejnej moci, ak to vyžaduje zákon</li>
             </ul>
 
-            <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
+            <h2 style={{ color: 'var(--ink)', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
               7. Cookies
             </h2>
             <p>
@@ -119,12 +119,12 @@ export default function GDPRPage() {
               Cookies, ktoré nie sú nevyhnutné, používame len s vaším súhlasom.
             </p>
 
-            <h2 style={{ color: '#fff', fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
+            <h2 style={{ color: 'var(--ink)', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 24, margin: '48px 0 16px' }}>
               8. Zmeny tohto dokumentu
             </h2>
             <p>
               Vyhradzujeme si právo tento dokument aktualizovať. Aktuálna verzia je vždy dostupná na tejto stránke.
-              Posledná aktualizácia: <strong style={{ color: '#fff' }}>marec 2025</strong>.
+              Posledná aktualizácia: <strong style={{ color: 'var(--ink)' }}>marec 2025</strong>.
             </p>
 
           </div>

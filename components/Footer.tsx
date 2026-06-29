@@ -2,8 +2,8 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer style={{ flexDirection: 'column', gap: '24px', padding: '48px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '20px', flexWrap: 'wrap' }}>
+    <footer style={{ flexDirection: 'column', gap: 0, padding: '44px 48px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 20, flexWrap: 'wrap' }}>
         <div className="footer-logo">MONETICO</div>
         <span className="footer-copy">© {new Date().getFullYear()} Brandrise s.r.o. — IČO: 53196449</span>
         <ul className="footer-links">
@@ -13,7 +13,7 @@ export default function Footer() {
           <li><Link href="/kontakt/">Kontakt</Link></li>
         </ul>
       </div>
-      <div style={{ width: '100%', borderTop: '1px solid var(--border)', paddingTop: '20px', fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--muted)', letterSpacing: '1px', textTransform: 'uppercase' }}>
+      <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,0.12)', marginTop: 28, paddingTop: 20, fontFamily: 'var(--font-mono)', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 1, textTransform: 'uppercase' }}>
         Brandrise s.r.o. · Sokolovská 178/10, 040 11 Košice · DIČ: 2121313865 · IČ DPH: SK2121313865 · Platca DPH
       </div>
     </footer>

@@ -659,10 +659,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 };
 
 const sectionTitleStyle = {
-  fontFamily: 'Syne, sans-serif',
+  fontFamily: 'var(--font-display)',
   fontWeight: 800,
   fontSize: 28,
-  color: '#fff',
+  color: 'var(--ink)',
   margin: '0 0 28px',
 } as const;
 
@@ -704,10 +704,10 @@ export default function ServicePage({ service }: { service: ServiceData }) {
               </span>
               <h1
                 style={{
-                  fontFamily: 'Syne, sans-serif',
+                  fontFamily: 'var(--font-display)',
                   fontWeight: 800,
                   fontSize: 'clamp(40px, 6vw, 80px)',
-                  color: '#fff',
+                  color: 'var(--ink)',
                   margin: '8px 0 0',
                   lineHeight: 1,
                 }}
@@ -718,9 +718,9 @@ export default function ServicePage({ service }: { service: ServiceData }) {
           </div>
           <p
             style={{
-              fontFamily: 'DM Sans, sans-serif',
+              fontFamily: 'var(--font-body)',
               fontSize: 20,
-              color: '#888',
+              color: 'var(--muted)',
               maxWidth: 780,
               lineHeight: 1.6,
             }}
@@ -750,16 +750,16 @@ export default function ServicePage({ service }: { service: ServiceData }) {
         <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 40px' }}>
           {service.intro && (
             <section style={{ paddingTop: 80 }}>
-              <div style={{ background: 'var(--panel)', padding: '48px 40px' }}>
+              <div style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '48px 40px' }}>
                 <h2 style={sectionTitleStyle}>Viac o službe</h2>
                 <div style={{ display: 'grid', gap: 20 }}>
                   {service.intro.map((paragraph, index) => (
                     <p
                       key={index}
                       style={{
-                        fontFamily: 'DM Sans, sans-serif',
+                        fontFamily: 'var(--font-body)',
                         fontSize: 17,
-                        color: '#9da3aa',
+                        color: 'var(--muted)',
                         lineHeight: 1.75,
                         margin: 0,
                         maxWidth: 1040,
@@ -781,7 +781,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
               marginTop: 2,
             }}
           >
-            <div style={{ background: 'var(--panel)', padding: '48px 40px' }}>
+            <div style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '48px 40px' }}>
               <h2 style={sectionTitleStyle}>Pre koho je táto služba</h2>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {service.forWhom.map((item, i) => (
@@ -789,12 +789,12 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                     <span style={{ color: service.color, marginTop: 2, flexShrink: 0, display: 'inline-flex' }}>
                       <ArrowRightIcon size={14} />
                     </span>
-                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, color: '#aaa', lineHeight: 1.5 }}>{item}</span>
+                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--muted)', lineHeight: 1.5 }}>{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div style={{ background: 'var(--panel)', padding: '48px 40px' }}>
+            <div style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '48px 40px' }}>
               <h2 style={sectionTitleStyle}>Čo dostanete</h2>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {service.whatYouGet.map((item, i) => (
@@ -802,7 +802,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                     <span style={{ color: service.color, marginTop: 2, flexShrink: 0, display: 'inline-flex' }}>
                       <CheckIcon size={14} />
                     </span>
-                    <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, color: '#aaa', lineHeight: 1.5 }}>{item}</span>
+                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--muted)', lineHeight: 1.5 }}>{item}</span>
                   </li>
                 ))}
               </ul>
@@ -813,10 +813,10 @@ export default function ServicePage({ service }: { service: ServiceData }) {
             <section style={{ padding: '80px 0 0' }}>
               <h2
                 style={{
-                  fontFamily: 'Syne, sans-serif',
+                  fontFamily: 'var(--font-display)',
                   fontWeight: 800,
                   fontSize: 48,
-                  color: '#fff',
+                  color: 'var(--ink)',
                   margin: '0 0 40px',
                 }}
               >
@@ -830,7 +830,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                 }}
               >
                 {service.process.map((step, index) => (
-                  <div key={step.title} style={{ background: 'var(--panel)', padding: '36px 32px' }}>
+                  <div key={step.title} style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '36px 32px' }}>
                     <div
                       style={{
                         fontFamily: 'Space Mono, monospace',
@@ -844,16 +844,16 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                     </div>
                     <h3
                       style={{
-                        fontFamily: 'Syne, sans-serif',
+                        fontFamily: 'var(--font-display)',
                         fontWeight: 700,
                         fontSize: 24,
-                        color: '#fff',
+                        color: 'var(--ink)',
                         margin: '0 0 12px',
                       }}
                     >
                       {step.title}
                     </h3>
-                    <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, color: '#868d95', lineHeight: 1.6, margin: 0 }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>
                       {step.text}
                     </p>
                   </div>
@@ -865,10 +865,10 @@ export default function ServicePage({ service }: { service: ServiceData }) {
           <section style={{ padding: '80px 0' }}>
             <h2
               style={{
-                fontFamily: 'Syne, sans-serif',
+                fontFamily: 'var(--font-display)',
                 fontWeight: 800,
                 fontSize: 48,
-                color: '#fff',
+                color: 'var(--ink)',
                 margin: '0 0 48px',
               }}
             >
@@ -885,7 +885,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                 <div
                   key={i}
                   style={{
-                    background: 'var(--panel)',
+                    background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)',
                     padding: '40px 32px',
                     position: 'relative',
                   }}
@@ -906,17 +906,17 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                       fontSize: 10,
                       letterSpacing: '0.2em',
                       textTransform: 'uppercase',
-                      color: '#555',
+                      color: 'var(--faint)',
                     }}
                   >
                     {plan.name}
                   </span>
                   <div
                     style={{
-                      fontFamily: 'Syne, sans-serif',
+                      fontFamily: 'var(--font-display)',
                       fontWeight: 800,
                       fontSize: 28,
-                      color: '#fff',
+                      color: 'var(--ink)',
                       margin: '12px 0 24px',
                       lineHeight: 1.15,
                       letterSpacing: '-0.02em',
@@ -931,7 +931,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                         <span style={{ color: service.color, flexShrink: 0, display: 'inline-flex' }}>
                           <CheckIcon size={13} />
                         </span>
-                        <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: '#777', lineHeight: 1.45 }}>{item}</span>
+                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--muted)', lineHeight: 1.45 }}>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -967,15 +967,15 @@ export default function ServicePage({ service }: { service: ServiceData }) {
               }}
             >
               {service.pricingNote && (
-                <div style={{ background: 'var(--panel)', padding: '40px 36px' }}>
+                <div style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '40px 36px' }}>
                   <h2 style={sectionTitleStyle}>Dôležité k cenníku</h2>
-                  <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 16, color: '#8d949b', lineHeight: 1.7, margin: 0 }}>
+                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 16, color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
                     {service.pricingNote}
                   </p>
                 </div>
               )}
               {service.extras && (
-                <div style={{ background: 'var(--panel)', padding: '40px 36px' }}>
+                <div style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '40px 36px' }}>
                   <h2 style={sectionTitleStyle}>Doplnky a rozšírenia</h2>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
                     {service.extras.map((item, index) => (
@@ -983,7 +983,7 @@ export default function ServicePage({ service }: { service: ServiceData }) {
                         <span style={{ color: service.color, marginTop: 2, flexShrink: 0, display: 'inline-flex' }}>
                           <ArrowRightIcon size={14} />
                         </span>
-                        <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, color: '#8d949b', lineHeight: 1.55 }}>{item}</span>
+                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--muted)', lineHeight: 1.55 }}>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -996,10 +996,10 @@ export default function ServicePage({ service }: { service: ServiceData }) {
             <section style={{ padding: service.pricingNote || service.extras ? '0 0 80px' : '0 0 80px' }}>
               <h2
                 style={{
-                  fontFamily: 'Syne, sans-serif',
+                  fontFamily: 'var(--font-display)',
                   fontWeight: 800,
                   fontSize: 48,
-                  color: '#fff',
+                  color: 'var(--ink)',
                   margin: '0 0 48px',
                 }}
               >
@@ -1007,19 +1007,19 @@ export default function ServicePage({ service }: { service: ServiceData }) {
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {service.faq.map((item, i) => (
-                  <div key={i} style={{ background: 'var(--panel)', padding: '32px 40px' }}>
+                  <div key={i} style={{ background: 'var(--panel)', border: '2px solid var(--ink)', borderRadius: '16px', boxShadow: 'var(--sh)', padding: '32px 40px' }}>
                     <h3
                       style={{
-                        fontFamily: 'Syne, sans-serif',
+                        fontFamily: 'var(--font-display)',
                         fontWeight: 700,
                         fontSize: 20,
-                        color: '#fff',
+                        color: 'var(--ink)',
                         margin: '0 0 12px',
                       }}
                     >
                       {item.q}
                     </h3>
-                    <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 15, color: '#777', margin: 0, lineHeight: 1.6 }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--muted)', margin: 0, lineHeight: 1.6 }}>
                       {item.a}
                     </p>
                   </div>
@@ -1030,9 +1030,11 @@ export default function ServicePage({ service }: { service: ServiceData }) {
 
           <section
             style={{
-              background: '#111417',
-              border: '1px solid rgba(255,255,255,0.08)',
-              padding: '64px 60px',
+              background: 'var(--y)',
+              border: '2px solid var(--ink)',
+              borderRadius: 22,
+              boxShadow: 'var(--sh)',
+              padding: '56px 56px',
               marginBottom: 80,
               display: 'flex',
               justifyContent: 'space-between',
@@ -1042,10 +1044,10 @@ export default function ServicePage({ service }: { service: ServiceData }) {
             }}
           >
             <div>
-              <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 36, color: '#fff', margin: '0 0 8px' }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 36, color: 'var(--ink)', margin: '0 0 8px' }}>
                 Zaujalo vás to?
               </h2>
-              <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 16, color: '#8b9198', margin: 0 }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 16, color: 'var(--ink)', margin: 0 }}>
                 Nezáväzná konzultácia zdarma. Odpovieme do 24 hodín.
               </p>
             </div>
