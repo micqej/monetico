@@ -83,27 +83,27 @@ export default function Kontakt() {
             )}
           </div>
           <div>
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '40px', marginBottom: '40px' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--acid)', marginBottom: '16px' }}>Kontakt</div>
-              <a href="mailto:info@monetico.sk" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '20px', letterSpacing: '-0.5px', display: 'block', marginBottom: '10px', transition: 'color 0.2s', color: 'var(--ink)' }}>info@monetico.sk</a>
-              <a href="tel:+421908804366" style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '20px', letterSpacing: '-0.5px', display: 'block', transition: 'color 0.2s', color: 'var(--ink)' }}>+421 908 804 366</a>
+            <div style={{ background: 'var(--purple)', border: '2px solid var(--ink)', borderRadius: '18px', boxShadow: 'var(--sh)', padding: '28px', marginBottom: '16px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--y)', marginBottom: '16px' }}>Kontakt</div>
+              <a href="mailto:info@monetico.sk" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '21px', letterSpacing: '-0.5px', display: 'block', marginBottom: '10px', color: '#fff' }}>info@monetico.sk</a>
+              <a href="tel:+421908804366" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '21px', letterSpacing: '-0.5px', display: 'block', color: 'var(--y)' }}>+421 908 804 366</a>
             </div>
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '40px', marginBottom: '40px' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--acid)', marginBottom: '16px' }}>Fakturačné údaje</div>
+            <div style={{ background: 'var(--white)', border: '2px solid var(--ink)', borderRadius: '18px', boxShadow: 'var(--sh)', padding: '28px', marginBottom: '16px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--purple)', marginBottom: '16px' }}>Fakturačné údaje</div>
               {[['Spoločnosť','Brandrise s.r.o.'],['Adresa','Sokolovská 178/10, 040 11 Košice'],['IČO','53196449'],['DIČ','2121313865'],['IČ DPH','SK2121313865'],['Platca DPH','Áno']].map(([k,v]) => (
-                <div key={k} style={{ display: 'flex', gap: '16px', fontSize: '14px', lineHeight: '1.8' }}>
+                <div key={k} style={{ display: 'flex', gap: '16px', fontSize: '14px', lineHeight: '1.9' }}>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '1px', color: 'var(--muted)', textTransform: 'uppercase', minWidth: '80px', paddingTop: '3px' }}>{k}</span>
-                  <span style={{ color: 'var(--ink)' }}>{v}</span>
+                  <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{v}</span>
                 </div>
               ))}
             </div>
-            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '40px' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--acid)', marginBottom: '16px' }}>Naše služby</div>
-              {['Cold Email','SEO','Sociálne Médiá','Email Marketing','WordPress','Shoptet','Google & FB Ads'].map(s => (
-                <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: '1px solid var(--border)', fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                  <span style={{ color: 'var(--acid)', display: 'inline-flex' }}><SparkIcon size={14} /></span> {s}
-                </div>
-              ))}
+            <div style={{ background: 'var(--y)', border: '2px solid var(--ink)', borderRadius: '18px', boxShadow: 'var(--sh)', padding: '28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--ink)', marginBottom: '16px' }}><SparkIcon size={14} /> Naše služby</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {['Cold Email','SEO','Sociálne Médiá','Email Marketing','WordPress','Shoptet','Google & FB Ads'].map(s => (
+                  <span key={s} style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.5px', textTransform: 'uppercase', color: 'var(--ink)', background: 'var(--white)', border: '2px solid var(--ink)', padding: '7px 12px', borderRadius: '50px' }}>{s}</span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
