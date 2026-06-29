@@ -398,6 +398,55 @@ footer {
 .services-overview-card:hover { transform: translate(-3px,-3px); box-shadow: var(--sh-lg); }
 .service-overview-icon { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 13px; border: 2px solid var(--ink); background: var(--purple-lt); }
 
+/* ─── SERVICE DETAIL ─── */
+.svc-hero { max-width: 1180px; margin: 0 auto; padding: 120px var(--side) 0; }
+.svc-back { font-family: var(--font-mono); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--purple); }
+.svc-back:hover { text-decoration: underline; }
+.svc-hero-row { display: flex; gap: 22px; align-items: center; margin: 26px 0 24px; }
+.svc-hero-ico { display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 18px; border: 2px solid var(--ink); background: var(--purple-lt); color: var(--purple); box-shadow: var(--sh); flex-shrink: 0; }
+.svc-eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--purple); margin-bottom: 8px; }
+.svc-title { font-family: var(--font-display); font-weight: 900; font-size: clamp(34px, 5vw, 64px); letter-spacing: -2px; line-height: 1; color: var(--ink); }
+.svc-lead { font-size: clamp(17px, 1.6vw, 20px); line-height: 1.7; color: var(--muted); max-width: 760px; margin: 0 0 32px; }
+
+.svc-wrap { max-width: 1180px; margin: 0 auto; padding: 56px var(--side) 90px; display: flex; flex-direction: column; gap: 44px; }
+.svc-block { background: var(--white); border: 2px solid var(--ink); border-radius: var(--r); box-shadow: var(--sh); padding: 38px 42px; }
+.svc-block-h2 { font-family: var(--font-display); font-weight: 800; font-size: 24px; letter-spacing: -.6px; color: var(--ink); margin-bottom: 22px; }
+.svc-prose { display: flex; flex-direction: column; gap: 18px; }
+.svc-prose p { font-size: 16.5px; line-height: 1.8; color: #2a2a28; max-width: 1000px; }
+.svc-h2 { font-family: var(--font-display); font-weight: 900; font-size: clamp(28px, 3.4vw, 42px); letter-spacing: -1.2px; color: var(--ink); margin-bottom: 26px; }
+.svc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.svc-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.svc-list li { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; line-height: 1.55; color: var(--ink); }
+.svc-ic { color: var(--purple); flex-shrink: 0; display: inline-flex; margin-top: 2px; }
+
+.svc-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.svc-step { background: var(--cream); border: 2px solid var(--ink); border-radius: var(--r-sm); padding: 28px 26px; box-shadow: var(--sh); }
+.svc-step-n { font-family: var(--font-mono); font-size: 13px; letter-spacing: .15em; color: var(--purple); margin-bottom: 14px; }
+.svc-step-t { font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.3px; color: var(--ink); margin-bottom: 10px; }
+.svc-step p { font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+
+.svc-price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+.svc-price-card { display: flex; flex-direction: column; background: var(--white); border: 2px solid var(--ink); border-radius: var(--r-sm); padding: 30px 28px; box-shadow: var(--sh); transition: transform .14s, box-shadow .14s; }
+.svc-price-card:hover { transform: translate(-3px,-3px); box-shadow: var(--sh-lg); }
+.svc-price-card.is-hot { background: var(--purple-lt); }
+.svc-price-name { font-family: var(--font-mono); font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--purple); }
+.svc-price-val { font-family: var(--font-display); font-weight: 900; font-size: 26px; letter-spacing: -1px; color: var(--ink); margin: 10px 0 22px; line-height: 1.15; }
+.svc-price-card .svc-list { margin-bottom: 26px; }
+.svc-price-card .svc-list li { font-size: 13.5px; color: var(--muted); }
+.svc-price-btn { margin-top: auto; align-self: flex-start; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--ink); background: var(--y); border: 2px solid var(--ink); padding: 11px 20px; border-radius: 50px; box-shadow: 2px 2px 0 var(--ink); transition: transform .1s, box-shadow .1s; }
+.svc-price-btn:hover { transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--ink); }
+
+.svc-faq { display: flex; flex-direction: column; gap: 12px; }
+.svc-faq-item { background: var(--white); border: 2px solid var(--ink); border-radius: var(--r-sm); padding: 26px 30px; box-shadow: var(--sh); }
+.svc-faq-q { font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: -.3px; color: var(--ink); margin-bottom: 10px; }
+.svc-faq-a { font-size: 15px; line-height: 1.65; color: var(--muted); }
+
+.svc-final-cta { background: var(--y); border: 2px solid var(--ink); border-radius: var(--r); box-shadow: var(--sh); padding: 44px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+.svc-final-h2 { font-family: var(--font-display); font-weight: 900; font-size: clamp(26px, 3vw, 38px); letter-spacing: -1px; color: var(--ink); margin-bottom: 6px; }
+.svc-final-p { font-size: 15.5px; color: var(--ink); opacity: .8; }
+.svc-final-btn { flex-shrink: 0; font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--white); background: var(--ink); border: 2px solid var(--ink); padding: 16px 28px; border-radius: 50px; box-shadow: 3px 3px 0 rgba(0,0,0,.25); transition: transform .1s, box-shadow .1s; }
+.svc-final-btn:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 rgba(0,0,0,.3); }
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 1280px) { :root { --side: 56px; } }
 @media (max-width: 1024px) {
@@ -426,4 +475,9 @@ footer {
   .process-tag { grid-column: 2; justify-self: start; }
   .post-card.featured { grid-column: span 1; grid-template-columns: 1fr; }
   .article-body { padding: 28px 22px; }
+  .svc-cols { grid-template-columns: 1fr; }
+  .svc-hero { padding-top: 92px; }
+  .svc-block { padding: 26px 22px; }
+  .svc-final-cta { padding: 30px 24px; }
+  .svc-hero-row { gap: 16px; }
 }

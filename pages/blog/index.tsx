@@ -12,7 +12,7 @@ interface Props {
   categories: { name: string; count: number }[]
 }
 
-const PER_PAGE = 12
+const PER_PAGE = 11
 
 export default function Blog({ posts, categories }: Props) {
   const [activeCategory, setActiveCategory] = useState('Všetky')

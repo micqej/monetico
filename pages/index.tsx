@@ -125,7 +125,7 @@ export default function Home({ recentPosts, categories }: Props) {
         <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(44px,5vw,72px)', letterSpacing: '-3px', lineHeight: '0.9', marginBottom: '64px' }}>NAJNOVŠIE<br />ČLÁNKY</h2>
         <div className="posts-grid">
           {recentPosts.slice(0, 1).map(p => <PostCard key={p.id} post={p} featured />)}
-          {recentPosts.slice(1, 4).map(p => <PostCard key={p.id} post={p} />)}
+          {recentPosts.slice(1, 5).map(p => <PostCard key={p.id} post={p} />)}
         </div>
         <div style={{ textAlign: 'center', marginTop: '48px' }}>
           <Link href="/blog/" className="btn-primary">Všetky články →</Link>
