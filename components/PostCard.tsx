@@ -11,7 +11,7 @@ export default function PostCard({ post, featured }: Props) {
 
   if (featured) {
     return (
-      <article className="post-card featured">
+      <article className="post-card featured reveal">
         <div>
           <div className="card-cat">{cat}</div>
           <Link href={post.url}>
@@ -32,7 +32,7 @@ export default function PostCard({ post, featured }: Props) {
   }
 
   return (
-    <article className="post-card">
+    <article className="post-card reveal">
       <div className="card-cat">{cat}</div>
       <Link href={post.url}>
         <h2 className="card-title">{post.title}</h2>

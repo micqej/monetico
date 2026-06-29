@@ -71,7 +71,7 @@ export default function Home({ recentPosts, categories }: Props) {
             { num: '05', slug: 'tvorba-webov', icon: 'web' as ServiceIconName, title: 'Tvorba Webov', desc: 'WordPress weby a Shoptet e-shopy na mieru. Rýchle, moderné, konverzné. Od dizajnu po spustenie.' },
             { num: '06', slug: 'komplexny-growth', icon: 'copy' as ServiceIconName, title: 'Komplexný Growth', desc: 'Pre firmy, ktoré chcú systematický rast. Kombinujeme všetky kanály do jednej stratégie šitej na mieru.' },
           ].map(s => (
-            <Link key={s.num} href={`/sluzby/${s.slug}/`} className="service-card-link">
+            <Link key={s.num} href={`/sluzby/${s.slug}/`} className="service-card-link reveal">
               <div className="service-card">
                 <div className="service-num">{s.num}</div>
                 <span className="service-icon"><ServiceIcon name={s.icon} size={28} /></span>
@@ -92,7 +92,7 @@ export default function Home({ recentPosts, categories }: Props) {
           { num: '8k', suffix: '', label: 'Cold emailov\nmesačne' },
           { num: '97', suffix: '%', label: 'Spokojnosť\nklientov' },
         ].map(s => (
-          <div key={s.num} className="stat-box">
+          <div key={s.num} className="stat-box reveal">
             <div className="stat-num">{s.num}<span>{s.suffix}</span></div>
             <div className="stat-label" style={{ whiteSpace: 'pre-line' }}>{s.label}</div>
           </div>
@@ -110,7 +110,7 @@ export default function Home({ recentPosts, categories }: Props) {
             { n: '03', title: 'Spustenie Kampaní', tag: 'Mesiac 2' },
             { n: '04', title: 'Optimalizácia & Škálovanie', tag: 'Priebežne' },
           ].map(p => (
-            <div key={p.n} className="process-item">
+            <div key={p.n} className="process-item reveal">
               <div className="process-step">{p.n}</div>
               <div className="process-title">{p.title}</div>
               <div className="process-tag">{p.tag}</div>

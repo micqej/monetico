@@ -9,7 +9,7 @@ export default function Custom404() {
       <SEO title="404 — Stránka nenájdená" noindex />
       <Nav />
       <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '140px 48px 80px', textAlign: 'center' }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(100px,20vw,220px)', lineHeight: '1', letterSpacing: '-8px', color: 'transparent', WebkitTextStroke: '1px rgba(244,240,232,0.1)', marginBottom: '20px' }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(100px,20vw,220px)', lineHeight: '1', letterSpacing: '-8px', color: 'transparent', WebkitTextStroke: '2px var(--ink)', opacity: 0.12, marginBottom: '20px' }}>
           404
         </div>
         <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(32px,5vw,64px)', letterSpacing: '-2px', marginBottom: '16px' }}>
@@ -20,7 +20,7 @@ export default function Custom404() {
         </p>
         <div style={{ display: 'flex', gap: '16px' }}>
           <Link href="/" className="btn-primary">← Späť na hlavnú</Link>
-          <Link href="/blog/" className="btn-ghost">Čítať blog</Link>
+          <Link href="/blog/" className="btn-ghost" style={{ color: 'var(--ink)', borderColor: 'var(--ink)' }}>Čítať blog</Link>
         </div>
       </div>
       <Footer />
