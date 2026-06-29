@@ -28,6 +28,8 @@ export default function PostPage({ post, related, headings, cleanContent }: Prop
         ogDesc={post.og_desc || post.meta_desc}
         keywords={post.meta_keywords}
         type="article"
+        publishedTime={post.date}
+        author={post.author}
       />
       <Nav />
 
