@@ -4,7 +4,8 @@ import Nav from '../../components/Nav'
 import Footer from '../../components/Footer'
 import PostCard from '../../components/PostCard'
 import SEO from '../../components/SEO'
-import { getAllPosts, getAllCategories, Post } from '../../lib/posts'
+import { getAllPosts, mergePosts, categoriesFrom, Post } from '../../lib/posts'
+import { getPublishedPosts } from '../../lib/articles'
 import { SITE_URL } from '../../lib/site'
 
 interface Props {
@@ -121,7 +122,13 @@ export default function Blog({ posts, categories }: Props) {
           <p style={{ color: 'var(--muted)', marginBottom: '22px', lineHeight: '1.7' }}>
             Každý týždeň jeden tip z praxe. Bez spamu, len obsah, ktorý používate hneď.
           </p>
-          <form className="newsletter-form" onSubmit={e => e.preventDefault()}>
+          <form className="newsletter-form" onSubmit={async e => {
+            e.preventDefault()
+            const input = e.currentTarget.querySelector('input') as HTMLInputElement | null
+            const email = input?.value
+            if (!email) return
+            try { await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, source: 'blog' }) }); if (input) input.value = ''; alert('Ďakujeme! Prihlásili sme vás.') } catch {}
+          }}>
             <input className="newsletter-input" type="email" placeholder="váš@email.sk" required />
             <button type="submit" className="newsletter-submit">Prihlásiť →</button>
           </form>
@@ -134,9 +141,10 @@ export default function Blog({ posts, categories }: Props) {
 }
 
 export async function getStaticProps() {
-  const posts = getAllPosts()
-  const categories = getAllCategories()
+  const posts = mergePosts(getAllPosts(), await getPublishedPosts())
+  const categories = categoriesFrom(posts)
   return {
     props: { posts, categories },
+    revalidate: 60,
   }
 }
