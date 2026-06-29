@@ -60,7 +60,7 @@ export default function Home({ recentPosts, categories }: Props) {
       {/* SERVICES */}
       <section className="section" id="sluzby">
         <div className="section-label">Čo robíme</div>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(44px,6vw,90px)', letterSpacing: '-3px', lineHeight: '0.9', marginBottom: '72px' }}>NAŠE<br />SLUŽBY</h2>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(44px,6vw,90px)', letterSpacing: '-0.02em', lineHeight: '1.04', marginBottom: '72px' }}>NAŠE<br />SLUŽBY</h2>
 
         <div className="services-grid">
           {[
@@ -102,7 +102,7 @@ export default function Home({ recentPosts, categories }: Props) {
       {/* PROCESS */}
       <section className="section">
         <div className="section-label">Ako pracujeme</div>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(44px,6vw,90px)', letterSpacing: '-3px', lineHeight: '0.9', marginBottom: '64px' }}>PROCES</h2>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(44px,6vw,90px)', letterSpacing: '-0.02em', lineHeight: '1.04', marginBottom: '64px' }}>PROCES</h2>
         <div>
           {[
             { n: '01', title: 'Audit & Stratégia', tag: 'Týždeň 1–2' },
@@ -122,7 +122,7 @@ export default function Home({ recentPosts, categories }: Props) {
       {/* RECENT POSTS */}
       <section className="section" style={{ paddingTop: 0 }}>
         <div className="section-label">Z blogu</div>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(44px,5vw,72px)', letterSpacing: '-3px', lineHeight: '0.9', marginBottom: '64px' }}>NAJNOVŠIE<br />ČLÁNKY</h2>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(44px,5vw,72px)', letterSpacing: '-0.02em', lineHeight: '1.04', marginBottom: '64px' }}>NAJNOVŠIE<br />ČLÁNKY</h2>
         <div className="posts-grid">
           {recentPosts.slice(0, 1).map(p => <PostCard key={p.id} post={p} featured />)}
           {recentPosts.slice(1, 5).map(p => <PostCard key={p.id} post={p} />)}

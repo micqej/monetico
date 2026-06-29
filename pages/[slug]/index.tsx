@@ -102,39 +102,6 @@ export default function PostPage({ post, related, headings, cleanContent }: Prop
             <Link href="/kontakt/">Dohodnúť konzultáciu →</Link>
           </div>
 
-          {post.categories.length > 0 && (
-            <div className="sidebar-block" style={{ marginTop: '16px' }}>
-              <div className="sidebar-label">Kategórie</div>
-              <ul className="sidebar-cats">
-                {post.categories.map(cat => (
-                  <li key={cat}>
-                    <Link href="/blog/">{cat}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {post.tags.length > 0 && (
-            <div className="sidebar-block" style={{ marginTop: '16px' }}>
-              <div className="sidebar-label">Tagy</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {post.tags.map(tag => (
-                  <span key={tag} style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '10px',
-                    letterSpacing: '1px',
-                    padding: '5px 12px',
-                    border: '1px solid var(--border)',
-                    color: 'var(--muted)',
-                    textTransform: 'uppercase',
-                  }}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
         </aside>
       </div>
 
@@ -142,7 +109,7 @@ export default function PostPage({ post, related, headings, cleanContent }: Prop
       {related.length > 0 && (
         <div className="related-section">
           <div className="section-label">Ďalšie články</div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(32px,4vw,56px)', letterSpacing: '-2px', lineHeight: '1', marginBottom: '48px' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(30px,3.6vw,50px)', letterSpacing: '-0.02em', lineHeight: '1.08', marginBottom: '48px' }}>
             MOHLO BY VÁS<br />ZAUJÍMAŤ
           </h2>
           <div className="related-grid">

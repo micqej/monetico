@@ -7,10 +7,10 @@ import Router from 'next/router'
  *  - jemný parallax pozadia hero
  *  - reveal (fade-up) prvkov s triedou .reveal pri scrollovaní
  *
- * Dôležité: pri client-side navigácii (Link) sa _app neremountuje, preto
- * po každej zmene stránky znova oskenujeme nové .reveal prvky — inak by
- * ostali natrvalo skryté (opacity:0). Plus poistka: ak by observer zlyhal,
- * po krátkom čase prvky aj tak odkryjeme.
+ * Reveal musí fungovať aj pri DYNAMICKEJ zmene obsahu (filtre/stránkovanie na
+ * blogu, client-side navigácia), inak nové .reveal karty ostanú skryté
+ * (opacity:0) a vyzerá to ako keby filtre nefungovali. Preto sledujeme DOM
+ * cez MutationObserver + re-scan pri zmene routy + poistka.
  */
 export default function Effects() {
   useEffect(() => {
@@ -42,27 +42,27 @@ export default function Effects() {
           }
         })
       },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
     )
 
-    let safety: ReturnType<typeof setTimeout>
-    const scan = () => {
+    const observeAll = () => {
       document.querySelectorAll('.reveal:not(.in)').forEach(el => io.observe(el))
       onScroll()
-      // poistka: nech obsah nikdy neostane skrytý, ak by observer nezabral
-      clearTimeout(safety)
-      safety = setTimeout(() => {
-        document.querySelectorAll('.reveal:not(.in)').forEach(el => el.classList.add('in'))
-      }, 2500)
     }
 
-    scan()
-    Router.events.on('routeChangeComplete', scan)
+    observeAll()
+
+    // nové prvky (filtre, stránkovanie, async render)
+    const mo = new MutationObserver(() => observeAll())
+    mo.observe(document.body, { childList: true, subtree: true })
+
+    // client-side navigácia
+    Router.events.on('routeChangeComplete', observeAll)
 
     return () => {
       window.removeEventListener('scroll', onScroll)
-      Router.events.off('routeChangeComplete', scan)
-      clearTimeout(safety)
+      Router.events.off('routeChangeComplete', observeAll)
+      mo.disconnect()
       io.disconnect()
       bar.remove()
     }
