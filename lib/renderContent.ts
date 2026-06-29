@@ -18,6 +18,16 @@ export function renderWordPressContent(content: string): string {
   // Trim excess whitespace lines
   html = html.replace(/\n{3,}/g, '\n\n')
 
+  // Interlink: rewrite original monetico.sk ANCHOR links to relative paths so the
+  // article cross-links work on this site. Image/asset URLs (src=, wp-content) are
+  // left absolute so they keep loading from the original domain.
+  html = html.replace(
+    /href="https?:\/\/(?:www\.)?monetico\.sk\/((?!wp-content\/|wp-includes\/)[^"]*)"/gi,
+    'href="/$1"'
+  )
+  // map old WordPress contact slug to the current one
+  html = html.replace(/href="\/?kontakt-2\/?"/gi, 'href="/kontakt/"')
+
   // Inject stable IDs into h2–h4 headings (in document order) so the
   // table-of-contents anchors match the headings in the body.
   let hIndex = 0

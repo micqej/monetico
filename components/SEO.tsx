@@ -12,6 +12,8 @@ interface SEOProps {
   noindex?: boolean
   image?: string
   type?: 'website' | 'article'
+  publishedTime?: string
+  author?: string
 }
 
 export default function SEO({
@@ -24,6 +26,8 @@ export default function SEO({
   noindex = false,
   image = DEFAULT_OG_IMAGE,
   type = 'website',
+  publishedTime,
+  author,
 }: SEOProps) {
   const router = useRouter()
   const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Digitálna agentúra`
@@ -39,6 +43,8 @@ export default function SEO({
           description,
           image,
           mainEntityOfPage: resolvedCanonical,
+          ...(publishedTime ? { datePublished: publishedTime } : {}),
+          ...(author ? { author: { '@type': 'Person', name: author } } : {}),
           publisher: {
             '@type': 'Organization',
             name: SITE_NAME,
@@ -79,6 +85,8 @@ export default function SEO({
       <meta property="og:locale" content="sk_SK" />
       <meta property="og:image" content={image} />
       <meta property="og:image:alt" content={ogTitle || fullTitle} />
+      {type === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+      {type === 'article' && author && <meta property="article:author" content={author} />}
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
