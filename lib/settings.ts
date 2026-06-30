@@ -16,6 +16,8 @@ export interface AutopilotSettings {
   imageCount: number           // koľko fotiek na článok (1–3)
   autoInterlink: boolean
   linkCount: number            // koľko interných odkazov vložiť (0–3)
+  titleMaxWords: number        // max počet slov v názve článku
+  randomStyle: boolean         // náhodný štýl písania pre každý článok
   newsletterSubject: string
   businessContext: string      // čím sa firma reálne zaoberá — grounduje témy aj texty
 }
@@ -36,6 +38,8 @@ export const DEFAULT_SETTINGS: AutopilotSettings = {
   imageCount: 1,
   autoInterlink: true,
   linkCount: 2,
+  titleMaxWords: 8,
+  randomStyle: true,
   newsletterSubject: 'Tipy pre rast — Monetico',
   businessContext:
     'Monetico je slovenská digitálna agentúra. Služby: tvorba webov a e-shopov, SEO, ' +

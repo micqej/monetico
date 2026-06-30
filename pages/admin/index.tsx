@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef, forwardRef, useImperativeHandle } from 'react'
 import Head from 'next/head'
+import { sentenceCaseSk } from '../../lib/text'
 
 type Session = { authed: boolean; configured: boolean; db: boolean; ai: boolean; pexels: boolean; pixabay: boolean }
 type ImageR = { url: string; thumb: string; credit: string; source: string }
@@ -76,6 +77,13 @@ export default function Admin() {
   const refresh = useCallback(async () => setSess(await api('/api/admin/session')), [])
   useEffect(() => { refresh() }, [refresh])
 
+  // počet čakajúcich komentárov pre odznak v menu
+  const [pendingC, setPendingC] = useState(0)
+  const loadPending = useCallback(() => {
+    api('/api/admin/stats').then(d => setPendingC(d?.comments?.pending || 0)).catch(() => {})
+  }, [])
+  useEffect(() => { if (sess?.authed) loadPending() }, [sess?.authed, tab, loadPending])
+
   async function login(e: any) {
     e.preventDefault(); setErr('')
     try { await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ pin }) }); setPin(''); await refresh() }
@@ -107,7 +115,8 @@ export default function Admin() {
             <nav className="anav">
               {TABS.map(t => (
                 <button key={t.id} className={`anav-i${tab === t.id ? ' on' : ''}`} onClick={() => setTab(t.id)}>
-                  <Ic n={t.icon} /> {t.id}
+                  <Ic n={t.icon} /> <span style={{ flex: 1 }}>{t.id}</span>
+                  {t.id === 'Komentáre' && pendingC > 0 && <span className="anav-badge">{pendingC}</span>}
                 </button>
               ))}
             </nav>
@@ -222,6 +231,7 @@ const RichEditor = forwardRef(function RichEditor({ value, onChange }: { value: 
         <button type="button" onClick={() => exec('italic')}><i>I</i></button>
         <button type="button" onClick={() => exec('insertUnorderedList')}>• Zoznam</button>
         <button type="button" onClick={link}>Odkaz</button>
+        <button type="button" onClick={() => exec('unlink')}>Zrušiť odkaz</button>
         <button type="button" onClick={() => exec('removeFormat')}>Vyčistiť štýl</button>
         <button type="button" className={mode === 'html' ? 'on' : ''} onClick={() => { if (mode === 'visual') sync(); setMode(m => (m === 'visual' ? 'html' : 'visual')) }}>{mode === 'visual' ? 'HTML' : 'Vizuálne'}</button>
       </div>
@@ -432,7 +442,7 @@ function Plan() {
       <table className="atab2 mt"><tbody>
         {list.map(p => (
           <tr key={p.id}>
-            <td><b>{p.topic}</b><br /><span className="amut sm">{p.category}{p.scheduled_for ? ' · ' + new Date(p.scheduled_for).toLocaleString('sk-SK') : ''}</span></td>
+            <td><b>{sentenceCaseSk(p.topic)}</b><br /><span className="amut sm">{p.category}{p.scheduled_for ? ' · ' + new Date(p.scheduled_for).toLocaleString('sk-SK') : ''}</span></td>
             <td><span className={`apill ${p.status === 'done' ? 'good' : 'bad'}`}>{p.status}</span></td>
             <td className="ar"><button className="icbtn" onClick={() => del(p.id)}><Ic n="trash" s={16} /></button></td>
           </tr>
@@ -473,6 +483,7 @@ function Settings() {
       <label className="achk"><input type="checkbox" checked={s.autopilotEnabled} onChange={e => set('autopilotEnabled', e.target.checked)} /> Autopilot zapnutý</label>
       <label className="achk"><input type="checkbox" checked={s.autoPublish} onChange={e => set('autoPublish', e.target.checked)} /> Automaticky publikovať (vyp = koncept)</label>
       <label className="achk"><input type="checkbox" checked={s.randomCategory} onChange={e => set('randomCategory', e.target.checked)} /> Náhodne vyberať kategóriu (mix tém)</label>
+      <label className="achk"><input type="checkbox" checked={s.randomStyle} onChange={e => set('randomStyle', e.target.checked)} /> Náhodný štýl písania pre každý článok (návod / príbeh / dáta / mýty…)</label>
       <label className="alab">Čím sa firma zaoberá — z toho AI tvorí témy aj texty</label>
       <textarea className="ain" rows={4} value={s.businessContext || ''} onChange={e => set('businessContext', e.target.value)} placeholder="Napr. služby, ktoré ponúkate, cieľová skupina, čím sa odlišujete…" />
       <div className="agrid3">
@@ -486,8 +497,8 @@ function Settings() {
       ))}</div>
       <div className="agrid3">
         <div><label className="alab">AI model</label><select className="ain" value={s.model} onChange={e => set('model', e.target.value)}><option value="gpt-4o-mini">gpt-4o-mini (lacný)</option><option value="gpt-4o">gpt-4o (kvalitnejší)</option></select></div>
-        <div><label className="alab">Kreativita (0–1)</label><input className="ain" type="number" step="0.1" min={0} max={1} value={s.temperature} onChange={e => set('temperature', +e.target.value)} /></div>
-        <div><label className="alab">Dĺžka (slov)</label><input className="ain" type="number" value={s.wordCount} onChange={e => set('wordCount', +e.target.value)} /></div>
+        <div><label className="alab">Dĺžka článku (slov)</label><input className="ain" type="number" value={s.wordCount} onChange={e => set('wordCount', +e.target.value)} /></div>
+        <div><label className="alab">Max. slov v názve</label><input className="ain" type="number" min={3} max={16} value={s.titleMaxWords} onChange={e => set('titleMaxWords', +e.target.value)} /></div>
       </div>
       <div className="agrid3">
         <div><label className="alab">Zdroj fotiek</label><select className="ain" value={s.imageSource} onChange={e => set('imageSource', e.target.value)}><option value="both">Pexels + Pixabay</option><option value="pexels">Pexels</option><option value="pixabay">Pixabay</option></select></div>
@@ -605,6 +616,7 @@ body{margin:0;background:var(--bg);font-family:'Inter',-apple-system,sans-serif;
 .anav-i{display:flex;align-items:center;gap:11px;font-family:inherit;font-size:14px;font-weight:500;color:var(--mut);background:none;border:0;padding:10px 12px;border-radius:9px;cursor:pointer;text-align:left;width:100%}
 .anav-i:hover{background:var(--bg);color:var(--ink)}
 .anav-i.on{background:var(--acc-sft);color:var(--acc);font-weight:600}
+.anav-badge{background:#dc2626;color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:50px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
 .anav-i.out{color:var(--mut);margin-top:8px}
 .amain{flex:1;padding:26px 30px;max-width:960px}
 .ahd{font-size:22px;font-weight:700;margin:0 0 18px;letter-spacing:-.4px}

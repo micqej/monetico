@@ -5,6 +5,7 @@ import { generateArticle, suggestTopic, aiReady } from './aiContent'
 import { searchImages } from './images'
 import { linkPool, embedImages } from './links'
 import { CATEGORIES } from './categories'
+import { SERVICE_LINKS, WRITING_STYLES } from './text'
 import { quotaMessage } from './quota'
 import { dbReady } from './db'
 
@@ -54,7 +55,11 @@ export async function runAutopilot(force = false): Promise<AutopilotResult> {
   }
 
   try {
-    const links = s.autoInterlink && s.linkCount > 0 ? await linkPool(category, undefined, 20) : []
+    // prelinkovanie: prednostne naše SLUŽBY + zopár blog článkov
+    const links = s.autoInterlink && s.linkCount > 0
+      ? [...SERVICE_LINKS, ...(await linkPool(category, undefined, 10))]
+      : []
+    const style = s.randomStyle ? WRITING_STYLES[Math.floor(Math.random() * WRITING_STYLES.length)] : ''
     const art = await generateArticle({
       topic,
       category,
@@ -65,11 +70,14 @@ export async function runAutopilot(force = false): Promise<AutopilotResult> {
       businessContext: s.businessContext,
       links,
       linkCount: s.autoInterlink ? s.linkCount : 0,
+      maxTitleWords: s.titleMaxWords || 8,
+      style,
     })
 
     // Fotky idú PRIAMO do tela článku; prvá slúži aj ako OG/náhľad pri zdieľaní.
     const imgCount = Math.max(1, Math.min(3, s.imageCount || 1))
-    const imgs = await searchImages(art.image_query, s.imageSource, imgCount)
+    let imgs = await searchImages(art.image_query, s.imageSource, imgCount)
+    if (!imgs.length) imgs = await searchImages(category, s.imageSource, imgCount) // fallback keď query nič nenašiel
     const hero = imgs[0]
     const body = imgs.length ? embedImages(art.content, imgs) : art.content
 

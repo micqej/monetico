@@ -4,6 +4,7 @@ import { generateArticle, aiReady } from '../../../lib/aiContent'
 import { searchImages } from '../../../lib/images'
 import { getSettings } from '../../../lib/settings'
 import { linkPool } from '../../../lib/links'
+import { SERVICE_LINKS, WRITING_STYLES } from '../../../lib/text'
 import { quotaMessage } from '../../../lib/quota'
 
 // AI generovanie trvá 20–40 s — bez tohto Vercel zabije funkciu po 10 s a "nič sa nestane".
@@ -18,7 +19,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const s = await getSettings()
     const cat = category || s.defaultCategory
-    const links = s.autoInterlink && s.linkCount > 0 ? await linkPool(cat, undefined, 20) : []
+    const links = s.autoInterlink && s.linkCount > 0
+      ? [...SERVICE_LINKS, ...(await linkPool(cat, undefined, 10))]
+      : []
+    const style = s.randomStyle ? WRITING_STYLES[Math.floor(Math.random() * WRITING_STYLES.length)] : ''
     const article = await generateArticle({
       topic,
       category: cat,
@@ -29,8 +33,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       businessContext: s.businessContext,
       links,
       linkCount: s.autoInterlink ? s.linkCount : 0,
+      maxTitleWords: s.titleMaxWords || 8,
+      style,
     })
-    const images = await searchImages(article.image_query, s.imageSource, 12)
+    let images = await searchImages(article.image_query, s.imageSource, 12)
+    if (!images.length) images = await searchImages(cat, s.imageSource, 12)
     return res.status(200).json({ article, images })
   } catch (e: any) {
     return res.status(500).json({ error: quotaMessage(e) || e.message || 'Chyba generovania' })
