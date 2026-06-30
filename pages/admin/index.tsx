@@ -559,10 +559,25 @@ function CommentsAdmin() {
 function Integrations() {
   const [s, setS] = useState<any>(null)
   const [msg, setMsg] = useState('')
+  const [hook, setHook] = useState('')
+  const [hookBusy, setHookBusy] = useState(false)
   useEffect(() => { api('/api/admin/site').then(d => setS(d.site)).catch(() => {}) }, [])
   if (!s) return <div className="acard">Načítavam…</div>
   const set = (k: string, v: any) => setS((p: any) => ({ ...p, [k]: v }))
   async function save() { setMsg(''); try { const d = await api('/api/admin/site', { method: 'POST', body: JSON.stringify(s) }); setS(d.site); setMsg('Uložené ✓'.replace('✓', '')) } catch (e: any) { setMsg(e.message) } }
+  async function testHook() {
+    setHook(''); setHookBusy(true)
+    try { const r = await api('/api/admin/webhook', { method: 'POST', body: JSON.stringify({ action: 'test', url: s.webhookUrl, secret: s.webhookSecret }) }); setHook(r.ok ? `OK — cieľ odpovedal ${r.status}.` : `Webhook vrátil chybu${r.status ? ' ' + r.status : ''}${r.error ? ': ' + r.error : ''}.`) }
+    catch (e: any) { setHook(e.message) }
+    setHookBusy(false)
+  }
+  async function resendHook() {
+    if (!confirm('Poslať všetkých existujúcich odberateľov do CRM cez webhook?')) return
+    setHook(''); setHookBusy(true)
+    try { const r = await api('/api/admin/webhook', { method: 'POST', body: JSON.stringify({ action: 'resend' }) }); setHook(`Odoslaných ${r.ok}/${r.total} (chyby: ${r.fail}).`) }
+    catch (e: any) { setHook(e.message) }
+    setHookBusy(false)
+  }
   return (
     <>
       <div className="acard">
@@ -592,6 +607,20 @@ function Integrations() {
           <div><label className="alab">OpenAI API key</label><input className="ain" type="password" value={s.openaiKey} onChange={e => set('openaiKey', e.target.value)} placeholder="sk-…" /></div>
           <div><label className="alab">Pexels API key</label><input className="ain" type="password" value={s.pexelsKey} onChange={e => set('pexelsKey', e.target.value)} /></div>
           <div><label className="alab">Pixabay API key</label><input className="ain" type="password" value={s.pixabayKey} onChange={e => set('pixabayKey', e.target.value)} /></div>
+        </div>
+      </div>
+      <div className="acard">
+        <h3>Napojenie na CRM (webhook)</h3>
+        <p className="amut sm">Pri každom novom odbere newslettera pošleme POST s kontaktom na túto adresu (tvoje CRM, alebo Make/Zapier). Najprv ulož, potom otestuj.</p>
+        <label className="alab">URL webhooku</label>
+        <input className="ain" value={s.webhookUrl} onChange={e => set('webhookUrl', e.target.value)} placeholder="https://…/webhook/newsletter" />
+        <label className="alab">Tajný kľúč (voliteľné — posiela sa ako hlavička X-Webhook-Secret aj Bearer)</label>
+        <input className="ain" type="password" value={s.webhookSecret} onChange={e => set('webhookSecret', e.target.value)} />
+        <p className="amut sm">Payload (JSON): <code>{'{ event, email, name, source, subscribedAt, site }'}</code></p>
+        <div className="arow wrap">
+          <button className="abtn ghost" type="button" onClick={testHook} disabled={hookBusy}>{hookBusy ? 'Pracujem…' : 'Otestovať webhook'}</button>
+          <button className="abtn ghost" type="button" onClick={resendHook} disabled={hookBusy}>Poslať všetkých existujúcich</button>
+          {hook && <span className="amut sm">{hook}</span>}
         </div>
       </div>
       <div className="arow"><button className="abtn" onClick={save}>Uložiť všetko</button>{msg && <span className="amut sm">{msg}</span>}</div>

@@ -15,6 +15,9 @@ export interface SiteSettings {
   openaiKey: string
   pexelsKey: string
   pixabayKey: string
+  // Webhook na napojenie newslettera na CRM
+  webhookUrl: string
+  webhookSecret: string
 }
 
 const SITEBEHAVIOUR_DEFAULT = `<script type="text/javascript">
@@ -25,6 +28,7 @@ export const DEFAULT_SITE: SiteSettings = {
   gaId: '', metaPixelId: '', gtmId: '', headHtml: SITEBEHAVIOUR_DEFAULT,
   commentsEnabled: true, commentsModeration: true, recaptchaSiteKey: '', recaptchaSecret: '',
   openaiKey: '', pexelsKey: '', pixabayKey: '',
+  webhookUrl: '', webhookSecret: '',
 }
 
 const KEY = 'site'

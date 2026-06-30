@@ -1,14 +1,15 @@
 import { getSql, ensureSchema } from './db'
 
-export async function addSubscriber(email: string, source = 'web'): Promise<boolean> {
-  const sql = getSql()
-  if (!sql) return false
-  await ensureSchema()
+/** Vráti { created } — true len ak išlo o NOVÉHO odberateľa (nie duplicitný email). */
+export async function addSubscriber(email: string, source = 'web'): Promise<{ created: boolean; email: string }> {
   const clean = email.trim().toLowerCase()
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(clean)) throw new Error('invalid email')
-  await sql`INSERT INTO subscribers (email, source) VALUES (${clean}, ${source})
-    ON CONFLICT (email) DO NOTHING`
-  return true
+  const sql = getSql()
+  if (!sql) return { created: false, email: clean }
+  await ensureSchema()
+  const rows = await sql`INSERT INTO subscribers (email, source) VALUES (${clean}, ${source})
+    ON CONFLICT (email) DO NOTHING RETURNING id`
+  return { created: rows.length > 0, email: clean }
 }
 
 export async function listSubscribers(): Promise<{ id: number; email: string; source: string; created_at: string }[]> {
