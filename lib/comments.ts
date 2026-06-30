@@ -23,7 +23,10 @@ export async function approvedComments(slug: string): Promise<Comment[]> {
     await ensureSchema()
     // NIKDY nevracaj email/ip do verejného API (únik osobných údajov)
     const rows = await sql`SELECT id, slug, author, body, status, created_at FROM comments WHERE slug = ${slug} AND status = 'approved' ORDER BY created_at ASC`
-    return rows.map(r => ({ ...r, email: '', ip: '' }))
+    return rows.map((r: any): Comment => ({
+      id: r.id, slug: r.slug, author: r.author, body: r.body, status: r.status,
+      email: '', ip: '', created_at: r.created_at ? new Date(r.created_at).toISOString() : '',
+    }))
   } catch { return [] }
 }
 
