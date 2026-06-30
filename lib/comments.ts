@@ -21,8 +21,9 @@ export async function approvedComments(slug: string): Promise<Comment[]> {
   if (!sql) return []
   try {
     await ensureSchema()
-    const rows = await sql`SELECT * FROM comments WHERE slug = ${slug} AND status = 'approved' ORDER BY created_at ASC`
-    return rows.map(map)
+    // NIKDY nevracaj email/ip do verejného API (únik osobných údajov)
+    const rows = await sql`SELECT id, slug, author, body, status, created_at FROM comments WHERE slug = ${slug} AND status = 'approved' ORDER BY created_at ASC`
+    return rows.map(r => ({ ...r, email: '', ip: '' }))
   } catch { return [] }
 }
 
