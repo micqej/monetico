@@ -21,13 +21,13 @@ export async function linkPool(category?: string, excludeSlug?: string, limit = 
   return [...same, ...rest].slice(0, limit).map(({ title, slug }) => ({ title, slug }))
 }
 
-/** Vloží doplnkové fotky (okrem hero) do tela článku po niekoľkých odsekoch. */
+/** Vloží fotky priamo do tela článku — prvú hneď po úvodnom odseku, ďalšie nižšie. */
 export function embedImages(html: string, imgs: { url: string; credit: string }[]): string {
   if (!imgs.length) return html
   const parts = html.split('</p>')
-  if (parts.length < 3) return html
-  // body po 2. a 4. odseku
-  const slots = [2, 4]
+  if (parts.length < 2) return html
+  // prvá fotka hneď za 1. odsekom (viditeľná), ďalšie rozložené nižšie
+  const slots = [1, 3, 5]
   imgs.slice(0, slots.length).forEach((im, i) => {
     const at = slots[i]
     if (parts[at] !== undefined) {

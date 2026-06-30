@@ -7,6 +7,8 @@ import { listArticles } from '../../../lib/articles'
 import { getAllPosts } from '../../../lib/posts'
 import { quotaMessage } from '../../../lib/quota'
 
+export const config = { maxDuration: 60 }
+
 /**
  * Predgeneruje N návrhov názvov článkov (groundovaných na službách firmy),
  * vloží ich do Plánu ako `pending` a voliteľne ich rozloží po dňoch.

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, forwardRef, useImperativeHandle } from 'react'
 import Head from 'next/head'
 
 type Session = { authed: boolean; configured: boolean; db: boolean; ai: boolean; pexels: boolean; pixabay: boolean }
@@ -130,48 +130,47 @@ export default function Admin() {
   )
 }
 
-function Stat({ ok, label }: { ok: boolean; label: string }) {
-  return <span className={`apill ${ok ? 'good' : 'bad'}`}><Ic n={ok ? 'check' : 'x'} s={13} /> {label}</span>
-}
-
 function Overview({ sess }: { sess: Session }) {
   const [run, setRun] = useState<any>(null)
   const [busy, setBusy] = useState(false)
   const [stats, setStats] = useState<any>(null)
-  useEffect(() => { api('/api/admin/stats').then(setStats).catch(() => {}) }, [])
+  const load = useCallback(() => { api('/api/admin/stats').then(setStats).catch(() => {}) }, [])
+  useEffect(() => { load() }, [load])
   async function runNow() {
     setBusy(true); setRun(null)
-    try { setRun(await api('/api/admin/run-autopilot', { method: 'POST' })) }
+    try { setRun(await api('/api/admin/run-autopilot', { method: 'POST' })); load() }
     catch (e: any) { setRun({ ok: false, reason: e.message }) }
     setBusy(false)
   }
+  const fmtDate = (d: string) => { try { return new Date(d).toLocaleDateString('sk-SK') } catch { return '' } }
+  const missing = [!sess.ai && 'OpenAI', !sess.pexels && 'Pexels', !sess.pixabay && 'Pixabay'].filter(Boolean)
   return (
     <>
-      {stats && (
-        <div className="acard">
-          <h3>Štatistiky</h3>
-          <div className="stat-row">
-            <div className="stat-box2"><b>{stats.articles.total}</b><span>článkov (admin)</span></div>
-            <div className="stat-box2"><b>{stats.articles.published}</b><span>publikovaných</span></div>
-            <div className="stat-box2"><b>{stats.comments.pending}</b><span>komentárov čaká</span></div>
-            <div className="stat-box2"><b>{stats.subscribers}</b><span>newsletter</span></div>
-            <div className="stat-box2"><b>{stats.planPending}</b><span>tém v pláne</span></div>
-          </div>
-        </div>
+      {missing.length > 0 && (
+        <div className="awarn"><Ic n="warn" s={15} /> Chýbajú kľúče: {missing.join(', ')}. Doplň ich v <b>Integrácie</b>, inak generovanie/fotky nepôjdu.</div>
       )}
-      <div className="acard">
-        <h3>Stav integrácií</h3>
-        <div className="arow wrap">
-          <Stat ok={sess.db} label="Databáza" /><Stat ok={sess.ai} label="OpenAI" />
-          <Stat ok={sess.pexels} label="Pexels" /><Stat ok={sess.pixabay} label="Pixabay" />
-        </div>
-        <p className="amut sm">Doplň vo Vercel → Environment Variables: <code>DATABASE_URL</code>, <code>OPENAI_API_KEY</code>, <code>PEXELS_API_KEY</code>, <code>PIXABAY_API_KEY</code>, <code>ADMIN_PIN</code>, <code>CRON_SECRET</code>.</p>
+      <div className="stat-row" style={{ marginBottom: 16 }}>
+        <div className="stat-box2"><b>{stats ? stats.articles.published : '—'}</b><span>publikovaných článkov</span></div>
+        <div className="stat-box2"><b>{stats ? stats.articles.total : '—'}</b><span>článkov v admine</span></div>
+        <div className="stat-box2"><b>{stats ? stats.planPending : '—'}</b><span>tém v pláne</span></div>
+        <div className="stat-box2"><b>{stats ? stats.comments.pending : '—'}</b><span>komentárov čaká</span></div>
+        <div className="stat-box2"><b>{stats ? stats.subscribers : '—'}</b><span>odberateľov</span></div>
       </div>
       <div className="acard">
-        <h3>Autopilot</h3>
-        <p className="amut sm">Spustí jeden cyklus: vyberie tému, vygeneruje článok, pridá fotku a podľa nastavení publikuje.</p>
-        <button className="abtn" onClick={runNow} disabled={busy}><Ic n="play" s={15} /> {busy ? 'Pracujem…' : 'Spustiť teraz'}</button>
-        {run && <pre className="apre">{JSON.stringify(run, null, 2)}</pre>}
+        <h3>Posledné články</h3>
+        {stats?.recentArticles?.length ? (
+          <table className="atab2"><tbody>
+            {stats.recentArticles.map((a: any, i: number) => (
+              <tr key={i}><td><b>{a.title}</b></td><td><span className={`apill ${a.status === 'published' ? 'good' : 'bad'}`}>{a.status}</span></td><td className="amut sm ar">{fmtDate(a.date)}</td></tr>
+            ))}
+          </tbody></table>
+        ) : <p className="amut sm">Zatiaľ žiadne články z admina. Vytvor témy v <b>Pláne</b> alebo článok v <b>Generovať</b>.</p>}
+      </div>
+      <div className="acard">
+        <h3>Rýchle generovanie</h3>
+        <p className="amut sm">Spustí jeden cyklus: vyberie tému (z plánu alebo ju navrhne), napíše článok s fotkou a prelinkovaním a podľa nastavení ho publikuje. Trvá pol minúty.</p>
+        <button className="abtn" onClick={runNow} disabled={busy}><Ic n="play" s={15} /> {busy ? 'Pracujem… (~30 s)' : 'Vygenerovať článok teraz'}</button>
+        {run && <p className="amut sm" style={{ marginTop: 10 }}>{run.ok ? (run.created ? `Hotovo — vytvorený článok „${run.created}". Nájdeš ho v Článkoch.` : (run.skipped ? `Preskočené: ${run.skipped}` : 'Hotovo.')) : `Chyba: ${run.reason || run.error}`}</p>}
       </div>
     </>
   )
@@ -194,19 +193,52 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   )
 }
 
+/* ── Vizuálny (WYSIWYG) editor s prepnutím na HTML ── */
+const RichEditor = forwardRef(function RichEditor({ value, onChange }: { value: string; onChange: (h: string) => void }, ref) {
+  const elRef = useRef<HTMLDivElement>(null)
+  const [mode, setMode] = useState<'visual' | 'html'>('visual')
+  const sync = () => { if (elRef.current) onChange(elRef.current.innerHTML) }
+  // nastav obsah pri vstupe do vizuálneho režimu (nie pri každom písmene → nepreskakuje kurzor)
+  useEffect(() => {
+    if (mode === 'visual' && elRef.current && elRef.current.innerHTML !== value) elRef.current.innerHTML = value || ''
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode])
+  useImperativeHandle(ref, () => ({
+    insertImage(im: { url: string; credit: string }) {
+      const fig = `<figure class="wp-block-image"><img src="${im.url}" alt="" /></figure><p><br></p>`
+      if (mode === 'visual' && elRef.current) { elRef.current.focus(); document.execCommand('insertHTML', false, fig); sync() }
+      else onChange((value || '') + fig)
+    },
+  }))
+  const exec = (c: string, v?: string) => { elRef.current?.focus(); document.execCommand(c, false, v); sync() }
+  const link = () => { const url = window.prompt('Adresa odkazu (URL):', 'https://'); if (url) exec('createLink', url) }
+  return (
+    <div>
+      <div className="etb">
+        <button type="button" onClick={() => exec('formatBlock', 'H2')}>Nadpis</button>
+        <button type="button" onClick={() => exec('formatBlock', 'H3')}>Podnadpis</button>
+        <button type="button" onClick={() => exec('formatBlock', 'P')}>Odsek</button>
+        <button type="button" onClick={() => exec('bold')}><b>B</b></button>
+        <button type="button" onClick={() => exec('italic')}><i>I</i></button>
+        <button type="button" onClick={() => exec('insertUnorderedList')}>• Zoznam</button>
+        <button type="button" onClick={link}>Odkaz</button>
+        <button type="button" onClick={() => exec('removeFormat')}>Vyčistiť štýl</button>
+        <button type="button" className={mode === 'html' ? 'on' : ''} onClick={() => { if (mode === 'visual') sync(); setMode(m => (m === 'visual' ? 'html' : 'visual')) }}>{mode === 'visual' ? 'HTML' : 'Vizuálne'}</button>
+      </div>
+      {mode === 'visual'
+        ? <div ref={elRef} className="rich" contentEditable suppressContentEditableWarning onInput={sync} onBlur={sync} />
+        : <textarea className="ain mono" rows={18} value={value} onChange={e => onChange(e.target.value)} />}
+    </div>
+  )
+})
+
 function Editor({ initial, images, onSaved }: { initial: any; images: ImageR[]; onSaved: () => void }) {
   const [a, setA] = useState<any>(initial)
   const [imgs, setImgs] = useState<ImageR[]>(images)
   const [q, setQ] = useState('')
   const [msg, setMsg] = useState('')
   const set = (k: string, v: any) => setA((p: any) => ({ ...p, [k]: v }))
-  const taRef = useRef<HTMLTextAreaElement>(null)
-  function applyTag(before: string, after = '') {
-    const ta = taRef.current; if (!ta) { set('content', a.content + before + after); return }
-    const s = ta.selectionStart, e = ta.selectionEnd, val = a.content
-    set('content', val.slice(0, s) + before + val.slice(s, e) + after + val.slice(e))
-    requestAnimationFrame(() => { ta.focus(); ta.selectionStart = ta.selectionEnd = s + before.length })
-  }
+  const richRef = useRef<any>(null)
   async function searchImg() { if (!q) return; try { const d = await api(`/api/admin/images?q=${encodeURIComponent(q)}&source=both`); setImgs(d.images) } catch {} }
   async function save(status: string) {
     setMsg('')
@@ -228,38 +260,26 @@ function Editor({ initial, images, onSaved }: { initial: any; images: ImageR[]; 
       </div>
       <label className="alab">Perex</label>
       <textarea className="ain" rows={2} value={a.excerpt} onChange={e => set('excerpt', e.target.value)} />
-      <label className="alab">Obsah — vľavo píšeš, vpravo hneď vidíš výsledok</label>
-      <div className="etb">
-        <button type="button" onClick={() => applyTag('<h2>', '</h2>')}>Nadpis</button>
-        <button type="button" onClick={() => applyTag('<h3>', '</h3>')}>Podnadpis</button>
-        <button type="button" onClick={() => applyTag('<strong>', '</strong>')}>Tučné</button>
-        <button type="button" onClick={() => applyTag('<em>', '</em>')}>Kurzíva</button>
-        <button type="button" onClick={() => applyTag('<a href="https://">', '</a>')}>Odkaz</button>
-        <button type="button" onClick={() => applyTag('<ul>\n  <li>', '</li>\n</ul>')}>Zoznam</button>
-        <button type="button" onClick={() => applyTag('<p>', '</p>')}>Odsek</button>
-      </div>
-      <div className="ed-split">
-        <textarea ref={taRef} className="ain mono" rows={18} value={a.content} onChange={e => set('content', e.target.value)} />
-        <div className="eprev" dangerouslySetInnerHTML={{ __html: a.content || '<p style="color:#9ca3af">Náhľad sa zobrazí tu…</p>' }} />
-      </div>
+      <label className="alab">Obsah — píš normálne, formátuj tlačidlami (alebo prepni na HTML)</label>
+      <RichEditor ref={richRef} value={a.content} onChange={v => set('content', v)} />
       <div className="agrid2">
         <div><label className="alab">Meta title</label><input className="ain" value={a.meta_title} onChange={e => set('meta_title', e.target.value)} /></div>
         <div><label className="alab">Meta keywords</label><input className="ain" value={a.meta_keywords} onChange={e => set('meta_keywords', e.target.value)} /></div>
       </div>
       <label className="alab">Meta description</label>
       <textarea className="ain" rows={2} value={a.meta_desc} onChange={e => set('meta_desc', e.target.value)} />
-      <label className="alab">Obrázok</label>
-      {a.image_url && <img className="aimgsel" src={a.image_url} alt="" />}
+      <label className="alab">Fotky — klikni a vloží sa priamo do článku (prvá = náhľad pri zdieľaní)</label>
       <div className="arow">
-        <input className="ain" style={{ marginBottom: 0 }} placeholder="Hľadať fotku…" value={q} onChange={e => setQ(e.target.value)} />
+        <input className="ain" style={{ marginBottom: 0 }} placeholder="Hľadať fotku…" value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); searchImg() } }} />
         <button className="abtn ghost" type="button" onClick={searchImg}><Ic n="search" s={15} /> Hľadať</button>
       </div>
       <div className="aimgs">
         {imgs.map((im, i) => (
-          <button key={i} type="button" className={`athumb${a.image_url === im.url ? ' on' : ''}`} title={im.credit} onClick={() => { set('image_url', im.url); set('image_credit', im.credit) }}>
+          <button key={i} type="button" className="athumb" title={'Vložiť do článku — ' + im.credit} onClick={() => { richRef.current?.insertImage(im); if (!a.image_url) { set('image_url', im.url); set('image_credit', im.credit) } }}>
             <img src={im.thumb} alt="" /><span>{im.source}</span>
           </button>
         ))}
+        {imgs.length === 0 && <p className="amut sm" style={{ gridColumn: '1/-1' }}>Vyhľadaj fotku vyššie (treba mať vyplnené Pexels/Pixabay kľúče v Integráciách).</p>}
       </div>
       <div className="arow mt"><button className="abtn ghost" onClick={() => save('draft')}>Uložiť koncept</button><button className="abtn" onClick={() => save('published')}>Publikovať</button>{msg && <span className="amut sm">{msg}</span>}</div>
     </div>
@@ -305,9 +325,13 @@ function Articles() {
   const [statics, setStatics] = useState<{ posts: any[]; total: number }>({ posts: [], total: 0 })
   const [sq, setSq] = useState('')
   const [busySlug, setBusySlug] = useState('')
-  const load = useCallback(async () => setList((await api('/api/admin/articles')).articles), [])
+  const [err, setErr] = useState('')
+  const load = useCallback(async () => {
+    try { setErr(''); setList((await api('/api/admin/articles')).articles || []) }
+    catch (e: any) { setErr('Nepodarilo sa načítať články (' + (e.message || 'chyba') + '). Skús to znova.') }
+  }, [])
   const loadStatic = useCallback(async (q: string) => {
-    try { const d = await api('/api/admin/static-posts' + (q ? `?q=${encodeURIComponent(q)}` : '')); setStatics({ posts: d.posts, total: d.total }) } catch {}
+    try { const d = await api('/api/admin/static-posts' + (q ? `?q=${encodeURIComponent(q)}` : '')); setStatics({ posts: d.posts || [], total: d.total || 0 }) } catch {}
   }, [])
   useEffect(() => { load(); loadStatic('') }, [load, loadStatic])
   const reload = () => { load(); loadStatic(sq) }
@@ -325,7 +349,8 @@ function Articles() {
   return (
     <>
       <div className="acard">
-        <h3>Články z admina ({list.length})</h3>
+        <h3>Články z admina ({list.length}) <button className="abtn ghost" style={{ float: 'right', padding: '5px 12px' }} onClick={reload}>Obnoviť</button></h3>
+        {err && <div className="aerr">{err}</div>}
         <table className="atab2"><tbody>
           {list.map(a => (
             <tr key={a.id}>
@@ -629,6 +654,12 @@ body{margin:0;background:var(--bg);font-family:'Inter',-apple-system,sans-serif;
 .eprev h2{font-size:19px;font-weight:700;margin:16px 0 8px}.eprev h3{font-size:16px;font-weight:700;margin:14px 0 6px}
 .eprev p{margin:0 0 10px}.eprev a{color:var(--acc);text-decoration:underline}.eprev ul{margin:0 0 10px 20px}
 .eprev img{max-width:100%;border-radius:8px;margin:10px 0}
+.rich{border:1px solid var(--bd);border-radius:9px;padding:16px 18px;background:#fff;min-height:380px;font-size:14px;line-height:1.6;outline:none;overflow:auto;color:var(--ink)}
+.rich:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-sft)}
+.rich:empty:before{content:'Začni písať článok…';color:#9ca3af}
+.rich h2{font-size:19px;font-weight:700;margin:16px 0 8px}.rich h3{font-size:16px;font-weight:700;margin:14px 0 6px}
+.rich p{margin:0 0 10px}.rich a{color:var(--acc);text-decoration:underline}.rich ul,.rich ol{margin:0 0 10px 20px}
+.rich figure{margin:12px 0}.rich img{max-width:100%;border-radius:8px;display:block}
 .ed-split{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
 .ed-split .ain.mono{margin-bottom:0;min-height:360px}
 .ed-split .eprev{max-height:none;min-height:360px}

@@ -67,11 +67,11 @@ export async function runAutopilot(force = false): Promise<AutopilotResult> {
       linkCount: s.autoInterlink ? s.linkCount : 0,
     })
 
-    // Fotky: prvá = hero (image_url), ďalšie sa vložia do tela.
+    // Fotky idú PRIAMO do tela článku; prvá slúži aj ako OG/náhľad pri zdieľaní.
     const imgCount = Math.max(1, Math.min(3, s.imageCount || 1))
     const imgs = await searchImages(art.image_query, s.imageSource, imgCount)
     const hero = imgs[0]
-    const body = imgs.length > 1 ? embedImages(art.content, imgs.slice(1)) : art.content
+    const body = imgs.length ? embedImages(art.content, imgs) : art.content
 
     const created = await createArticle({
       title: art.title,

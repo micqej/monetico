@@ -6,6 +6,9 @@ import { getSettings } from '../../../lib/settings'
 import { linkPool } from '../../../lib/links'
 import { quotaMessage } from '../../../lib/quota'
 
+// AI generovanie trvá 20–40 s — bez tohto Vercel zabije funkciu po 10 s a "nič sa nestane".
+export const config = { maxDuration: 60 }
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!requireAdmin(req, res)) return
   if (req.method !== 'POST') return res.status(405).end()
