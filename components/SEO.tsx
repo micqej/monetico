@@ -86,6 +86,9 @@ export default function SEO({
       <meta property="og:url" content={resolvedCanonical} />
       <meta property="og:locale" content="sk_SK" />
       <meta property="og:image" content={image} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:type" content="image/png" />
       <meta property="og:image:alt" content={ogTitle || fullTitle} />
       {type === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
       {type === 'article' && author && <meta property="article:author" content={author} />}

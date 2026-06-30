@@ -30,6 +30,7 @@ export default function PostPage({ post, related, headings, cleanContent }: Prop
         ogDesc={post.og_desc || post.meta_desc}
         keywords={post.meta_keywords}
         type="article"
+        image={post.image || `${SITE_URL}/api/og?title=${encodeURIComponent(post.title.slice(0, 80))}`}
         publishedTime={post.date}
         author={post.author}
       />
