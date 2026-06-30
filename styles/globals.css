@@ -501,6 +501,25 @@ footer { margin-top: 24px; margin-bottom: 40px; }
 .sidebar-cta-box a { display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--ink); background: var(--y); border: 2px solid var(--ink); padding: 10px 16px; border-radius: 50px; box-shadow: 2px 2px 0 var(--ink); transition: transform .1s, box-shadow .1s; }
 .sidebar-cta-box a:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--ink); }
 
+/* ─── COMMENTS ─── */
+.comments { max-width: 900px; margin: 56px auto 0; padding: 0 var(--side); }
+.comments-h { font-family: var(--font-display); font-weight: 900; font-size: clamp(24px, 3vw, 34px); letter-spacing: -1px; margin-bottom: 22px; }
+.comments-h span { color: var(--muted); font-weight: 700; }
+.comment-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+.comment { background: var(--white); border: 2px solid var(--ink); border-radius: var(--r-sm); padding: 18px 22px; box-shadow: var(--sh); }
+.comment-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+.comment-meta b { font-size: 14.5px; color: var(--ink); }
+.comment-meta span { font-family: var(--font-mono); font-size: 11px; color: var(--faint); }
+.comment p { font-size: 15px; line-height: 1.6; color: #2a2a28; white-space: pre-wrap; }
+.comments-empty { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+.comment-form { background: var(--cream); border: 2px solid var(--ink); border-radius: var(--r); padding: 28px; box-shadow: var(--sh); }
+.comment-form h3 { font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: -.3px; margin-bottom: 16px; }
+.cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 600px) { .cf-row { grid-template-columns: 1fr; } }
+.cf-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.cf-bottom { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+.cf-msg { font-size: 13.5px; color: var(--purple); font-weight: 600; }
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 1280px) { :root { --side: 56px; } }
 @media (max-width: 1024px) {

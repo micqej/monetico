@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import Head from 'next/head'
 
 type Session = { authed: boolean; configured: boolean; db: boolean; ai: boolean; pexels: boolean; pixabay: boolean }
@@ -8,7 +8,8 @@ const CATEGORIES = ['Marketing Tipy', 'Podnikanie', 'O eshopoch', 'Ako na to', '
 const TABS: { id: string; icon: string }[] = [
   { id: 'Prehľad', icon: 'overview' }, { id: 'Generovať', icon: 'generate' },
   { id: 'Články', icon: 'articles' }, { id: 'Plán', icon: 'plan' },
-  { id: 'Newsletter', icon: 'mail' }, { id: 'Nastavenia', icon: 'settings' },
+  { id: 'Komentáre', icon: 'comment' }, { id: 'Newsletter', icon: 'mail' },
+  { id: 'Nastavenia', icon: 'settings' }, { id: 'Integrácie', icon: 'plug' },
 ]
 
 /* ── SVG ikony (feather) ── */
@@ -32,6 +33,14 @@ function Ic({ n, s = 18 }: { n: string; s?: number }) {
     play: <polygon points="5 3 19 12 5 21 5 3" />,
     lock: <><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></>,
     arrow: <><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></>,
+    comment: <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />,
+    plug: <><path d="M9 2v6M15 2v6M7 8h10v3a5 5 0 0 1-10 0V8zM12 16v6" /></>,
+    chart: <><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></>,
+    eye: <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></>,
+    bold: <><path d="M6 4h8a4 4 0 0 1 0 8H6zM6 12h9a4 4 0 0 1 0 8H6z" /></>,
+    h2: <><path d="M4 12h8M4 18V6M12 18V6" /><path d="M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1" /></>,
+    link: <><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" /></>,
+    list: <><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></>,
   }
   return <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">{c[n]}</svg>
 }
@@ -100,8 +109,10 @@ export default function Admin() {
             {tab === 'Generovať' && <Generate sess={sess} />}
             {tab === 'Články' && <Articles />}
             {tab === 'Plán' && <Plan />}
+            {tab === 'Komentáre' && <CommentsAdmin />}
             {tab === 'Newsletter' && <Newsletter />}
             {tab === 'Nastavenia' && <Settings />}
+            {tab === 'Integrácie' && <Integrations />}
           </main>
         </div>
       )}
@@ -116,6 +127,8 @@ function Stat({ ok, label }: { ok: boolean; label: string }) {
 function Overview({ sess }: { sess: Session }) {
   const [run, setRun] = useState<any>(null)
   const [busy, setBusy] = useState(false)
+  const [stats, setStats] = useState<any>(null)
+  useEffect(() => { api('/api/admin/stats').then(setStats).catch(() => {}) }, [])
   async function runNow() {
     setBusy(true); setRun(null)
     try { setRun(await api('/api/admin/run-autopilot', { method: 'POST' })) }
@@ -124,6 +137,18 @@ function Overview({ sess }: { sess: Session }) {
   }
   return (
     <>
+      {stats && (
+        <div className="acard">
+          <h3>Štatistiky</h3>
+          <div className="stat-row">
+            <div className="stat-box2"><b>{stats.articles.total}</b><span>článkov (admin)</span></div>
+            <div className="stat-box2"><b>{stats.articles.published}</b><span>publikovaných</span></div>
+            <div className="stat-box2"><b>{stats.comments.pending}</b><span>komentárov čaká</span></div>
+            <div className="stat-box2"><b>{stats.subscribers}</b><span>newsletter</span></div>
+            <div className="stat-box2"><b>{stats.planPending}</b><span>tém v pláne</span></div>
+          </div>
+        </div>
+      )}
       <div className="acard">
         <h3>Stav integrácií</h3>
         <div className="arow wrap">
@@ -148,6 +173,14 @@ function Editor({ initial, images, onSaved }: { initial: any; images: ImageR[]; 
   const [q, setQ] = useState('')
   const [msg, setMsg] = useState('')
   const set = (k: string, v: any) => setA((p: any) => ({ ...p, [k]: v }))
+  const taRef = useRef<HTMLTextAreaElement>(null)
+  const [preview, setPreview] = useState(false)
+  function applyTag(before: string, after = '') {
+    const ta = taRef.current; if (!ta) { set('content', a.content + before + after); return }
+    const s = ta.selectionStart, e = ta.selectionEnd, val = a.content
+    set('content', val.slice(0, s) + before + val.slice(s, e) + after + val.slice(e))
+    requestAnimationFrame(() => { ta.focus(); ta.selectionStart = ta.selectionEnd = s + before.length })
+  }
   async function searchImg() { if (!q) return; try { const d = await api(`/api/admin/images?q=${encodeURIComponent(q)}&source=both`); setImgs(d.images) } catch {} }
   async function save(status: string) {
     setMsg('')
@@ -169,8 +202,20 @@ function Editor({ initial, images, onSaved }: { initial: any; images: ImageR[]; 
       </div>
       <label className="alab">Perex</label>
       <textarea className="ain" rows={2} value={a.excerpt} onChange={e => set('excerpt', e.target.value)} />
-      <label className="alab">Obsah (HTML)</label>
-      <textarea className="ain mono" rows={14} value={a.content} onChange={e => set('content', e.target.value)} />
+      <label className="alab">Obsah</label>
+      <div className="etb">
+        <button type="button" onClick={() => applyTag('<h2>', '</h2>')}>H2</button>
+        <button type="button" onClick={() => applyTag('<h3>', '</h3>')}>H3</button>
+        <button type="button" onClick={() => applyTag('<strong>', '</strong>')}>Tučné</button>
+        <button type="button" onClick={() => applyTag('<em>', '</em>')}>Kurzíva</button>
+        <button type="button" onClick={() => applyTag('<a href="https://">', '</a>')}>Odkaz</button>
+        <button type="button" onClick={() => applyTag('<ul>\n  <li>', '</li>\n</ul>')}>Zoznam</button>
+        <button type="button" onClick={() => applyTag('<p>', '</p>')}>Odsek</button>
+        <button type="button" onClick={() => setPreview(p => !p)}>{preview ? '✎ Upraviť'.replace('✎ ', '') : 'Náhľad'}</button>
+      </div>
+      {preview
+        ? <div className="eprev" dangerouslySetInnerHTML={{ __html: a.content }} />
+        : <textarea ref={taRef} className="ain mono" rows={14} value={a.content} onChange={e => set('content', e.target.value)} />}
       <div className="agrid2">
         <div><label className="alab">Meta title</label><input className="ain" value={a.meta_title} onChange={e => set('meta_title', e.target.value)} /></div>
         <div><label className="alab">Meta keywords</label><input className="ain" value={a.meta_keywords} onChange={e => set('meta_keywords', e.target.value)} /></div>
@@ -342,6 +387,91 @@ function Settings() {
   )
 }
 
+function CommentsAdmin() {
+  const [list, setList] = useState<any[]>([])
+  const [filter, setFilter] = useState('')
+  const [edit, setEdit] = useState<any>(null)
+  const load = useCallback(async () => setList((await api('/api/admin/comments' + (filter ? `?status=${filter}` : ''))).comments), [filter])
+  useEffect(() => { load() }, [load])
+  async function act(id: number, patch: any) { await api(`/api/admin/comments/${id}`, { method: 'PUT', body: JSON.stringify(patch) }); load() }
+  async function del(id: number) { if (!confirm('Zmazať komentár?')) return; await api(`/api/admin/comments/${id}`, { method: 'DELETE' }); load() }
+  async function saveEdit() { await api(`/api/admin/comments/${edit.id}`, { method: 'PUT', body: JSON.stringify({ body: edit.body }) }); setEdit(null); load() }
+  return (
+    <div className="acard">
+      <h3>Komentáre ({list.length})</h3>
+      <div className="arow wrap" style={{ marginBottom: 14 }}>
+        {[['', 'všetky'], ['pending', 'čakajúce'], ['approved', 'schválené'], ['spam', 'spam']].map(([v, l]) => (
+          <button key={v} className={`aday${filter === v ? ' on' : ''}`} onClick={() => setFilter(v)}>{l}</button>
+        ))}
+      </div>
+      <table className="atab2"><tbody>
+        {list.map(c => (
+          <tr key={c.id}>
+            <td>
+              <b>{c.author}</b> <span className="amut sm">{new Date(c.created_at).toLocaleDateString('sk-SK')} · {c.slug}</span>
+              {edit?.id === c.id
+                ? <textarea className="ain" rows={3} style={{ marginTop: 6 }} value={edit.body} onChange={e => setEdit({ ...edit, body: e.target.value })} />
+                : <div style={{ marginTop: 4, fontSize: 14 }}>{c.body}</div>}
+            </td>
+            <td><span className={`apill ${c.status === 'approved' ? 'good' : 'bad'}`}>{c.status}</span></td>
+            <td className="ar" style={{ whiteSpace: 'nowrap' }}>
+              {edit?.id === c.id
+                ? <><button className="icbtn" title="Uložiť" onClick={saveEdit}><Ic n="check" s={16} /></button><button className="icbtn" title="Zrušiť" onClick={() => setEdit(null)}><Ic n="x" s={16} /></button></>
+                : <>{c.status !== 'approved' && <button className="icbtn" title="Schváliť" onClick={() => act(c.id, { status: 'approved' })}><Ic n="check" s={16} /></button>}
+                  <button className="icbtn" title="Upraviť" onClick={() => setEdit({ id: c.id, body: c.body })}><Ic n="edit" s={16} /></button>
+                  <button className="icbtn" title="Zmazať" onClick={() => del(c.id)}><Ic n="trash" s={16} /></button></>}
+            </td>
+          </tr>
+        ))}
+        {list.length === 0 && <tr><td className="amut sm">Žiadne komentáre.</td></tr>}
+      </tbody></table>
+    </div>
+  )
+}
+
+function Integrations() {
+  const [s, setS] = useState<any>(null)
+  const [msg, setMsg] = useState('')
+  useEffect(() => { api('/api/admin/site').then(d => setS(d.site)).catch(() => {}) }, [])
+  if (!s) return <div className="acard">Načítavam…</div>
+  const set = (k: string, v: any) => setS((p: any) => ({ ...p, [k]: v }))
+  async function save() { setMsg(''); try { const d = await api('/api/admin/site', { method: 'POST', body: JSON.stringify(s) }); setS(d.site); setMsg('Uložené ✓'.replace('✓', '')) } catch (e: any) { setMsg(e.message) } }
+  return (
+    <>
+      <div className="acard">
+        <h3>Meranie &amp; tracking</h3>
+        <p className="amut sm">Vlož kódy zo svojich účtov — aplikujú sa na celý web hneď po uložení.</p>
+        <div className="agrid3">
+          <div><label className="alab">Google Analytics (G-…)</label><input className="ain" value={s.gaId} onChange={e => set('gaId', e.target.value)} placeholder="G-XXXXXXX" /></div>
+          <div><label className="alab">Meta Pixel ID</label><input className="ain" value={s.metaPixelId} onChange={e => set('metaPixelId', e.target.value)} placeholder="1234567890" /></div>
+          <div><label className="alab">Google Tag Manager</label><input className="ain" value={s.gtmId} onChange={e => set('gtmId', e.target.value)} placeholder="GTM-XXXX" /></div>
+        </div>
+        <label className="alab">Vlastné skripty do &lt;head&gt; (SiteBehaviour, heatmapy…)</label>
+        <textarea className="ain mono" rows={6} value={s.headHtml} onChange={e => set('headHtml', e.target.value)} />
+      </div>
+      <div className="acard">
+        <h3>Komentáre — ochrana proti spamu</h3>
+        <label className="achk"><input type="checkbox" checked={s.commentsEnabled} onChange={e => set('commentsEnabled', e.target.checked)} /> Komentáre zapnuté</label>
+        <label className="achk"><input type="checkbox" checked={s.commentsModeration} onChange={e => set('commentsModeration', e.target.checked)} /> Schvaľovať pred zverejnením (odporúčané)</label>
+        <div className="agrid2">
+          <div><label className="alab">reCAPTCHA v3 — Site Key</label><input className="ain" value={s.recaptchaSiteKey} onChange={e => set('recaptchaSiteKey', e.target.value)} /></div>
+          <div><label className="alab">reCAPTCHA v3 — Secret</label><input className="ain" type="password" value={s.recaptchaSecret} onChange={e => set('recaptchaSecret', e.target.value)} /></div>
+        </div>
+      </div>
+      <div className="acard">
+        <h3>API kľúče (autopilot)</h3>
+        <p className="amut sm">Tu zadané kľúče majú prednosť pred Vercel premennými. <code>DATABASE_URL</code> musí ostať vo Verceli.</p>
+        <div className="agrid3">
+          <div><label className="alab">OpenAI API key</label><input className="ain" type="password" value={s.openaiKey} onChange={e => set('openaiKey', e.target.value)} placeholder="sk-…" /></div>
+          <div><label className="alab">Pexels API key</label><input className="ain" type="password" value={s.pexelsKey} onChange={e => set('pexelsKey', e.target.value)} /></div>
+          <div><label className="alab">Pixabay API key</label><input className="ain" type="password" value={s.pixabayKey} onChange={e => set('pixabayKey', e.target.value)} /></div>
+        </div>
+      </div>
+      <div className="arow"><button className="abtn" onClick={save}>Uložiť všetko</button>{msg && <span className="amut sm">{msg}</span>}</div>
+    </>
+  )
+}
+
 const css = `
 :root{--bg:#f6f7f9;--card:#fff;--bd:#e6e8ec;--ink:#111827;--mut:#6b7280;--acc:#4f46e5;--acc-sft:#eef2ff;--good:#059669;--good-sft:#ecfdf5;--bad:#9ca3af;--bad-sft:#f3f4f6}
 *{box-sizing:border-box}
@@ -396,4 +526,15 @@ body{margin:0;background:var(--bg);font-family:'Inter',-apple-system,sans-serif;
 .achk{display:flex;align-items:center;gap:9px;font-size:14px;margin-bottom:11px;cursor:pointer}
 .aday{font-family:inherit;font-size:13px;font-weight:600;padding:7px 13px;border:1px solid var(--bd);border-radius:8px;background:#fff;color:var(--mut);cursor:pointer}
 .aday.on{background:var(--acc-sft);color:var(--acc);border-color:var(--acc)}
+.stat-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media(max-width:760px){.stat-row{grid-template-columns:repeat(2,1fr)}}
+.stat-box2{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:16px}
+.stat-box2 b{display:block;font-size:26px;font-weight:800;letter-spacing:-1px;color:var(--ink);line-height:1}
+.stat-box2 span{font-size:12px;color:var(--mut)}
+.etb{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.etb button{font-family:inherit;font-size:12px;font-weight:600;padding:6px 10px;border:1px solid var(--bd);border-radius:7px;background:#fff;color:var(--ink);cursor:pointer}
+.etb button:hover{background:var(--bg);border-color:var(--acc);color:var(--acc)}
+.eprev{border:1px solid var(--bd);border-radius:9px;padding:16px 18px;background:#fff;max-height:360px;overflow:auto;font-size:14px;line-height:1.6}
+.eprev h2{font-size:19px;font-weight:700;margin:16px 0 8px}.eprev h3{font-size:16px;font-weight:700;margin:14px 0 6px}
+.eprev p{margin:0 0 10px}.eprev a{color:var(--acc);text-decoration:underline}.eprev ul{margin:0 0 10px 20px}
 `

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Nav from '../../components/Nav'
 import Footer from '../../components/Footer'
 import PostCard from '../../components/PostCard'
+import Comments from '../../components/Comments'
 import SEO from '../../components/SEO'
 import { getAllPosts, getPostBySlug, getAllSlugs, mergePosts, formatDate, Post } from '../../lib/posts'
 import { getPublishedPosts } from '../../lib/articles'
@@ -107,6 +108,8 @@ export default function PostPage({ post, related, headings, cleanContent }: Prop
 
         </aside>
       </div>
+
+      <Comments slug={post.slug} />
 
       {/* RELATED POSTS */}
       {related.length > 0 && (

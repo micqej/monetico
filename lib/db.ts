@@ -79,6 +79,18 @@ export async function ensureSchema(): Promise<boolean> {
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`
 
+  await sql`CREATE TABLE IF NOT EXISTS comments (
+    id         SERIAL PRIMARY KEY,
+    slug       TEXT NOT NULL,
+    author     TEXT NOT NULL DEFAULT 'Anonym',
+    email      TEXT NOT NULL DEFAULT '',
+    body       TEXT NOT NULL,
+    status     TEXT NOT NULL DEFAULT 'pending',
+    ip         TEXT NOT NULL DEFAULT '',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`
+  await sql`CREATE INDEX IF NOT EXISTS comments_slug_idx ON comments (slug, status)`
+
   schemaEnsured = true
   return true
 }

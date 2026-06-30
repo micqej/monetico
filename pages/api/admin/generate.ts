@@ -7,7 +7,7 @@ import { getSettings } from '../../../lib/settings'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!requireAdmin(req, res)) return
   if (req.method !== 'POST') return res.status(405).end()
-  if (!aiReady()) return res.status(400).json({ error: 'OPENAI_API_KEY nie je nastavený' })
+  if (!(await aiReady())) return res.status(400).json({ error: 'OPENAI_API_KEY nie je nastavený' })
   const { topic, category } = req.body || {}
   if (!topic) return res.status(400).json({ error: 'Chýba téma' })
   try {

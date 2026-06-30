@@ -1,19 +1,18 @@
 import OpenAI from 'openai'
+import { resolveSecret } from './siteSettings'
 
-let _client: OpenAI | null = null
-function client(): OpenAI {
-  const key = process.env.OPENAI_API_KEY
+async function client(): Promise<OpenAI> {
+  const key = await resolveSecret('openai')
   if (!key) throw new Error('OPENAI_API_KEY nie je nastavený')
-  if (!_client) _client = new OpenAI({ apiKey: key })
-  return _client
+  return new OpenAI({ apiKey: key })
 }
 
-export function aiReady(): boolean {
-  return !!process.env.OPENAI_API_KEY
+export async function aiReady(): Promise<boolean> {
+  return !!(await resolveSecret('openai'))
 }
 
 export async function suggestTopic(category: string, model = 'gpt-4o-mini', avoid: string[] = []): Promise<string> {
-  const res = await client().chat.completions.create({
+  const res = await (await client()).chat.completions.create({
     model,
     temperature: 0.9,
     messages: [
@@ -86,7 +85,7 @@ export async function generateArticle(opts: GenerateOpts): Promise<GeneratedArti
     '}',
   ].join('\n')
 
-  const res = await client().chat.completions.create({
+  const res = await (await client()).chat.completions.create({
     model,
     temperature,
     response_format: { type: 'json_object' },

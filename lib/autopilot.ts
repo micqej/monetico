@@ -26,7 +26,7 @@ export async function runAutopilot(force = false): Promise<AutopilotResult> {
   const today = new Date().getDay()
   if (!force && !s.publishDays.includes(today)) return { ok: true, skipped: 'dnes nie je deň publikovania', published }
 
-  if (!aiReady()) return { ok: false, reason: 'OPENAI_API_KEY nie je nastavený', published }
+  if (!(await aiReady())) return { ok: false, reason: 'OPENAI_API_KEY nie je nastavený', published }
 
   const planItem = await nextPending()
   let topic: string

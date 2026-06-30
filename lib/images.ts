@@ -5,8 +5,10 @@ export interface ImageResult {
   source: 'pexels' | 'pixabay'
 }
 
+import { resolveSecret } from './siteSettings'
+
 async function searchPexels(query: string, count: number): Promise<ImageResult[]> {
-  const key = process.env.PEXELS_API_KEY
+  const key = await resolveSecret('pexels')
   if (!key) return []
   try {
     const res = await fetch(
@@ -27,7 +29,7 @@ async function searchPexels(query: string, count: number): Promise<ImageResult[]
 }
 
 async function searchPixabay(query: string, count: number): Promise<ImageResult[]> {
-  const key = process.env.PIXABAY_API_KEY
+  const key = await resolveSecret('pixabay')
   if (!key) return []
   try {
     const res = await fetch(
