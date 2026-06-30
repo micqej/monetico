@@ -18,6 +18,8 @@ export interface Post {
   og_title: string
   og_desc: string
   reading_time: number
+  image?: string        // hero fotka (DB/AI články; statické majú fotku v obsahu)
+  image_credit?: string
 }
 
 const allPosts: Post[] = postsData as Post[]

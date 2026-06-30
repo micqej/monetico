@@ -75,6 +75,14 @@ export default function PostPage({ post, related, headings, cleanContent }: Prop
         </div>
       </div>
 
+      {/* HERO FOTKA (AI/DB články) */}
+      {post.image && (
+        <figure className="article-hero-img">
+          <img src={post.image} alt={post.title} />
+          {post.image_credit && <figcaption>{post.image_credit}</figcaption>}
+        </figure>
+      )}
+
       {/* ARTICLE BODY + SIDEBAR */}
       <div className="article-layout">
         {/* CONTENT */}

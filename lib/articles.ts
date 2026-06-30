@@ -165,6 +165,8 @@ function articleToPost(a: Article): Post {
     og_title: a.og_title,
     og_desc: a.og_desc,
     reading_time: a.reading_time,
+    image: a.image_url || '',
+    image_credit: a.image_credit || '',
   }
 }
 

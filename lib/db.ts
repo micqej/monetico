@@ -32,6 +32,13 @@ export async function ensureSchema(): Promise<boolean> {
   const sql = getSql()
   if (!sql) return false
   if (schemaEnsured) return true
+  // FAST PATH: ak tabuľky už existujú (čo v produkcii vždy), preskoč všetky CREATE
+  // a sprav jediný lacný round-trip namiesto 7. Toto bola hlavná príčina pomalého
+  // admina — každá serverless funkcia na cold-starte spúšťala celé DDL.
+  try {
+    const r = await sql`SELECT to_regclass('public.articles') AS t`
+    if (r[0]?.t) { schemaEnsured = true; return true }
+  } catch { /* skús DDL nižšie */ }
   // The schema may already be provisioned by a different (owner) role; the app
   // role has full DML but may not own the tables (so CREATE INDEX can fail with
   // "must be owner"). That's fine — swallow DDL errors, the tables already exist.

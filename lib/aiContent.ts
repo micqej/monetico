@@ -11,16 +11,48 @@ export async function aiReady(): Promise<boolean> {
   return !!(await resolveSecret('openai'))
 }
 
-export async function suggestTopic(category: string, model = 'gpt-4o-mini', avoid: string[] = []): Promise<string> {
+const STRATEG_SYSTEM =
+  'Si content stratég pre slovenskú digitálnu agentúru. Navrhuješ konkrétne, praktické a SEO-atraktívne ' +
+  'názvy blogov po slovensky, ktoré priamo súvisia so službami firmy a pomáhajú jej získavať klientov.'
+
+export async function suggestTopic(category: string, model = 'gpt-4o-mini', avoid: string[] = [], businessContext = ''): Promise<string> {
+  const list = await suggestTopics(1, { category, model, avoid, businessContext })
+  return list[0] || ''
+}
+
+/** Navrhne `count` konkrétnych názvov článkov groundovaných na službách firmy. */
+export async function suggestTopics(
+  count: number,
+  opts: { category?: string; model?: string; avoid?: string[]; businessContext?: string } = {}
+): Promise<string[]> {
+  const { category, model = 'gpt-4o-mini', avoid = [], businessContext = '' } = opts
   const res = await (await client()).chat.completions.create({
     model,
     temperature: 0.9,
+    response_format: { type: 'json_object' },
     messages: [
-      { role: 'system', content: 'Si content stratég pre slovenskú digitálnu agentúru Monetico. Navrhuješ konkrétne, praktické a SEO-atraktívne témy blogov po slovensky.' },
-      { role: 'user', content: `Navrhni JEDNU konkrétnu tému blogu do kategórie "${category}". Vráť len samotný názov témy, bez úvodzoviek a bez čísla.${avoid.length ? ' Vyhni sa týmto témam: ' + avoid.join('; ') : ''}` },
+      { role: 'system', content: STRATEG_SYSTEM },
+      {
+        role: 'user',
+        content: [
+          businessContext ? `O firme: ${businessContext}` : '',
+          `Navrhni ${count} konkrétnych, navzájom rozdielnych názvov blogových článkov` +
+            (category ? ` do kategórie "${category}"` : ' naprieč relevantnými témami') + '.',
+          'Témy musia priamo súvisieť so službami firmy a riešiť reálne problémy jej cieľovej skupiny.',
+          'Miešaj how-to návody, trendy, časté chyby, porovnania a praktické checklisty.',
+          avoid.length ? 'Vyhni sa týmto už existujúcim názvom: ' + avoid.slice(0, 60).join('; ') : '',
+          'Vráť JSON: { "topics": ["názov 1", "názov 2", ...] }. Len názvy, bez čísel a úvodzoviek v texte.',
+        ].filter(Boolean).join('\n'),
+      },
     ],
   })
-  return (res.choices[0]?.message?.content || '').trim().replace(/^["'\d.\s-]+/, '').slice(0, 140)
+  try {
+    const j = JSON.parse(res.choices[0]?.message?.content || '{}')
+    const arr: string[] = Array.isArray(j.topics) ? j.topics : []
+    return arr.map(t => String(t).trim().replace(/^["'\d.\s-]+/, '').slice(0, 140)).filter(Boolean).slice(0, count)
+  } catch {
+    return []
+  }
 }
 
 export interface GeneratedArticle {
@@ -44,6 +76,10 @@ export interface GenerateOpts {
   wordCount?: number
   model?: string
   temperature?: number
+  businessContext?: string
+  /** kandidáti na interné prelinkovanie (existujúce články) */
+  links?: { title: string; slug: string }[]
+  linkCount?: number
 }
 
 export async function generateArticle(opts: GenerateOpts): Promise<GeneratedArticle> {
@@ -54,22 +90,33 @@ export async function generateArticle(opts: GenerateOpts): Promise<GeneratedArti
     wordCount = 800,
     model = 'gpt-4o-mini',
     temperature = 0.7,
+    businessContext = '',
+    links = [],
+    linkCount = 0,
   } = opts
+
+  const linkPool = links.slice(0, 20)
+  const wantLinks = Math.min(linkCount, linkPool.length)
 
   const system = [
     'Si skúsený SEO copywriter pre slovenskú digitálnu agentúru Monetico (cold email, SEO, sociálne siete, email marketing, tvorba webov).',
+    businessContext ? `O firme (drž sa toho): ${businessContext}` : '',
     'Píšeš výhradne po slovensky, s korektnou diakritikou.',
     'Tvoríš hodnotné, konkrétne a prakticky použiteľné články pre majiteľov firiem a e-shopov.',
     `Tón: ${tone}`,
     'Obsah vraciaš ako čisté HTML telo článku — používaj <h2>, <h3>, <p>, <ul><li>, <strong>. NEPOUŽÍVAJ <h1> ani <html>/<body>. Žiadny markdown.',
     'Vždy vráť validný JSON objekt podľa zadanej schémy.',
-  ].join('\n')
+  ].filter(Boolean).join('\n')
 
   const user = [
     `Napíš SEO článok na tému: "${topic}".`,
     `Kategória: ${category}.`,
     `Cieľová dĺžka: približne ${wordCount} slov.`,
     'Štruktúra: úvod (1–2 odseky), 3–6 sekcií s <h2> nadpismi, kde sa hodí aj zoznam <ul>, a krátky záver s výzvou (CTA na konzultáciu).',
+    wantLinks > 0
+      ? `Do textu prirodzene vlož presne ${wantLinks} interné odkazy na tieto naše články (použi <a href="/SLUG/">výstižný text</a>, len ak to do vety naozaj sedí):\n` +
+        linkPool.map(l => `- /${l.slug}/ — ${l.title}`).join('\n')
+      : '',
     'Vráť JSON s kľúčmi:',
     '{',
     '  "title": "pútavý titulok",',

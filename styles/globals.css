@@ -341,6 +341,12 @@ img { max-width: 100%; height: auto; }
 .article-title { font-family: var(--font-display); font-weight: 900; font-size: clamp(28px, 4vw, 50px); letter-spacing: -0.02em; line-height: 1.1; color: var(--ink); margin-bottom: 22px; }
 .article-meta, .meta-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
 .meta-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--faint); }
+/* Nadpis + meta len cez ľavý (obsahový) stĺpec, nie cez celú šírku pod sidebar */
+.article-title, .article-hero .article-meta { max-width: calc(100% - 348px); }
+/* Hero fotka pre AI/DB články — zarovnaná s obsahovým stĺpcom */
+.article-hero-img { max-width: var(--maxw); margin: 30px auto 0; padding: 0 var(--side); }
+.article-hero-img img { display: block; width: calc(100% - 348px); border: 2px solid var(--ink); border-radius: var(--r); box-shadow: var(--sh); aspect-ratio: 16/8; object-fit: cover; }
+.article-hero-img figcaption { font-family: var(--font-mono); font-size: 11px; color: var(--faint); margin-top: 8px; }
 .article-layout { max-width: var(--maxw); margin: 40px auto 0; padding: 0 var(--side); display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 48px; align-items: start; }
 .article-body {
   background: var(--white); border: 2px solid var(--ink); border-radius: var(--r); padding: 44px 48px; box-shadow: var(--sh);
@@ -505,6 +511,8 @@ footer { margin-top: 24px; margin-bottom: 40px; }
 .comments { max-width: var(--maxw); margin: 72px auto 0; padding: 0 var(--side); }
 .comments-h { font-family: var(--font-display); font-weight: 900; font-size: clamp(24px, 3vw, 34px); letter-spacing: -1px; margin-bottom: 28px; }
 .comments-h span { color: var(--muted); font-weight: 700; }
+/* Komentáre zarovnané pod obsahový stĺpec (nie pod sidebar) */
+.comment-list, .comment-form { max-width: calc(100% - 348px); }
 .comment-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 40px; }
 .comment { background: var(--white); border: 2px solid var(--ink); border-radius: var(--r-sm); padding: 22px 26px; box-shadow: var(--sh); }
 .comment-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
@@ -512,15 +520,17 @@ footer { margin-top: 24px; margin-bottom: 40px; }
 .comment-meta span { font-family: var(--font-mono); font-size: 11px; color: var(--faint); }
 .comment p { font-size: 15px; line-height: 1.6; color: #2a2a28; white-space: pre-wrap; }
 .comments-empty { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
-.comment-form { background: var(--cream); border: 2px solid var(--ink); border-radius: var(--r); padding: 36px 38px; box-shadow: var(--sh); max-width: 760px; }
-.comment-form h3 { margin-bottom: 20px; }
-.comment-form .cf-row, .comment-form .form-textarea { margin-bottom: 4px; }
-.comment-form h3 { font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: -.3px; margin-bottom: 16px; }
-.cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+/* Jeden veľký komentárový box: meno + email + text spolu */
+.comment-form { background: var(--cream); border: 2px solid var(--ink); border-radius: var(--r); padding: 40px 44px; box-shadow: var(--sh); }
+.comment-form h3 { font-family: var(--font-display); font-weight: 800; font-size: 21px; letter-spacing: -.3px; margin-bottom: 22px; }
+.comment-form .form-input, .comment-form .form-textarea { padding: 14px 16px; font-size: 15px; }
+.comment-form .form-textarea { min-height: 150px; }
+.comment-form .cf-row { margin-bottom: 14px; }
+.cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media (max-width: 600px) { .cf-row { grid-template-columns: 1fr; } }
 .cf-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-.cf-bottom { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
-.cf-msg { font-size: 13.5px; color: var(--purple); font-weight: 600; }
+.cf-bottom { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
+.cf-msg { font-size: 14px; color: var(--purple); font-weight: 600; }
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 1280px) { :root { --side: 56px; } }
@@ -532,6 +542,9 @@ footer { margin-top: 24px; margin-bottom: 40px; }
   .stat-box:nth-child(1), .stat-box:nth-child(2) { border-bottom: 2px solid rgba(255,255,255,.12); }
   .article-layout { grid-template-columns: 1fr; }
   .sidebar { position: static; }
+  .article-title, .article-hero .article-meta { max-width: 100%; }
+  .article-hero-img img { width: 100%; }
+  .comment-list, .comment-form { max-width: 100%; }
   .post-card.featured { grid-column: span 2; }
 }
 @media (max-width: 768px) {

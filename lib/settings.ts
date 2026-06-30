@@ -11,9 +11,13 @@ export interface AutopilotSettings {
   tone: string
   wordCount: number
   defaultCategory: string
+  randomCategory: boolean      // náhodne vyberať kategóriu pre každý článok
   imageSource: 'pexels' | 'pixabay' | 'both'
+  imageCount: number           // koľko fotiek na článok (1–3)
   autoInterlink: boolean
+  linkCount: number            // koľko interných odkazov vložiť (0–3)
   newsletterSubject: string
+  businessContext: string      // čím sa firma reálne zaoberá — grounduje témy aj texty
 }
 
 export const DEFAULT_SETTINGS: AutopilotSettings = {
@@ -27,9 +31,16 @@ export const DEFAULT_SETTINGS: AutopilotSettings = {
   tone: 'Praktický, priateľský a odborný. Bez omáčky — konkrétne, použiteľné tipy pre slovenské firmy. Píš po slovensky.',
   wordCount: 800,
   defaultCategory: 'Marketing Tipy',
+  randomCategory: true,
   imageSource: 'both',
+  imageCount: 1,
   autoInterlink: true,
+  linkCount: 2,
   newsletterSubject: 'Tipy pre rast — Monetico',
+  businessContext:
+    'Monetico je slovenská digitálna agentúra. Služby: tvorba webov a e-shopov, SEO, ' +
+    'cold emailing, email marketing, správa sociálnych sietí, online reklama (Google/Meta) ' +
+    'a automatizácia marketingu. Cieľová skupina: majitelia malých a stredných firiem a e-shopov na Slovensku.',
 }
 
 const KEY = 'autopilot'

@@ -177,6 +177,23 @@ function Overview({ sess }: { sess: Session }) {
   )
 }
 
+function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: any }) {
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', h)
+    document.body.style.overflow = 'hidden'
+    return () => { window.removeEventListener('keydown', h); document.body.style.overflow = '' }
+  }, [onClose])
+  return (
+    <div className="amodal" onMouseDown={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="amodal-card">
+        <div className="amodal-top"><b>{title}</b><button className="icbtn" onClick={onClose} title="Zavrieť"><Ic n="x" s={18} /></button></div>
+        <div className="amodal-body">{children}</div>
+      </div>
+    </div>
+  )
+}
+
 function Editor({ initial, images, onSaved }: { initial: any; images: ImageR[]; onSaved: () => void }) {
   const [a, setA] = useState<any>(initial)
   const [imgs, setImgs] = useState<ImageR[]>(images)
@@ -184,7 +201,6 @@ function Editor({ initial, images, onSaved }: { initial: any; images: ImageR[]; 
   const [msg, setMsg] = useState('')
   const set = (k: string, v: any) => setA((p: any) => ({ ...p, [k]: v }))
   const taRef = useRef<HTMLTextAreaElement>(null)
-  const [preview, setPreview] = useState(false)
   function applyTag(before: string, after = '') {
     const ta = taRef.current; if (!ta) { set('content', a.content + before + after); return }
     const s = ta.selectionStart, e = ta.selectionEnd, val = a.content
@@ -212,20 +228,20 @@ function Editor({ initial, images, onSaved }: { initial: any; images: ImageR[]; 
       </div>
       <label className="alab">Perex</label>
       <textarea className="ain" rows={2} value={a.excerpt} onChange={e => set('excerpt', e.target.value)} />
-      <label className="alab">Obsah</label>
+      <label className="alab">Obsah — vľavo píšeš, vpravo hneď vidíš výsledok</label>
       <div className="etb">
-        <button type="button" onClick={() => applyTag('<h2>', '</h2>')}>H2</button>
-        <button type="button" onClick={() => applyTag('<h3>', '</h3>')}>H3</button>
+        <button type="button" onClick={() => applyTag('<h2>', '</h2>')}>Nadpis</button>
+        <button type="button" onClick={() => applyTag('<h3>', '</h3>')}>Podnadpis</button>
         <button type="button" onClick={() => applyTag('<strong>', '</strong>')}>Tučné</button>
         <button type="button" onClick={() => applyTag('<em>', '</em>')}>Kurzíva</button>
         <button type="button" onClick={() => applyTag('<a href="https://">', '</a>')}>Odkaz</button>
         <button type="button" onClick={() => applyTag('<ul>\n  <li>', '</li>\n</ul>')}>Zoznam</button>
         <button type="button" onClick={() => applyTag('<p>', '</p>')}>Odsek</button>
-        <button type="button" onClick={() => setPreview(p => !p)}>{preview ? '✎ Upraviť'.replace('✎ ', '') : 'Náhľad'}</button>
       </div>
-      {preview
-        ? <div className="eprev" dangerouslySetInnerHTML={{ __html: a.content }} />
-        : <textarea ref={taRef} className="ain mono" rows={14} value={a.content} onChange={e => set('content', e.target.value)} />}
+      <div className="ed-split">
+        <textarea ref={taRef} className="ain mono" rows={18} value={a.content} onChange={e => set('content', e.target.value)} />
+        <div className="eprev" dangerouslySetInnerHTML={{ __html: a.content || '<p style="color:#9ca3af">Náhľad sa zobrazí tu…</p>' }} />
+      </div>
       <div className="agrid2">
         <div><label className="alab">Meta title</label><input className="ain" value={a.meta_title} onChange={e => set('meta_title', e.target.value)} /></div>
         <div><label className="alab">Meta keywords</label><input className="ain" value={a.meta_keywords} onChange={e => set('meta_keywords', e.target.value)} /></div>
@@ -278,7 +294,7 @@ function Generate({ sess }: { sess: Session }) {
         {err && <div className="aerr">{err}</div>}
         <button className="abtn" onClick={gen} disabled={busy || !topic}><Ic n="generate" s={15} /> {busy ? 'Generujem…' : 'Vygenerovať'}</button>
       </div>
-      {editor && <Editor initial={editor} images={images} onSaved={() => {}} />}
+      {editor && <Modal title="Nový článok" onClose={() => setEditor(null)}><Editor initial={editor} images={images} onSaved={() => setEditor(null)} /></Modal>}
     </>
   )
 }
@@ -341,7 +357,7 @@ function Articles() {
         {statics.total > statics.posts.length && <p className="amut sm" style={{ marginTop: 10 }}>Zobrazených {statics.posts.length} z {statics.total} — použi hľadanie na zúženie.</p>}
       </div>
 
-      {edit && <Editor initial={edit} images={[]} onSaved={() => { setEdit(null); reload() }} />}
+      {edit && <Modal title={edit.id ? 'Upraviť článok' : 'Nový článok'} onClose={() => setEdit(null)}><Editor initial={edit} images={[]} onSaved={() => { setEdit(null); reload() }} /></Modal>}
     </>
   )
 }
@@ -353,14 +369,37 @@ function Plan() {
   const [when, setWhen] = useState('')
   const load = useCallback(async () => setList((await api('/api/admin/plan')).plan), [])
   useEffect(() => { load() }, [load])
+  const [count, setCount] = useState(14)
+  const [scat, setScat] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
   async function add() { if (!topic) return; await api('/api/admin/plan', { method: 'POST', body: JSON.stringify({ topic, category: cat, scheduled_for: when || null }) }); setTopic(''); setWhen(''); load() }
   async function del(id: number) { await api(`/api/admin/plan/${id}`, { method: 'DELETE' }); load() }
+  async function suggest() {
+    setBusy(true); setMsg('')
+    try {
+      const d = await api('/api/admin/suggest-topics', { method: 'POST', body: JSON.stringify({ count, category: scat || undefined, schedule: true }) })
+      setMsg(`Pridaných ${d.added} tém do plánu.`); load()
+    } catch (e: any) { setMsg(e.message) }
+    setBusy(false)
+  }
   return (
+    <>
+      <div className="acard">
+        <h3>1 · Navrhnúť témy automaticky</h3>
+        <p className="amut sm">AI navrhne názvy článkov podľa toho, čím sa firma zaoberá (Nastavenia → Čím sa zaoberáte), rozloží ich po dňoch a autopilot z nich potom postupne píše texty.</p>
+        <div className="agrid3">
+          <div><label className="alab">Koľko tém</label><input className="ain" type="number" min={1} max={50} value={count} onChange={e => setCount(+e.target.value)} /></div>
+          <div><label className="alab">Kategória (voliteľné)</label><select className="ain" value={scat} onChange={e => setScat(e.target.value)}><option value="">Mix / náhodne</option>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></div>
+          <div style={{ display: 'flex', alignItems: 'flex-end' }}><button className="abtn full" onClick={suggest} disabled={busy}><Ic n="generate" s={15} /> {busy ? 'Generujem…' : 'Navrhnúť témy'}</button></div>
+        </div>
+        {msg && <p className="amut sm" style={{ marginTop: 8 }}>{msg}</p>}
+      </div>
     <div className="acard">
-      <h3>Plán obsahu</h3>
-      <p className="amut sm">Témy, ktoré autopilot postupne spracuje. Dátum je voliteľný.</p>
+      <h3>2 · Plán obsahu ({list.length})</h3>
+      <p className="amut sm">Témy čakajúce na spracovanie. Môžeš pridať aj vlastnú. Dátum je voliteľný — autopilot ich spracúva postupne.</p>
       <div className="agrid3">
-        <input className="ain" placeholder="Téma" value={topic} onChange={e => setTopic(e.target.value)} />
+        <input className="ain" placeholder="Vlastná téma" value={topic} onChange={e => setTopic(e.target.value)} />
         <select className="ain" value={cat} onChange={e => setCat(e.target.value)}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select>
         <input className="ain" type="datetime-local" value={when} onChange={e => setWhen(e.target.value)} />
       </div>
@@ -373,9 +412,10 @@ function Plan() {
             <td className="ar"><button className="icbtn" onClick={() => del(p.id)}><Ic n="trash" s={16} /></button></td>
           </tr>
         ))}
-        {list.length === 0 && <tr><td className="amut sm">Plán je prázdny — autopilot si tému navrhne sám.</td></tr>}
+        {list.length === 0 && <tr><td className="amut sm">Plán je prázdny — navrhni témy vyššie, alebo si autopilot tému navrhne sám.</td></tr>}
       </tbody></table>
     </div>
+    </>
   )
 }
 
@@ -407,11 +447,13 @@ function Settings() {
       <h3>Nastavenia autopilota</h3>
       <label className="achk"><input type="checkbox" checked={s.autopilotEnabled} onChange={e => set('autopilotEnabled', e.target.checked)} /> Autopilot zapnutý</label>
       <label className="achk"><input type="checkbox" checked={s.autoPublish} onChange={e => set('autoPublish', e.target.checked)} /> Automaticky publikovať (vyp = koncept)</label>
-      <label className="achk"><input type="checkbox" checked={s.autoInterlink} onChange={e => set('autoInterlink', e.target.checked)} /> Automatické prelinkovanie</label>
+      <label className="achk"><input type="checkbox" checked={s.randomCategory} onChange={e => set('randomCategory', e.target.checked)} /> Náhodne vyberať kategóriu (mix tém)</label>
+      <label className="alab">Čím sa firma zaoberá — z toho AI tvorí témy aj texty</label>
+      <textarea className="ain" rows={4} value={s.businessContext || ''} onChange={e => set('businessContext', e.target.value)} placeholder="Napr. služby, ktoré ponúkate, cieľová skupina, čím sa odlišujete…" />
       <div className="agrid3">
         <div><label className="alab">Článkov / týždeň</label><input className="ain" type="number" value={s.postsPerWeek} onChange={e => set('postsPerWeek', +e.target.value)} /></div>
         <div><label className="alab">Hodina publikovania</label><input className="ain" type="number" min={0} max={23} value={s.publishHour} onChange={e => set('publishHour', +e.target.value)} /></div>
-        <div><label className="alab">Predvolená kategória</label><select className="ain" value={s.defaultCategory} onChange={e => set('defaultCategory', e.target.value)}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></div>
+        <div><label className="alab">Predvolená kategória {s.randomCategory ? '(náhodné je zapnuté)' : ''}</label><select className="ain" value={s.defaultCategory} onChange={e => set('defaultCategory', e.target.value)} disabled={s.randomCategory}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></div>
       </div>
       <label className="alab">Dni publikovania</label>
       <div className="arow wrap">{days.map(([lab, d]) => (
@@ -422,8 +464,11 @@ function Settings() {
         <div><label className="alab">Kreativita (0–1)</label><input className="ain" type="number" step="0.1" min={0} max={1} value={s.temperature} onChange={e => set('temperature', +e.target.value)} /></div>
         <div><label className="alab">Dĺžka (slov)</label><input className="ain" type="number" value={s.wordCount} onChange={e => set('wordCount', +e.target.value)} /></div>
       </div>
-      <label className="alab">Zdroj fotiek</label>
-      <select className="ain" value={s.imageSource} onChange={e => set('imageSource', e.target.value)}><option value="both">Pexels + Pixabay</option><option value="pexels">Pexels</option><option value="pixabay">Pixabay</option></select>
+      <div className="agrid3">
+        <div><label className="alab">Zdroj fotiek</label><select className="ain" value={s.imageSource} onChange={e => set('imageSource', e.target.value)}><option value="both">Pexels + Pixabay</option><option value="pexels">Pexels</option><option value="pixabay">Pixabay</option></select></div>
+        <div><label className="alab">Fotiek na článok</label><select className="ain" value={s.imageCount} onChange={e => set('imageCount', +e.target.value)}><option value={1}>1</option><option value={2}>2</option><option value={3}>3</option></select></div>
+        <div><label className="alab">Interných odkazov {s.autoInterlink ? '' : '(prelinkovanie je vyp.)'}</label><select className="ain" value={s.linkCount} onChange={e => set('linkCount', +e.target.value)} disabled={!s.autoInterlink}><option value={0}>0</option><option value={1}>1</option><option value={2}>2</option><option value={3}>3</option></select></div>
+      </div>
       <label className="alab">Tón a štýl písania</label>
       <textarea className="ain" rows={3} value={s.tone} onChange={e => set('tone', e.target.value)} />
       <label className="alab">Predmet newslettera</label>
@@ -583,4 +628,15 @@ body{margin:0;background:var(--bg);font-family:'Inter',-apple-system,sans-serif;
 .eprev{border:1px solid var(--bd);border-radius:9px;padding:16px 18px;background:#fff;max-height:360px;overflow:auto;font-size:14px;line-height:1.6}
 .eprev h2{font-size:19px;font-weight:700;margin:16px 0 8px}.eprev h3{font-size:16px;font-weight:700;margin:14px 0 6px}
 .eprev p{margin:0 0 10px}.eprev a{color:var(--acc);text-decoration:underline}.eprev ul{margin:0 0 10px 20px}
+.eprev img{max-width:100%;border-radius:8px;margin:10px 0}
+.ed-split{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.ed-split .ain.mono{margin-bottom:0;min-height:360px}
+.ed-split .eprev{max-height:none;min-height:360px}
+@media(max-width:760px){.ed-split{grid-template-columns:1fr}}
+.amodal{position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-start;justify-content:center;background:rgba(15,23,42,.55);backdrop-filter:blur(2px);overflow:auto;padding:24px}
+.amodal-card{background:var(--bg);width:min(1040px,100%);border-radius:14px;margin:12px 0 40px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+.amodal-top{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-radius:14px 14px 0 0;z-index:3}
+.amodal-top b{font-size:15px;font-weight:700}
+.amodal-body{padding:18px 20px}
+.amodal-body .acard{margin-bottom:0;border:0;box-shadow:none;padding:0;background:none}
 `
