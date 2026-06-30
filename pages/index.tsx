@@ -26,6 +26,27 @@ export default function Home({ recentPosts, categories }: Props) {
       <section className="hero">
         <div className="hero-bg" />
         <div className="hero-noise" />
+        <div className="hero-visual" aria-hidden="true">
+          <div className="hv-card">
+            <div className="hv-head">
+              <span className="hv-label">Výsledky klientov</span>
+              <span className="hv-pill">↗ rast</span>
+            </div>
+            <svg className="hv-chart" viewBox="0 0 260 120" preserveAspectRatio="none">
+              <rect x="6" y="78" width="32" height="36" rx="4" />
+              <rect x="48" y="62" width="32" height="52" rx="4" />
+              <rect x="90" y="68" width="32" height="46" rx="4" />
+              <rect x="132" y="42" width="32" height="72" rx="4" className="hv-y" />
+              <rect x="174" y="26" width="32" height="88" rx="4" className="hv-y" />
+              <rect x="216" y="6" width="32" height="108" rx="4" className="hv-p" />
+            </svg>
+            <div className="hv-foot">
+              <div><b>120+</b><span>projektov</span></div>
+              <div><b>8 000</b><span>emailov / mes.</span></div>
+            </div>
+          </div>
+          <div className="hv-chip">42× ROI z emailov</div>
+        </div>
         <div className="hero-tag">— Digitálna agentúra pre rastúce firmy</div>
         <h1 className="hero-headline">
           RAST<br />

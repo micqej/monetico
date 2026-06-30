@@ -140,6 +140,23 @@ img { max-width: 100%; height: auto; }
 .scroll-line::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 20px; background: var(--y); animation: scrollDash 1.8s ease-in-out infinite; }
 @keyframes scrollDash { 0% { left: -20px; } 100% { left: 60px; } }
 
+/* hero visual (rastová karta vpravo) */
+.hero-visual { position: absolute; top: 104px; right: 56px; width: 360px; z-index: 1; }
+.hv-card { background: var(--white); border: 2px solid var(--ink); border-radius: 18px; box-shadow: 6px 6px 0 var(--ink); padding: 22px; transform: rotate(2deg); }
+.hv-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.hv-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); }
+.hv-pill { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink); background: var(--y); border: 2px solid var(--ink); padding: 3px 10px; border-radius: 50px; }
+.hv-chart { width: 100%; height: 96px; display: block; }
+.hv-chart rect { fill: #e9e7df; }
+.hv-chart rect.hv-y { fill: var(--y); }
+.hv-chart rect.hv-p { fill: var(--purple); }
+.hv-foot { display: flex; gap: 20px; margin-top: 14px; border-top: 2px solid var(--ink); padding-top: 12px; }
+.hv-foot div { display: flex; flex-direction: column; }
+.hv-foot b { font-family: var(--font-display); font-weight: 900; font-size: 20px; letter-spacing: -.5px; color: var(--ink); line-height: 1; }
+.hv-foot span { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.hv-chip { position: absolute; left: -26px; bottom: -16px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--ink); background: var(--y); border: 2px solid var(--ink); padding: 9px 16px; border-radius: 50px; box-shadow: 3px 3px 0 var(--ink); transform: rotate(-3deg); }
+@media (max-width: 1180px) { .hero-visual { display: none; } }
+
 /* buttons */
 .btn-primary {
   display: inline-flex; align-items: center; gap: 8px;

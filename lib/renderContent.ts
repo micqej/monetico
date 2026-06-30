@@ -18,6 +18,12 @@ export function renderWordPressContent(content: string): string {
   // Trim excess whitespace lines
   html = html.replace(/\n{3,}/g, '\n\n')
 
+  // After the domain swap (monetico.sk -> Vercel), the WordPress media library lives
+  // on the old WP at novinky.monetico.sk. Point all wp-content/wp-includes assets
+  // there so images load (absolute monetico.sk and root-relative paths).
+  html = html.replace(/(src|href|srcset)="https?:\/\/(?:www\.)?monetico\.sk\/(wp-content\/|wp-includes\/)/gi, '$1="https://novinky.monetico.sk/$2')
+  html = html.replace(/(src|href|srcset)="\/(wp-content\/|wp-includes\/)/gi, '$1="https://novinky.monetico.sk/$2')
+
   // Interlink: rewrite original monetico.sk ANCHOR links to relative paths so the
   // article cross-links work on this site. Image/asset URLs (src=, wp-content) are
   // left absolute so they keep loading from the original domain.
