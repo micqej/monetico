@@ -61,7 +61,17 @@ export default function Admin() {
   const [sess, setSess] = useState<Session | null>(null)
   const [pin, setPin] = useState('')
   const [err, setErr] = useState('')
-  const [tab, setTab] = useState('Prehľad')
+  const [tab, setTabState] = useState('Prehľad')
+  const setTab = useCallback((id: string) => {
+    setTabState(id)
+    if (typeof window !== 'undefined') window.location.hash = encodeURIComponent(id)
+  }, [])
+
+  // po refreshi ostaň na rovnakej záložke (z URL hashu)
+  useEffect(() => {
+    const h = decodeURIComponent((window.location.hash || '').replace(/^#/, ''))
+    if (h && TABS.some(t => t.id === h)) setTabState(h)
+  }, [])
 
   const refresh = useCallback(async () => setSess(await api('/api/admin/session')), [])
   useEffect(() => { refresh() }, [refresh])
@@ -276,10 +286,26 @@ function Generate({ sess }: { sess: Session }) {
 function Articles() {
   const [list, setList] = useState<any[]>([])
   const [edit, setEdit] = useState<any>(null)
+  const [statics, setStatics] = useState<{ posts: any[]; total: number }>({ posts: [], total: 0 })
+  const [sq, setSq] = useState('')
+  const [busySlug, setBusySlug] = useState('')
   const load = useCallback(async () => setList((await api('/api/admin/articles')).articles), [])
-  useEffect(() => { load() }, [load])
-  async function del(id: number) { if (!confirm('Zmazať článok?')) return; await api(`/api/admin/articles/${id}`, { method: 'DELETE' }); load() }
+  const loadStatic = useCallback(async (q: string) => {
+    try { const d = await api('/api/admin/static-posts' + (q ? `?q=${encodeURIComponent(q)}` : '')); setStatics({ posts: d.posts, total: d.total }) } catch {}
+  }, [])
+  useEffect(() => { load(); loadStatic('') }, [load, loadStatic])
+  const reload = () => { load(); loadStatic(sq) }
+  async function del(id: number) { if (!confirm('Zmazať článok?')) return; await api(`/api/admin/articles/${id}`, { method: 'DELETE' }); reload() }
   function openEdit(a: any) { setEdit({ id: a.id, title: a.title, slug: a.slug, category: a.category, tags: (a.tags || []).join(', '), content: a.content, excerpt: a.excerpt, meta_title: a.meta_title, meta_desc: a.meta_desc, meta_keywords: a.meta_keywords, image_url: a.image_url, image_credit: a.image_credit, status: a.status }) }
+  async function editStatic(slug: string) {
+    setBusySlug(slug)
+    try {
+      const { post: p } = await api(`/api/admin/static-posts?slug=${encodeURIComponent(slug)}`)
+      setEdit({ id: 0, title: p.title, slug: p.slug, category: p.categories?.[0] || 'Marketing Tipy', tags: (p.tags || []).join(', '), content: p.content, excerpt: p.excerpt, meta_title: p.meta_title || p.title, meta_desc: p.meta_desc, meta_keywords: p.meta_keywords, image_url: '', image_credit: '', status: 'published' })
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch {}
+    setBusySlug('')
+  }
   return (
     <>
       <div className="acard">
@@ -292,10 +318,30 @@ function Articles() {
               <td className="ar"><button className="icbtn" title="Upraviť" onClick={() => openEdit(a)}><Ic n="edit" s={16} /></button><button className="icbtn" title="Zmazať" onClick={() => del(a.id)}><Ic n="trash" s={16} /></button></td>
             </tr>
           ))}
-          {list.length === 0 && <tr><td className="amut sm">Zatiaľ žiadne (162 pôvodných je v statických dátach).</td></tr>}
+          {list.length === 0 && <tr><td className="amut sm">Zatiaľ žiadne — uprav niektorý z pôvodných nižšie alebo vytvor nový.</td></tr>}
         </tbody></table>
       </div>
-      {edit && <Editor initial={edit} images={[]} onSaved={() => { setEdit(null); load() }} />}
+
+      <div className="acard">
+        <h3>Pôvodné články ({statics.total})</h3>
+        <p className="amut sm">Pôvodný obsah z webu. Klikni <b>Upraviť</b> — článok sa otvorí v editore a po uložení ho budeš mať plne pod kontrolou (prepíše pôvodný na webe).</p>
+        <form className="arow" onSubmit={e => { e.preventDefault(); loadStatic(sq) }}>
+          <input className="ain" style={{ marginBottom: 0 }} placeholder="Hľadať v pôvodných článkoch…" value={sq} onChange={e => setSq(e.target.value)} />
+          <button className="abtn ghost" type="submit"><Ic n="search" s={15} /> Hľadať</button>
+        </form>
+        <table className="atab2 mt"><tbody>
+          {statics.posts.map(p => (
+            <tr key={p.slug}>
+              <td><b>{p.title}</b><br /><span className="amut sm">{p.category}{p.date ? ' · ' + p.date.slice(0, 10) : ''}</span></td>
+              <td className="ar"><button className="abtn ghost" disabled={busySlug === p.slug} onClick={() => editStatic(p.slug)}><Ic n="edit" s={15} /> {busySlug === p.slug ? 'Otváram…' : 'Upraviť'}</button></td>
+            </tr>
+          ))}
+          {statics.posts.length === 0 && <tr><td className="amut sm">Nič nenájdené.</td></tr>}
+        </tbody></table>
+        {statics.total > statics.posts.length && <p className="amut sm" style={{ marginTop: 10 }}>Zobrazených {statics.posts.length} z {statics.total} — použi hľadanie na zúženie.</p>}
+      </div>
+
+      {edit && <Editor initial={edit} images={[]} onSaved={() => { setEdit(null); reload() }} />}
     </>
   )
 }

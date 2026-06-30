@@ -147,7 +147,8 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }: { params: { slug: string } }) {
   const dbPosts = await getPublishedPosts()
-  const post = getPostBySlug(params.slug) || dbPosts.find(p => p.slug === params.slug)
+  // DB verzia (upravená v admine) má prednosť pred pôvodným statickým článkom
+  const post = dbPosts.find(p => p.slug === params.slug) || getPostBySlug(params.slug)
   if (!post) return { notFound: true }
 
   const allPosts = mergePosts(getAllPosts(), dbPosts)
