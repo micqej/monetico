@@ -30,7 +30,9 @@ export default function SEO({
   author,
 }: SEOProps) {
   const router = useRouter()
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Digitálna agentúra`
+  const fullTitle = title
+    ? (title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`)
+    : `${SITE_NAME} — Digitálna agentúra`
   const path = router.asPath ? router.asPath.split('?')[0] : '/'
   const resolvedCanonical = canonical || `${SITE_URL}${path === '/' ? '/' : path}`
   const robots = noindex ? 'noindex, nofollow' : 'index, follow'
