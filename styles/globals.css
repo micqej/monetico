@@ -334,14 +334,14 @@ img { max-width: 100%; height: auto; }
 .page-btn.active { background: var(--y); }
 
 /* ─── ARTICLE (blog post) ─── */
-.breadcrumb { max-width: 900px; margin: 110px auto 0; padding: 0 var(--side); font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.breadcrumb { max-width: var(--maxw); margin: 110px auto 0; padding: 0 var(--side); font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
 .breadcrumb a:hover { color: var(--purple); }
-.article-hero { max-width: 900px; margin: 24px auto 0; padding: 0 var(--side); }
+.article-hero { max-width: var(--maxw); margin: 24px auto 0; padding: 0 var(--side); }
 .article-cat-badge { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink); background: var(--y); border: 2px solid var(--ink); padding: 4px 12px; border-radius: 50px; display: inline-block; margin-bottom: 18px; }
 .article-title { font-family: var(--font-display); font-weight: 900; font-size: clamp(28px, 4vw, 50px); letter-spacing: -0.02em; line-height: 1.1; color: var(--ink); margin-bottom: 22px; }
 .article-meta, .meta-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
 .meta-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--faint); }
-.article-layout { max-width: 1280px; margin: 40px auto 0; padding: 0 var(--side); display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 48px; align-items: start; }
+.article-layout { max-width: var(--maxw); margin: 40px auto 0; padding: 0 var(--side); display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 48px; align-items: start; }
 .article-body {
   background: var(--white); border: 2px solid var(--ink); border-radius: var(--r); padding: 44px 48px; box-shadow: var(--sh);
   font-size: 16.5px; line-height: 1.8; color: var(--ink);
@@ -502,17 +502,19 @@ footer { margin-top: 24px; margin-bottom: 40px; }
 .sidebar-cta-box a:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--ink); }
 
 /* ─── COMMENTS ─── */
-.comments { max-width: 900px; margin: 56px auto 0; padding: 0 var(--side); }
-.comments-h { font-family: var(--font-display); font-weight: 900; font-size: clamp(24px, 3vw, 34px); letter-spacing: -1px; margin-bottom: 22px; }
+.comments { max-width: var(--maxw); margin: 72px auto 0; padding: 0 var(--side); }
+.comments-h { font-family: var(--font-display); font-weight: 900; font-size: clamp(24px, 3vw, 34px); letter-spacing: -1px; margin-bottom: 28px; }
 .comments-h span { color: var(--muted); font-weight: 700; }
-.comment-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
-.comment { background: var(--white); border: 2px solid var(--ink); border-radius: var(--r-sm); padding: 18px 22px; box-shadow: var(--sh); }
+.comment-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 40px; }
+.comment { background: var(--white); border: 2px solid var(--ink); border-radius: var(--r-sm); padding: 22px 26px; box-shadow: var(--sh); }
 .comment-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
 .comment-meta b { font-size: 14.5px; color: var(--ink); }
 .comment-meta span { font-family: var(--font-mono); font-size: 11px; color: var(--faint); }
 .comment p { font-size: 15px; line-height: 1.6; color: #2a2a28; white-space: pre-wrap; }
 .comments-empty { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
-.comment-form { background: var(--cream); border: 2px solid var(--ink); border-radius: var(--r); padding: 28px; box-shadow: var(--sh); }
+.comment-form { background: var(--cream); border: 2px solid var(--ink); border-radius: var(--r); padding: 36px 38px; box-shadow: var(--sh); max-width: 760px; }
+.comment-form h3 { margin-bottom: 20px; }
+.comment-form .cf-row, .comment-form .form-textarea { margin-bottom: 4px; }
 .comment-form h3 { font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: -.3px; margin-bottom: 16px; }
 .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 600px) { .cf-row { grid-template-columns: 1fr; } }

@@ -8,8 +8,12 @@ import { listPlan } from '../../../lib/plan'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!requireAdmin(req, res)) return
   try {
+    const safe = async <T>(p: Promise<T>, fb: T): Promise<T> => { try { return await p } catch { return fb } }
     const [articles, comments, subs, plan] = await Promise.all([
-      listArticles(), commentCounts(), listSubscribers(), listPlan(),
+      safe(listArticles(), [] as any[]),
+      safe(commentCounts(), { pending: 0, approved: 0, spam: 0 }),
+      safe(listSubscribers(), [] as any[]),
+      safe(listPlan(), [] as any[]),
     ])
     return res.status(200).json({
       articles: {
