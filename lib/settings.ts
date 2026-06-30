@@ -41,7 +41,9 @@ export async function getSettings(): Promise<AutopilotSettings> {
     await ensureSchema()
     const rows = await sql`SELECT value FROM settings WHERE key = ${KEY} LIMIT 1`
     if (!rows[0]) return DEFAULT_SETTINGS
-    return { ...DEFAULT_SETTINGS, ...(rows[0].value as object) }
+    const v: any = rows[0].value
+    const obj = typeof v === 'string' ? JSON.parse(v) : v
+    return { ...DEFAULT_SETTINGS, ...obj }
   } catch {
     return DEFAULT_SETTINGS
   }
@@ -52,8 +54,7 @@ export async function saveSettings(patch: Partial<AutopilotSettings>): Promise<A
   if (!sql) throw new Error('DB not configured')
   await ensureSchema()
   const next = { ...(await getSettings()), ...patch }
-  const value = JSON.stringify(next)
-  await sql`INSERT INTO settings (key, value) VALUES (${KEY}, ${value}::jsonb)
-    ON CONFLICT (key) DO UPDATE SET value = ${value}::jsonb`
+  await sql`INSERT INTO settings (key, value) VALUES (${KEY}, ${sql.json(next as any)})
+    ON CONFLICT (key) DO UPDATE SET value = ${sql.json(next as any)}`
   return next
 }

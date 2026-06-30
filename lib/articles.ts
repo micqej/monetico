@@ -94,14 +94,14 @@ export async function createArticle(a: Partial<Article>): Promise<Article> {
   await ensureSchema()
   const base = slugify(a.slug || a.title || 'clanok')
   const slug = await uniqueSlug(base)
-  const tags = JSON.stringify(a.tags || [])
+  const tags = a.tags || []
   const rows = await sql`INSERT INTO articles
     (slug, title, content, excerpt, meta_title, meta_desc, meta_keywords, og_title, og_desc,
      category, tags, image_url, image_credit, author, status, publish_at, reading_time, source)
     VALUES (${slug}, ${a.title || ''}, ${a.content || ''}, ${a.excerpt || ''},
      ${a.meta_title || a.title || ''}, ${a.meta_desc || ''}, ${a.meta_keywords || ''},
      ${a.og_title || a.title || ''}, ${a.og_desc || a.meta_desc || ''},
-     ${a.category || 'Marketing'}, ${tags}::jsonb, ${a.image_url || ''}, ${a.image_credit || ''},
+     ${a.category || 'Marketing'}, ${sql.json(tags as any)}, ${a.image_url || ''}, ${a.image_credit || ''},
      ${a.author || 'Monetico'}, ${a.status || 'draft'}, ${a.publish_at || null},
      ${a.reading_time || readingTime(a.content || '')}, ${a.source || 'manual'})
     RETURNING *`
@@ -118,12 +118,12 @@ export async function updateArticle(id: number, a: Partial<Article>): Promise<Ar
     ? await uniqueSlug(slugify(a.slug), id)
     : current.slug
   const merged = { ...current, ...a, slug }
-  const tags = JSON.stringify(merged.tags || [])
+  const tags = merged.tags || []
   const rows = await sql`UPDATE articles SET
     slug = ${merged.slug}, title = ${merged.title}, content = ${merged.content},
     excerpt = ${merged.excerpt}, meta_title = ${merged.meta_title}, meta_desc = ${merged.meta_desc},
     meta_keywords = ${merged.meta_keywords}, og_title = ${merged.og_title}, og_desc = ${merged.og_desc},
-    category = ${merged.category}, tags = ${tags}::jsonb, image_url = ${merged.image_url},
+    category = ${merged.category}, tags = ${sql.json(tags as any)}, image_url = ${merged.image_url},
     image_credit = ${merged.image_credit}, author = ${merged.author}, status = ${merged.status},
     publish_at = ${merged.publish_at}, reading_time = ${merged.reading_time}, updated_at = now()
     WHERE id = ${id} RETURNING *`
