@@ -17,7 +17,15 @@ export function getSql(): Sql | null {
     process.env.POSTGRES_PRISMA_URL ||
     process.env.DATABASE_URL_UNPOOLED
   _sql = url
-    ? postgres(url, { prepare: false, ssl: 'require', idle_timeout: 20, max: 3 })
+    ? postgres(url, {
+        prepare: false,        // povinné pre Supabase transaction pooler (pgbouncer)
+        ssl: 'require',
+        max: 1,                // serverless: 1 spojenie na inštanciu (inak leakujú a saturujú pooler → 504)
+        idle_timeout: 10,      // rýchlo zavri nečinné spojenia
+        connect_timeout: 10,   // nezasekni sa na 300 s keď je pooler plný — zlyhaj rýchlo
+        max_lifetime: 60 * 5,  // recykluj spojenia, nech sa nehromadia staré
+        fetch_types: false,    // o jeden round-trip menej pri cold-starte
+      })
     : null
   return _sql
 }
