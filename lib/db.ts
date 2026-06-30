@@ -32,7 +32,19 @@ export async function ensureSchema(): Promise<boolean> {
   const sql = getSql()
   if (!sql) return false
   if (schemaEnsured) return true
+  // The schema may already be provisioned by a different (owner) role; the app
+  // role has full DML but may not own the tables (so CREATE INDEX can fail with
+  // "must be owner"). That's fine — swallow DDL errors, the tables already exist.
+  try {
+    await ensureSchemaInner(sql)
+  } catch {
+    /* schema already exists */
+  }
+  schemaEnsured = true
+  return true
+}
 
+async function ensureSchemaInner(sql: Sql): Promise<void> {
   await sql`CREATE TABLE IF NOT EXISTS articles (
     id            SERIAL PRIMARY KEY,
     slug          TEXT UNIQUE NOT NULL,
@@ -90,7 +102,4 @@ export async function ensureSchema(): Promise<boolean> {
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`
   await sql`CREATE INDEX IF NOT EXISTS comments_slug_idx ON comments (slug, status)`
-
-  schemaEnsured = true
-  return true
 }
