@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { requireAdmin } from '../../../lib/adminAuth'
-import { suggestTopics, aiReady } from '../../../lib/aiContent'
+import { planTopics, aiReady } from '../../../lib/aiContent'
 import { getSettings } from '../../../lib/settings'
-import { listPlan, addPlan } from '../../../lib/plan'
+import { listPlan, addPlan, lastPendingDate } from '../../../lib/plan'
 import { listArticles } from '../../../lib/articles'
 import { getAllPosts } from '../../../lib/posts'
 import { quotaMessage } from '../../../lib/quota'
@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ...getAllPosts().slice(0, 40).map(p => p.title),
     ]
 
-    const topics = await suggestTopics(count, {
+    const topics = await planTopics(count, {
       category,
       model: s.model,
       avoid,
@@ -63,17 +63,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
     if (!topics.length) return res.status(502).json({ error: 'AI nevrátila žiadne témy, skús znova.' })
 
-    // rozlož po dňoch (jedna téma / deň, od zajtra) o nastavenej hodine v ČASE SLOVENSKA
+    // rozlož po dňoch (jedna téma / deň) o nastavenej hodine v ČASE SLOVENSKA;
+    // POKRAČUJ za poslednou už naplánovanou položkou (žiadne dve na ten istý deň)
     const hour = s.publishHour ?? 9
+    const now = new Date()
+    const last = schedule ? await lastPendingDate() : null
+    const startBase = last && last.getTime() > now.getTime() ? last : now
     const created = []
     for (let i = 0; i < topics.length; i++) {
       let when: string | null = null
       if (schedule) {
-        const base = new Date()
+        const base = new Date(startBase)
         base.setUTCDate(base.getUTCDate() + i + 1)
         when = skLocalISO(base, hour)
       }
-      created.push(await addPlan(topics[i], category || s.defaultCategory, when))
+      created.push(await addPlan(topics[i].title, topics[i].category, when, { keywords: topics[i].keywords }))
     }
     return res.status(200).json({ added: created.length, plan: created })
   } catch (e: any) {

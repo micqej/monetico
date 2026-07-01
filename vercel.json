@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
   "crons": [
-    { "path": "/api/cron/autopilot", "schedule": "0 9 * * *" }
+    { "path": "/api/cron/autopilot", "schedule": "0 * * * *" }
   ]
 }

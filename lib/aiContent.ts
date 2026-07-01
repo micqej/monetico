@@ -1,6 +1,7 @@
 import OpenAI from 'openai'
 import { resolveSecret } from './siteSettings'
 import { sentenceCaseSk } from './text'
+import { CATEGORIES } from './categories'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
@@ -61,6 +62,60 @@ export async function suggestTopics(
   }
 }
 
+export interface PlannedTopic { title: string; category: string; keywords: string }
+
+/**
+ * Bohatší návrh do plánu: pre každý článok vráti názov + KATEGÓRIU + SEO kľúčové
+ * slová. Keď je `category` zadaná, použije ju pre všetky; keď nie (mix), AI vyberie
+ * vhodnú kategóriu z povoleného zoznamu pre každý článok zvlášť.
+ */
+export async function planTopics(
+  count: number,
+  opts: { category?: string; model?: string; avoid?: string[]; businessContext?: string; maxWords?: number } = {}
+): Promise<PlannedTopic[]> {
+  const { category, model = 'gpt-4o-mini', avoid = [], businessContext = '', maxWords = 8 } = opts
+  const res = await (await client()).chat.completions.create({
+    model,
+    temperature: 0.9,
+    response_format: { type: 'json_object' },
+    messages: [
+      { role: 'system', content: STRATEG_SYSTEM },
+      {
+        role: 'user',
+        content: [
+          businessContext ? `O firme: ${businessContext}` : '',
+          `Navrhni ${count} konkrétnych, navzájom rozdielnych blogových článkov.`,
+          category
+            ? `Všetky do kategórie "${category}".`
+            : `Ku každému priraď najvhodnejšiu kategóriu PRESNE z tohto zoznamu (rôzne, nie stále tú istú): ${CATEGORIES.join(', ')}.`,
+          'Témy musia priamo súvisieť so službami firmy a riešiť reálne problémy jej cieľovej skupiny.',
+          'Miešaj how-to návody, trendy, časté chyby, porovnania a praktické checklisty.',
+          `Názvy v BEŽNOM SLOVENSKOM PRAVOPISE (veľké písmeno len na začiatku a vo vlastných menách), max ${maxWords} slov.`,
+          `Aktuálny rok je ${CURRENT_YEAR}. Ak spomenieš rok, použi ${CURRENT_YEAR}.`,
+          'Ku každému pridaj 3–5 SEO kľúčových slov (na aké výrazy má článok cieliť).',
+          avoid.length ? 'Vyhni sa týmto názvom: ' + avoid.slice(0, 60).join('; ') : '',
+          'Vráť JSON: { "items": [ { "title": "...", "category": "...", "keywords": "slovo1, slovo2, slovo3" } ] }.',
+        ].filter(Boolean).join('\n'),
+      },
+    ],
+  })
+  try {
+    const j = JSON.parse(res.choices[0]?.message?.content || '{}')
+    const arr: any[] = Array.isArray(j.items) ? j.items : []
+    const valid = new Set(CATEGORIES)
+    return arr.slice(0, count).map(it => {
+      const cat = category || (valid.has(it.category) ? it.category : CATEGORIES[0])
+      return {
+        title: sentenceCaseSk(String(it.title || '').trim().replace(/^["'\d.\s-]+/, '').slice(0, 140)),
+        category: cat,
+        keywords: String(it.keywords || '').trim().slice(0, 200),
+      }
+    }).filter(t => t.title)
+  } catch {
+    return []
+  }
+}
+
 export interface GeneratedArticle {
   title: string
   content: string // HTML body (h2/h3/p/ul/strong) — bez <h1>
@@ -88,6 +143,7 @@ export interface GenerateOpts {
   linkCount?: number
   maxTitleWords?: number
   style?: string
+  keywords?: string   // cieľové SEO kľúčové slová (z plánu) — zapracovať prirodzene
 }
 
 export async function generateArticle(opts: GenerateOpts): Promise<GeneratedArticle> {
@@ -103,6 +159,7 @@ export async function generateArticle(opts: GenerateOpts): Promise<GeneratedArti
     linkCount = 0,
     maxTitleWords = 8,
     style = '',
+    keywords = '',
   } = opts
 
   const linkPool = links.slice(0, 24)
@@ -124,6 +181,7 @@ export async function generateArticle(opts: GenerateOpts): Promise<GeneratedArti
     `Napíš SEO článok na tému: "${topic}".`,
     `Kategória: ${category}.`,
     `Cieľová dĺžka: približne ${wordCount} slov.`,
+    keywords ? `Cieľové SEO kľúčové slová (zapracuj ich prirodzene do textu aj do meta_keywords): ${keywords}.` : '',
     'Štruktúra: úvod (1–2 odseky), 3–6 sekcií s <h2> nadpismi, kde sa hodí aj zoznam <ul>, a krátky záver s jemnou výzvou na akciu.',
     `Názov (title) píš v bežnom slovenskom pravopise (veľké len prvé slovo + vlastné mená, NIE každé slovo), max ${maxTitleWords} slov.`,
     wantLinks > 0

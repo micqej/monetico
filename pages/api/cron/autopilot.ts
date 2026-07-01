@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { runAutopilot } from '../../../lib/autopilot'
+import { runAutopilotBatch } from '../../../lib/autopilot'
 
 export const config = { maxDuration: 60 }
 
@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Neautorizované' })
   }
   try {
-    const result = await runAutopilot(false)
+    const result = await runAutopilotBatch(5, false)
     return res.status(200).json(result)
   } catch (e: any) {
     return res.status(500).json({ ok: false, error: e.message || 'Chyba' })

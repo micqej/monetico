@@ -397,19 +397,27 @@ function Articles() {
   )
 }
 
+function toLocalInput(iso: string | null): string {
+  if (!iso) return ''
+  const d = new Date(iso); const p = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`
+}
+
 function Plan() {
   const [list, setList] = useState<any[]>([])
   const [topic, setTopic] = useState('')
   const [cat, setCat] = useState('Marketing Tipy')
   const [when, setWhen] = useState('')
-  const load = useCallback(async () => setList((await api('/api/admin/plan')).plan), [])
-  useEffect(() => { load() }, [load])
   const [count, setCount] = useState(14)
   const [scat, setScat] = useState('')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
+  const [edit, setEdit] = useState<any>(null)
+  const [genId, setGenId] = useState(0)
+  const load = useCallback(async () => setList((await api('/api/admin/plan')).plan), [])
+  useEffect(() => { load() }, [load])
   async function add() { if (!topic) return; await api('/api/admin/plan', { method: 'POST', body: JSON.stringify({ topic, category: cat, scheduled_for: when || null }) }); setTopic(''); setWhen(''); load() }
-  async function del(id: number) { await api(`/api/admin/plan/${id}`, { method: 'DELETE' }); load() }
+  async function del(id: number) { if (!confirm('Zmazať tému z plánu?')) return; await api(`/api/admin/plan/${id}`, { method: 'DELETE' }); load() }
   async function suggest() {
     setBusy(true); setMsg('')
     try {
@@ -418,38 +426,78 @@ function Plan() {
     } catch (e: any) { setMsg(e.message) }
     setBusy(false)
   }
+  function startEdit(p: any) { setEdit({ id: p.id, topic: p.topic, category: p.category, keywords: p.keywords || '', word_count: p.word_count || '', scheduled_for: toLocalInput(p.scheduled_for) }) }
+  async function saveEdit() {
+    await api(`/api/admin/plan/${edit.id}`, {
+      method: 'PUT', body: JSON.stringify({
+        topic: edit.topic, category: edit.category, keywords: edit.keywords,
+        word_count: edit.word_count || null,
+        scheduled_for: edit.scheduled_for ? new Date(edit.scheduled_for).toISOString() : null,
+      }),
+    }); setEdit(null); load()
+  }
+  async function genNow(id: number) {
+    setGenId(id); setMsg('')
+    try { const r = await api(`/api/admin/plan/${id}`, { method: 'POST', body: JSON.stringify({ action: 'generate' }) }); setMsg(r.created ? `Vygenerované — článok "${r.created}" je v Články.` : 'Hotovo'); load() }
+    catch (e: any) { setMsg(e.message) }
+    setGenId(0)
+  }
   return (
     <>
       <div className="acard">
         <h3>1 · Navrhnúť témy automaticky</h3>
-        <p className="amut sm">AI navrhne názvy článkov podľa toho, čím sa firma zaoberá (Nastavenia → Čím sa zaoberáte), rozloží ich po dňoch a autopilot z nich potom postupne píše texty.</p>
+        <p className="amut sm">AI navrhne názvy článkov podľa toho, čím sa firma zaoberá (Nastavenia → Čím sa zaoberáte), ku každému priradí kategóriu a SEO kľúčové slová a rozloží ich po dňoch. Autopilot z nich potom postupne píše texty (alebo klikni „Generovať teraz").</p>
         <div className="agrid3">
           <div><label className="alab">Koľko tém</label><input className="ain" type="number" min={1} max={50} value={count} onChange={e => setCount(+e.target.value)} /></div>
-          <div><label className="alab">Kategória (voliteľné)</label><select className="ain" value={scat} onChange={e => setScat(e.target.value)}><option value="">Mix / náhodne</option>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></div>
+          <div><label className="alab">Kategória</label><select className="ain" value={scat} onChange={e => setScat(e.target.value)}><option value="">Mix / náhodne</option>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></div>
           <div style={{ display: 'flex', alignItems: 'flex-end' }}><button className="abtn full" onClick={suggest} disabled={busy}><Ic n="generate" s={15} /> {busy ? 'Generujem…' : 'Navrhnúť témy'}</button></div>
         </div>
         {msg && <p className="amut sm" style={{ marginTop: 8 }}>{msg}</p>}
       </div>
-    <div className="acard">
-      <h3>2 · Plán obsahu ({list.length})</h3>
-      <p className="amut sm">Témy čakajúce na spracovanie. Môžeš pridať aj vlastnú. Dátum je voliteľný — autopilot ich spracúva postupne.</p>
-      <div className="agrid3">
-        <input className="ain" placeholder="Vlastná téma" value={topic} onChange={e => setTopic(e.target.value)} />
-        <select className="ain" value={cat} onChange={e => setCat(e.target.value)}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select>
-        <input className="ain" type="datetime-local" value={when} onChange={e => setWhen(e.target.value)} />
+      <div className="acard">
+        <h3>2 · Plán obsahu ({list.length})</h3>
+        <p className="amut sm">Vlastnú tému pridáš nižšie. Klikni na ikonu ceruzky pri riadku a upravíš názov, dátum, kategóriu, počet slov aj kľúčové slová. „Generovať teraz" spustí článok okamžite.</p>
+        <div className="agrid3">
+          <input className="ain" placeholder="Vlastná téma" value={topic} onChange={e => setTopic(e.target.value)} />
+          <select className="ain" value={cat} onChange={e => setCat(e.target.value)}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select>
+          <input className="ain" type="datetime-local" value={when} onChange={e => setWhen(e.target.value)} />
+        </div>
+        <button className="abtn" onClick={add} disabled={!topic}><Ic n="plus" s={15} /> Pridať</button>
+        <table className="atab2 mt plan-tab"><thead><tr>
+          <th>Téma / kľúčové slová</th><th>Kategória</th><th>Dátum</th><th>Slov</th><th>Stav</th><th className="ar">Akcie</th>
+        </tr></thead><tbody>
+          {list.map(p => edit?.id === p.id ? (
+            <tr key={p.id} className="pedit">
+              <td>
+                <input className="ain" value={edit.topic} onChange={e => setEdit({ ...edit, topic: e.target.value })} />
+                <input className="ain" style={{ marginBottom: 0 }} placeholder="kľúčové slová (čiarka)" value={edit.keywords} onChange={e => setEdit({ ...edit, keywords: e.target.value })} />
+              </td>
+              <td><select className="ain" style={{ marginBottom: 0 }} value={edit.category} onChange={e => setEdit({ ...edit, category: e.target.value })}>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select></td>
+              <td><input className="ain" style={{ marginBottom: 0 }} type="datetime-local" value={edit.scheduled_for} onChange={e => setEdit({ ...edit, scheduled_for: e.target.value })} /></td>
+              <td><input className="ain" style={{ marginBottom: 0, width: 78 }} type="number" placeholder="auto" value={edit.word_count} onChange={e => setEdit({ ...edit, word_count: e.target.value })} /></td>
+              <td><span className={`apill ${p.status === 'done' ? 'good' : 'bad'}`}>{p.status}</span></td>
+              <td className="ar" style={{ whiteSpace: 'nowrap' }}>
+                <button className="icbtn" title="Uložiť" onClick={saveEdit}><Ic n="check" s={16} /></button>
+                <button className="icbtn" title="Zrušiť" onClick={() => setEdit(null)}><Ic n="x" s={16} /></button>
+              </td>
+            </tr>
+          ) : (
+            <tr key={p.id}>
+              <td><b>{sentenceCaseSk(p.topic)}</b>{p.keywords && <><br /><span className="amut sm">SEO: {p.keywords}</span></>}</td>
+              <td><span className="apill">{p.category}</span></td>
+              <td className="amut sm">{p.scheduled_for ? new Date(p.scheduled_for).toLocaleString('sk-SK', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+              <td className="amut sm">{p.word_count || '—'}</td>
+              <td><span className={`apill ${p.status === 'done' ? 'good' : p.status === 'error' ? 'bad' : ''}`}>{p.status}</span></td>
+              <td className="ar" style={{ whiteSpace: 'nowrap' }}>
+                {p.status !== 'done' && <button className="abtn ghost sm" disabled={genId === p.id} onClick={() => genNow(p.id)}><Ic n="play" s={13} /> {genId === p.id ? '…' : 'Teraz'}</button>}
+                <button className="icbtn" title="Upraviť" onClick={() => startEdit(p)}><Ic n="edit" s={16} /></button>
+                <button className="icbtn" title="Zmazať" onClick={() => del(p.id)}><Ic n="trash" s={16} /></button>
+              </td>
+            </tr>
+          ))}
+          {list.length === 0 && <tr><td className="amut sm" colSpan={6}>Plán je prázdny — navrhni témy vyššie, alebo si autopilot tému navrhne sám.</td></tr>}
+        </tbody></table>
       </div>
-      <button className="abtn" onClick={add} disabled={!topic}><Ic n="plus" s={15} /> Pridať</button>
-      <table className="atab2 mt"><tbody>
-        {list.map(p => (
-          <tr key={p.id}>
-            <td><b>{sentenceCaseSk(p.topic)}</b><br /><span className="amut sm">{p.category}{p.scheduled_for ? ' · ' + new Date(p.scheduled_for).toLocaleString('sk-SK') : ''}</span></td>
-            <td><span className={`apill ${p.status === 'done' ? 'good' : 'bad'}`}>{p.status}</span></td>
-            <td className="ar"><button className="icbtn" onClick={() => del(p.id)}><Ic n="trash" s={16} /></button></td>
-          </tr>
-        ))}
-        {list.length === 0 && <tr><td className="amut sm">Plán je prázdny — navrhni témy vyššie, alebo si autopilot tému navrhne sám.</td></tr>}
-      </tbody></table>
-    </div>
     </>
   )
 }
@@ -647,7 +695,7 @@ body{margin:0;background:var(--bg);font-family:'Inter',-apple-system,sans-serif;
 .anav-i.on{background:var(--acc-sft);color:var(--acc);font-weight:600}
 .anav-badge{background:#dc2626;color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:50px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
 .anav-i.out{color:var(--mut);margin-top:8px}
-.amain{flex:1;padding:26px 30px;max-width:960px}
+.amain{flex:1;padding:26px 30px;max-width:1180px}
 .ahd{font-size:22px;font-weight:700;margin:0 0 18px;letter-spacing:-.4px}
 .acard{background:var(--card);border:1px solid var(--bd);border-radius:13px;padding:22px;margin-bottom:16px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
 .acard h3{font-size:15px;font-weight:700;margin:0 0 14px}
@@ -711,4 +759,9 @@ body{margin:0;background:var(--bg);font-family:'Inter',-apple-system,sans-serif;
 .amodal-top b{font-size:15px;font-weight:700}
 .amodal-body{padding:18px 20px}
 .amodal-body .acard{margin-bottom:0;border:0;box-shadow:none;padding:0;background:none}
+.plan-tab thead th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);text-align:left;padding:6px 6px;border-bottom:1px solid var(--bd);font-weight:600}
+.plan-tab td{vertical-align:top}
+.plan-tab tr.pedit td{background:var(--acc-sft)}
+.plan-tab tr.pedit .ain{margin-bottom:6px}
+.abtn.sm{padding:6px 10px;font-size:12px;margin-right:4px}
 `
