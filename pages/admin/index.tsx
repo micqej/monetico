@@ -12,6 +12,11 @@ const TABS: { id: string; icon: string }[] = [
   { id: 'Komentáre', icon: 'comment' }, { id: 'Newsletter', icon: 'mail' },
   { id: 'Nastavenia', icon: 'settings' }, { id: 'Integrácie', icon: 'plug' },
 ]
+// pekné ascii slugy do URL hashu (žiadne #Pl%C3%A1n)
+const TAB_SLUG: Record<string, string> = {
+  'Prehľad': 'prehlad', 'Generovať': 'generovat', 'Články': 'clanky', 'Plán': 'plan',
+  'Komentáre': 'komentare', 'Newsletter': 'newsletter', 'Nastavenia': 'nastavenia', 'Integrácie': 'integracie',
+}
 
 /* ── SVG ikony (feather) ── */
 function Ic({ n, s = 18 }: { n: string; s?: number }) {
@@ -65,13 +70,14 @@ export default function Admin() {
   const [tab, setTabState] = useState('Prehľad')
   const setTab = useCallback((id: string) => {
     setTabState(id)
-    if (typeof window !== 'undefined') window.location.hash = encodeURIComponent(id)
+    if (typeof window !== 'undefined') window.location.hash = (TAB_SLUG[id] || id)
   }, [])
 
-  // po refreshi ostaň na rovnakej záložke (z URL hashu)
+  // po refreshi ostaň na rovnakej záložke (pekný ascii slug v URL)
   useEffect(() => {
-    const h = decodeURIComponent((window.location.hash || '').replace(/^#/, ''))
-    if (h && TABS.some(t => t.id === h)) setTabState(h)
+    const h = (window.location.hash || '').replace(/^#/, '')
+    const byId = TABS.find(t => TAB_SLUG[t.id] === h || t.id === decodeURIComponent(h))
+    if (byId) setTabState(byId.id)
   }, [])
 
   const refresh = useCallback(async () => setSess(await api('/api/admin/session')), [])
@@ -152,11 +158,12 @@ function Overview({ sess }: { sess: Session }) {
     setBusy(false)
   }
   const fmtDate = (d: string) => { try { return new Date(d).toLocaleDateString('sk-SK') } catch { return '' } }
-  const missing = [!sess.ai && 'OpenAI', !sess.pexels && 'Pexels', !sess.pixabay && 'Pixabay'].filter(Boolean)
+  // Upozorni len na skutočne blokujúce: OpenAI (bez neho sa nič negeneruje) a fotky len ak chýbajú OBA zdroje.
+  const blocking = [!sess.ai && 'OpenAI kľúč', (!sess.pexels && !sess.pixabay) && 'kľúč na fotky (Pexels/Pixabay)'].filter(Boolean)
   return (
     <>
-      {missing.length > 0 && (
-        <div className="awarn"><Ic n="warn" s={15} /> Chýbajú kľúče: {missing.join(', ')}. Doplň ich v <b>Integrácie</b>, inak generovanie/fotky nepôjdu.</div>
+      {blocking.length > 0 && (
+        <div className="awarn"><Ic n="warn" s={15} /> Chýba: {blocking.join(' a ')}. Doplň v <b>Integrácie</b>.</div>
       )}
       <div className="stat-row" style={{ marginBottom: 16 }}>
         <div className="stat-box2"><b>{stats ? stats.articles.published : '—'}</b><span>publikovaných článkov</span></div>
