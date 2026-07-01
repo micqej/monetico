@@ -8,13 +8,13 @@ type ImageR = { url: string; thumb: string; credit: string; source: string }
 const CATEGORIES = ['Marketing Tipy', 'Podnikanie', 'O eshopoch', 'Ako na to', 'Analýza', 'Email', 'SEO', 'WordPress', 'O weboch', 'Sociálne siete']
 const TABS: { id: string; icon: string }[] = [
   { id: 'Prehľad', icon: 'overview' }, { id: 'Generovať', icon: 'generate' },
-  { id: 'Články', icon: 'articles' }, { id: 'Plán', icon: 'plan' },
+  { id: 'Správy', icon: 'inbox' }, { id: 'Články', icon: 'articles' }, { id: 'Plán', icon: 'plan' },
   { id: 'Komentáre', icon: 'comment' }, { id: 'Newsletter', icon: 'mail' },
   { id: 'Nastavenia', icon: 'settings' }, { id: 'Integrácie', icon: 'plug' },
 ]
 // pekné ascii slugy do URL hashu (žiadne #Pl%C3%A1n)
 const TAB_SLUG: Record<string, string> = {
-  'Prehľad': 'prehlad', 'Generovať': 'generovat', 'Články': 'clanky', 'Plán': 'plan',
+  'Prehľad': 'prehlad', 'Generovať': 'generovat', 'Správy': 'spravy', 'Články': 'clanky', 'Plán': 'plan',
   'Komentáre': 'komentare', 'Newsletter': 'newsletter', 'Nastavenia': 'nastavenia', 'Integrácie': 'integracie',
 }
 
@@ -47,6 +47,9 @@ function Ic({ n, s = 18 }: { n: string; s?: number }) {
     h2: <><path d="M4 12h8M4 18V6M12 18V6" /><path d="M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1" /></>,
     link: <><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" /></>,
     list: <><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></>,
+    inbox: <><polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></>,
+    bell: <><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></>,
+    phone: <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />,
   }
   return <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">{c[n]}</svg>
 }
@@ -83,10 +86,11 @@ export default function Admin() {
   const refresh = useCallback(async () => setSess(await api('/api/admin/session')), [])
   useEffect(() => { refresh() }, [refresh])
 
-  // počet čakajúcich komentárov pre odznak v menu
+  // počty pre odznaky v menu (komentáre + nové správy)
   const [pendingC, setPendingC] = useState(0)
+  const [unreadM, setUnreadM] = useState(0)
   const loadPending = useCallback(() => {
-    api('/api/admin/stats').then(d => setPendingC(d?.comments?.pending || 0)).catch(() => {})
+    api('/api/admin/stats').then(d => { setPendingC(d?.comments?.pending || 0); setUnreadM(d?.messagesUnread || 0) }).catch(() => {})
   }, [])
   useEffect(() => { if (sess?.authed) loadPending() }, [sess?.authed, tab, loadPending])
 
@@ -99,7 +103,16 @@ export default function Admin() {
 
   return (
     <>
-      <Head><title>Admin — Monetico</title><meta name="robots" content="noindex, nofollow" /></Head>
+      <Head>
+        <title>Admin — Monetico</title>
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#6b21d9" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Monetico" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </Head>
       <style>{css}</style>
 
       {!sess ? <div className="aload">Načítavam…</div> : !sess.authed ? (
@@ -123,6 +136,7 @@ export default function Admin() {
                 <button key={t.id} className={`anav-i${tab === t.id ? ' on' : ''}`} onClick={() => setTab(t.id)}>
                   <Ic n={t.icon} /> <span style={{ flex: 1 }}>{t.id}</span>
                   {t.id === 'Komentáre' && pendingC > 0 && <span className="anav-badge">{pendingC}</span>}
+                  {t.id === 'Správy' && unreadM > 0 && <span className="anav-badge">{unreadM}</span>}
                 </button>
               ))}
             </nav>
@@ -131,6 +145,7 @@ export default function Admin() {
           <main className="amain">
             <h2 className="ahd">{tab}</h2>
             {tab === 'Prehľad' && <Overview sess={sess} />}
+            {tab === 'Správy' && <Messages onChange={loadPending} />}
             {tab === 'Generovať' && <Generate sess={sess} />}
             {tab === 'Články' && <Articles />}
             {tab === 'Plán' && <Plan />}
@@ -524,6 +539,97 @@ function Newsletter() {
   )
 }
 
+function urlB64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const raw = atob(base64)
+  const arr = new Uint8Array(raw.length)
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
+  return arr
+}
+
+function Messages({ onChange }: { onChange: () => void }) {
+  const [list, setList] = useState<any[]>([])
+  const [pushMsg, setPushMsg] = useState('')
+  const [pushOn, setPushOn] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const load = useCallback(async () => setList((await api('/api/admin/messages')).messages || []), [])
+  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window) {
+      navigator.serviceWorker.getRegistration().then(r => r?.pushManager.getSubscription().then(s => setPushOn(!!s))).catch(() => {})
+    }
+  }, [])
+  async function toggleRead(m: any) {
+    await api(`/api/admin/messages/${m.id}`, { method: 'PUT', body: JSON.stringify({ status: m.status === 'new' ? 'read' : 'new' }) })
+    load(); onChange()
+  }
+  async function del(id: number) { if (!confirm('Zmazať správu?')) return; await api(`/api/admin/messages/${id}`, { method: 'DELETE' }); load(); onChange() }
+  async function enablePush() {
+    setPushMsg(''); setBusy(true)
+    try {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+        setPushMsg('Toto zariadenie/prehliadač zatiaľ nepodporuje notifikácie. Na iPhone najprv pridaj appku na plochu (Zdieľať → Pridať na plochu) a otvor ju odtiaľ.')
+        setBusy(false); return
+      }
+      const perm = await Notification.requestPermission()
+      if (perm !== 'granted') { setPushMsg('Notifikácie neboli povolené v prehliadači.'); setBusy(false); return }
+      const reg = await navigator.serviceWorker.register('/sw.js')
+      await navigator.serviceWorker.ready
+      const { publicKey } = await api('/api/admin/push')
+      if (!publicKey) { setPushMsg('Chýba VAPID kľúč na serveri.'); setBusy(false); return }
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(publicKey) })
+      await api('/api/admin/push', { method: 'POST', body: JSON.stringify({ action: 'subscribe', subscription: sub.toJSON() }) })
+      setPushOn(true); setPushMsg('Notifikácie zapnuté. Toto zariadenie dostane upozornenie pri novej správe.')
+    } catch (e: any) { setPushMsg('Nepodarilo sa zapnúť: ' + (e.message || e)) }
+    setBusy(false)
+  }
+  async function testPush() {
+    setPushMsg('')
+    try { const r = await api('/api/admin/push', { method: 'POST', body: JSON.stringify({ action: 'test' }) }); setPushMsg(`Testovacia notifikácia poslaná na ${r.sent} zariadenie(í).`) }
+    catch (e: any) { setPushMsg(e.message) }
+  }
+  const fmt = (d: string) => { try { return new Date(d).toLocaleString('sk-SK', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) } catch { return '' } }
+  return (
+    <>
+      <div className="acard">
+        <h3>Notifikácie na telefón</h3>
+        <p className="amut sm">Zapni upozornenia a dostaneš push priamo na tento telefón pri každej novej správe — tak ako pri appke 365 citátov. <b>iPhone:</b> najprv otvor <code>monetico.sk/admin</code> v Safari → Zdieľať → <b>Pridať na plochu</b>, potom appku otvor z plochy a klikni sem.</p>
+        <div className="arow wrap">
+          <button className="abtn" onClick={enablePush} disabled={busy}><Ic n="bell" s={15} /> {pushOn ? 'Notifikácie sú zapnuté' : (busy ? 'Zapínam…' : 'Zapnúť notifikácie')}</button>
+          {pushOn && <button className="abtn ghost" onClick={testPush}>Poslať test</button>}
+          {pushMsg && <span className="amut sm">{pushMsg}</span>}
+        </div>
+      </div>
+      <div className="acard">
+        <h3>Správy z kontaktu ({list.length})</h3>
+        <table className="atab2"><tbody>
+          {list.map(m => (
+            <tr key={m.id} style={m.status === 'new' ? { background: 'var(--acc-sft)' } : undefined}>
+              <td>
+                <b>{m.name || 'Bez mena'}</b>{m.status === 'new' && <span className="apill" style={{ marginLeft: 8, background: 'var(--acc)', color: '#fff' }}>nová</span>}
+                <br />
+                <span className="amut sm">
+                  {m.email && <a href={`mailto:${m.email}`} style={{ color: 'var(--acc)' }}>{m.email}</a>}
+                  {m.phone && <> · <a href={`tel:${m.phone}`} style={{ color: 'var(--acc)' }}>{m.phone}</a></>}
+                  {' · '}{fmt(m.created_at)}
+                </span>
+                {m.services?.length > 0 && <div className="amut sm" style={{ marginTop: 4 }}>Záujem: {m.services.join(', ')}</div>}
+                {m.message && <div style={{ marginTop: 6, fontSize: 14, whiteSpace: 'pre-wrap' }}>{m.message}</div>}
+              </td>
+              <td className="ar" style={{ whiteSpace: 'nowrap' }}>
+                <button className="icbtn" title={m.status === 'new' ? 'Označiť ako prečítané' : 'Označiť ako nové'} onClick={() => toggleRead(m)}><Ic n={m.status === 'new' ? 'check' : 'eye'} s={16} /></button>
+                <button className="icbtn" title="Zmazať" onClick={() => del(m.id)}><Ic n="trash" s={16} /></button>
+              </td>
+            </tr>
+          ))}
+          {list.length === 0 && <tr><td className="amut sm">Zatiaľ žiadne správy z kontaktného formulára.</td></tr>}
+        </tbody></table>
+      </div>
+    </>
+  )
+}
+
 function Settings() {
   const [s, setS] = useState<any>(null)
   const [msg, setMsg] = useState('')
@@ -677,6 +783,16 @@ function Integrations() {
           <button className="abtn ghost" type="button" onClick={resendHook} disabled={hookBusy}>Poslať všetkých existujúcich</button>
           {hook && <span className="amut sm">{hook}</span>}
         </div>
+      </div>
+      <div className="acard">
+        <h3>E-mailové upozornenia (nové správy z kontaktu)</h3>
+        <p className="amut sm">Keď niekto vyplní kontaktný formulár, pošleme ti e-mail. Cez <b>Resend</b> (resend.com — free 3000 e-mailov/mes.). Vlož API kľúč a adresu, kam to má chodiť. Pre vlastnú doménu odosielateľa treba doménu v Resende overiť; inak nechaj predvolené.</p>
+        <div className="agrid2">
+          <div><label className="alab">Kam posielať (tvoj e-mail)</label><input className="ain" value={s.notifyEmail || ''} onChange={e => set('notifyEmail', e.target.value)} placeholder="michal@monetico.sk" /></div>
+          <div><label className="alab">Resend API kľúč</label><input className="ain" type="password" value={s.resendKey || ''} onChange={e => set('resendKey', e.target.value)} placeholder="re_…" /></div>
+        </div>
+        <label className="alab">Odosielateľ (From)</label>
+        <input className="ain" value={s.resendFrom || ''} onChange={e => set('resendFrom', e.target.value)} placeholder="Monetico <onboarding@resend.dev>" />
       </div>
       <div className="arow"><button className="abtn" onClick={save}>Uložiť všetko</button>{msg && <span className="amut sm">{msg}</span>}</div>
     </>

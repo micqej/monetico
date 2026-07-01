@@ -18,6 +18,10 @@ export interface SiteSettings {
   // Webhook na napojenie newslettera na CRM
   webhookUrl: string
   webhookSecret: string
+  // E-mailové upozornenia (nové správy z kontaktu) cez Resend
+  notifyEmail: string       // kam poslať upozornenie
+  resendKey: string         // Resend API kľúč (re_…)
+  resendFrom: string        // odosielateľ (napr. "Monetico <web@monetico.sk>")
 }
 
 const SITEBEHAVIOUR_DEFAULT = `<script type="text/javascript">
@@ -29,6 +33,7 @@ export const DEFAULT_SITE: SiteSettings = {
   commentsEnabled: true, commentsModeration: true, recaptchaSiteKey: '', recaptchaSecret: '',
   openaiKey: '', pexelsKey: '', pixabayKey: '',
   webhookUrl: '', webhookSecret: '',
+  notifyEmail: '', resendKey: '', resendFrom: 'Monetico <onboarding@resend.dev>',
 }
 
 const KEY = 'site'

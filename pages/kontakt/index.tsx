@@ -21,9 +21,27 @@ const SERVICES = [
 export default function Kontakt() {
   const [selected, setSelected] = useState<string[]>([])
   const [sent, setSent] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+  const [f, setF] = useState({ name: '', email: '', phone: '', message: '', website: '' })
+  const set = (k: string, v: string) => setF(p => ({ ...p, [k]: v }))
 
   const toggle = (s: string) => {
     setSelected(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])
+  }
+
+  async function submit(e: any) {
+    e.preventDefault(); setBusy(true); setErr('')
+    try {
+      const r = await fetch('/api/contact', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...f, services: selected }),
+      })
+      const d = await r.json().catch(() => ({}))
+      if (!r.ok) throw new Error(d.error || 'Nepodarilo sa odoslať. Skúste to znova.')
+      setSent(true)
+    } catch (e: any) { setErr(e.message) }
+    setBusy(false)
   }
 
   return (
@@ -48,18 +66,19 @@ export default function Kontakt() {
                 <p style={{ color: 'rgba(10,10,10,0.7)', fontSize: '14px' }}>Ozveme sa vám do 24 hodín.</p>
               </div>
             ) : (
-              <form className="contact-form" onSubmit={e => { e.preventDefault(); setSent(true) }}>
+              <form className="contact-form" onSubmit={submit}>
+                <input type="text" tabIndex={-1} autoComplete="off" value={f.website} onChange={e => set('website', e.target.value)} aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }} />
                 <div className="form-group">
                   <label className="form-label">Meno a priezvisko *</label>
-                  <input className="form-input" type="text" placeholder="Ján Novák" required />
+                  <input className="form-input" type="text" placeholder="Ján Novák" required value={f.name} onChange={e => set('name', e.target.value)} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Email *</label>
-                  <input className="form-input" type="email" placeholder="jan@firma.sk" required />
+                  <input className="form-input" type="email" placeholder="jan@firma.sk" required value={f.email} onChange={e => set('email', e.target.value)} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Telefón</label>
-                  <input className="form-input" type="tel" placeholder="+421 900 000 000" />
+                  <input className="form-input" type="tel" placeholder="+421 900 000 000" value={f.phone} onChange={e => set('phone', e.target.value)} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">O čo máte záujem? (môžete vybrať viac)</label>
@@ -76,9 +95,10 @@ export default function Kontakt() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Správa</label>
-                  <textarea className="form-textarea" placeholder="Popíšte váš projekt alebo otázku..." />
+                  <textarea className="form-textarea" placeholder="Popíšte váš projekt alebo otázku..." value={f.message} onChange={e => set('message', e.target.value)} />
                 </div>
-                <button type="submit" className="btn-primary" style={{ alignSelf: 'flex-start', marginTop: '8px' }}>Odoslať správu →</button>
+                {err && <div style={{ color: '#dc2626', fontSize: 14, fontWeight: 600, marginTop: 4 }}>{err}</div>}
+                <button type="submit" className="btn-primary" disabled={busy} style={{ alignSelf: 'flex-start', marginTop: '8px', opacity: busy ? 0.6 : 1 }}>{busy ? 'Odosielam…' : 'Odoslať správu →'}</button>
               </form>
             )}
           </div>
